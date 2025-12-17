@@ -1,11 +1,15 @@
 package ratemysupps.entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity(name="brand")
+@Getter
+@Setter
 public class Brand {
 
     @Id
@@ -18,7 +22,11 @@ public class Brand {
     @Column(length = 1000)
     private String description;
 
+    @Column(nullable = false, unique = true)
     private String websiteUrl;
+
+    @Column(unique = true)
+    private String imageUrl;
 
     private String country;
 
@@ -28,6 +36,9 @@ public class Brand {
     private Double averageRating;
 
     private int totalReviews;
+
+    @Column(nullable = false)
+    private boolean isVerified;
 
     /*
     CascadeType.ALL
