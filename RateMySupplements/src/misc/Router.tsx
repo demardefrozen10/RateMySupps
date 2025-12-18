@@ -10,7 +10,7 @@ function Router() {
     <Routes>
       <Route path="/" element={<Home />} />
       <Route path="/brands" element={<BrandCatalog />} />
-      <Route path="/products" element={<ProductCatalog />} />
+      <Route path="/products/:brandId" element={<ProductCatalog />} />
       <Route path="/product" element={<ProductPage />} />
       <Route path="/add-review" element={<AddReview />} />
     </Routes>

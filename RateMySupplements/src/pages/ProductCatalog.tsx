@@ -1,8 +1,17 @@
+import { useLocation } from "react-router-dom";
 import BrandCard from "../components/BrandCard"
 import { useState } from "react"
+import type { Brand } from "../types/Brand";
 
 export default function ProductCatalog() {
-    const [currentImage, setCurrentImage] = useState(0)
+    const [currentImage, setCurrentImage] = useState(0);
+
+
+    const location = useLocation();
+    const brand: Brand = location.state?.brand;
+
+
+
     const images = [
         "https://via.placeholder.com/1200x300/10b981/ffffff?text=Revolution+Nutrition",
         "https://via.placeholder.com/1200x300/059669/ffffff?text=Revolution+Nutrition",
@@ -20,7 +29,7 @@ export default function ProductCatalog() {
                         <div className="absolute inset-0 bg-black/40"></div>
                         
                         <div className="absolute inset-0 flex items-center justify-center">
-                            <h1 className="text-6xl font-bold text-white drop-shadow-lg">Revolution Nutrition</h1>
+                            <h1 className="text-6xl font-bold text-white drop-shadow-lg">{brand.brandName}</h1>
                         </div>
 
                         <button 
@@ -83,8 +92,6 @@ export default function ProductCatalog() {
                 </div>
 
                 <div className="flex flex-col gap-4">
-                    <BrandCard/>
-                    <BrandCard/>
                     <BrandCard/>
                 </div>
             </div>

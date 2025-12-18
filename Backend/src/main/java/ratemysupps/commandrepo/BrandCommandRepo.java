@@ -4,7 +4,7 @@ import org.springframework.stereotype.Component;
 import ratemysupps.entity.Brand;
 import ratemysupps.icommandrepo.IBrandCommandRepo;
 import ratemysupps.repository.IBrandRepository;
-import ratemysupps.writemapper.WriteBrandMapper;
+import ratemysupps.mapper.WriteBrandMapper;
 import ratemysupps.writemodel.WriteBrand;
 
 @Component

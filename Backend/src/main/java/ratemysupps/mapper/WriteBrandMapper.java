@@ -1,4 +1,4 @@
-package ratemysupps.writemapper;
+package ratemysupps.mapper;
 
 import org.springframework.stereotype.Component;
 import ratemysupps.entity.Brand;
