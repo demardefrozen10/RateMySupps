@@ -1,10 +1,19 @@
-export default function BrandCard() {
+import type {Supplement} from "../types/Supplement";
+import { useNavigate } from "react-router-dom";
+export default function BrandCard(props: Supplement) {
+
+    const navigate = useNavigate();
+
+    const handleCardClick = () => {
+        navigate('/product');
+    }
+
     return (
-        <div className="flex items-center justify-between bg-white border-2 border-emerald-100 rounded-xl p-6 shadow-sm hover:shadow-lg hover:border-emerald-300 transition-all cursor-pointer">
+        <div onClick={handleCardClick} className="flex items-center justify-between bg-white border-2 border-emerald-100 rounded-xl p-6 shadow-sm hover:shadow-lg hover:border-emerald-300 transition-all cursor-pointer">
             <div className="flex items-center gap-6">
-                <div className="w-20 h-20 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden">
+                <div className="w-30 h-30 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden">
                     <img 
-                        src="https://via.placeholder.com/80" 
+                        src={props.imageUrl} 
                         alt="Brand Logo" 
                         className="w-full h-full object-cover"
                     />
@@ -12,7 +21,7 @@ export default function BrandCard() {
 
                 <div className="flex flex-col gap-1">
                     <h2 className="text-2xl font-bold text-gray-800 hover:text-emerald-600 transition-colors">
-                        Revolution Nutrition
+                        {props.supplementName}
                     </h2>
                 </div>
             </div>
@@ -22,10 +31,18 @@ export default function BrandCard() {
                     <span className="text-xs font-semibold text-emerald-600 uppercase tracking-wide mb-1">
                         Quality
                     </span>
-                    <div className="bg-gradient-to-br from-emerald-400 to-emerald-500 rounded-lg px-4 py-2 shadow-md">
-                        <span className="text-3xl font-bold text-white">2.9</span>
-                    </div>
-                    <span className="text-xs text-gray-500 mt-2">47 ratings</span>
+                    <div className={`rounded-lg px-4 py-2 shadow-md ${
+                    props.totalReviews === 0 
+                        ? 'bg-gray-400' 
+                        : props.averageRating <= 2 
+                            ? 'bg-gradient-to-br from-red-400 to-red-500'
+                            : props.averageRating <= 3
+                                ? 'bg-gradient-to-br from-yellow-400 to-yellow-500'
+                                : 'bg-gradient-to-br from-emerald-400 to-emerald-500'
+                    }`}>
+                    <span className="text-3xl font-bold text-white">{props.averageRating}</span>
+                </div>
+                    <span className="text-xs text-gray-500 mt-2">{props.totalReviews} ratings</span>
                 </div>
 
                 <div className="text-emerald-500">

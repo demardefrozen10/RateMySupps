@@ -1,21 +1,34 @@
 import { useState } from "react"
-
+import { useNavigate } from "react-router-dom"
 export default function AddReview() {
-    const [rating, setRating] = useState(0)
-    const [hoverRating, setHoverRating] = useState(0)
-    const [wouldPurchaseAgain, setWouldPurchaseAgain] = useState<boolean | null>(null)
-    const [review, setReview] = useState("")
-    const [images, setImages] = useState<File[]>([])
+    const [rating, setRating] = useState(0);
+    const [hoverRating, setHoverRating] = useState(0);
+    const [wouldPurchaseAgain, setWouldPurchaseAgain] = useState<boolean | null>(null);
+    const [review, setReview] = useState("");
+    const [images, setImages] = useState<File[]>([]);
+    const [proofOfPurchase, setProofOfPurchase] = useState<File | null>(null);
+    const navigate = useNavigate();
 
     const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const files = Array.from(e.target.files || [])
-        const remainingSlots = 5 - images.length
-        const newImages = files.slice(0, remainingSlots)
-        setImages([...images, ...newImages])
+        const files = Array.from(e.target.files || []);
+        const remainingSlots = 5 - images.length;
+        const newImages = files.slice(0, remainingSlots);
+        setImages([...images, ...newImages]);
+    }
+
+    const handleProofUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0]
+        if (file) {
+            setProofOfPurchase(file);
+        }
     }
 
     const removeImage = (index: number) => {
-        setImages(images.filter((_, i) => i !== index))
+        setImages(images.filter((_, i) => i !== index));
+    }
+
+    const removeProof = () => {
+        setProofOfPurchase(null);
     }
 
     return (
@@ -104,6 +117,7 @@ export default function AddReview() {
                     <div className="mb-8">
                         <label className="block text-lg font-bold text-gray-800 mb-3">
                             Your Review <span className="text-red-500">*</span>
+                            
                         </label>
                         <textarea
                             value={review}
@@ -113,10 +127,60 @@ export default function AddReview() {
                             maxLength={1000}
                         />
                         <div className="flex justify-between items-center mt-2">
+                            
                             <p className="text-sm text-gray-500">
-                                {review.length}/1000 characters
+                                {review.length}/200 characters
                             </p>
                         </div>
+                    </div>
+
+                    <div className="mb-8">
+                        <label className="block text-lg font-bold text-gray-800 mb-3">
+                            Proof of Purchase <span className="text-red-500">*</span>
+                        </label>
+                        <p className="text-sm text-gray-600 mb-3">
+                            Upload a receipt or order confirmation to verify that you have purchased this product.
+                        </p>
+                        
+                        {!proofOfPurchase ? (
+                            <label className="cursor-pointer">
+                                <div className="border-2 border-dashed border-emerald-300 bg-emerald-50 rounded-lg p-6 text-center hover:border-emerald-500 hover:bg-emerald-100 transition-all">
+                                    <svg className="mx-auto h-10 w-10 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                    </svg>
+                                    <p className="mt-2 text-sm text-gray-700">
+                                        <span className="font-semibold text-emerald-600">Click to upload</span>
+                                    </p>
+                                    <p className="text-xs text-gray-500 mt-1">PDF, PNG, JPG up to 10MB</p>
+                                </div>
+                                <input
+                                    type="file"
+                                    accept="image/*,.pdf"
+                                    onChange={handleProofUpload}
+                                    className="hidden"
+                                />
+                            </label>
+                        ) : (
+                            <div className="bg-emerald-50 border-2 border-emerald-300 rounded-lg p-4 flex items-center justify-between">
+                                <div className="flex items-center gap-3">
+                                    <svg className="w-8 h-8 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    <div>
+                                        <p className="font-semibold text-gray-800">{proofOfPurchase.name}</p>
+                                        <p className="text-xs text-gray-600">
+                                            {(proofOfPurchase.size / 1024).toFixed(2)} KB
+                                        </p>
+                                    </div>
+                                </div>
+                                <button
+                                    onClick={removeProof}
+                                    className="bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center hover:bg-red-600 transition-colors"
+                                >
+                                    ×
+                                </button>
+                            </div>
+                        )}
                     </div>
 
                     <div className="mb-8">
@@ -124,7 +188,7 @@ export default function AddReview() {
                             Add Photos (Optional)
                         </label>
                         <p className="text-sm text-gray-600 mb-3">
-                            Upload up to 5 images to support your review
+                            Upload up to 5 images to support your review.
                         </p>
                         
                         {images.length < 5 && (
@@ -134,7 +198,7 @@ export default function AddReview() {
                                         <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                                     </svg>
                                     <p className="mt-2 text-sm text-gray-600">
-                                        <span className="font-semibold text-emerald-600">Click to upload</span> or drag and drop
+                                        <span className="font-semibold text-emerald-600">Click to upload</span>
                                     </p>
                                     <p className="text-xs text-gray-500 mt-1">PNG, JPG, GIF up to 10MB</p>
                                 </div>
@@ -192,11 +256,11 @@ export default function AddReview() {
                     </div>
 
                     <div className="flex gap-4">
-                        <button className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-4 rounded-xl transition-colors">
+                        <button className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-4 rounded-xl transition-colors" onClick={() => navigate(-1)}>
                             Cancel
                         </button>
                         <button 
-                            disabled={!rating || wouldPurchaseAgain === null || !review.trim()}
+                            disabled={!rating || wouldPurchaseAgain === null || !review.trim() || !proofOfPurchase}
                             className="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-4 rounded-xl transition-colors shadow-lg disabled:bg-gray-300 disabled:cursor-not-allowed"
                         >
                             Submit Review
