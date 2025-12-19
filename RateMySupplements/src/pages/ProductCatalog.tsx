@@ -1,15 +1,32 @@
 import { useLocation } from "react-router-dom";
 import BrandCard from "../components/BrandCard"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import type { Brand } from "../types/Brand";
+import useFetch from "../hooks/useFetch";
+import type {Supplement} from "../types/Supplement";
+
 
 export default function ProductCatalog() {
     const [currentImage, setCurrentImage] = useState(0);
+    const [supplements, setSupplements] = useState<Supplement[]>([]);
+
+    const { get } = useFetch("http://localhost:8080/api/supplement/");
 
 
     const location = useLocation();
     const brand: Brand = location.state?.brand;
 
+
+    useEffect(() => {
+        get(`getSupplements?brandId=${brand.id}`).then((data: Supplement[]) => {
+            setSupplements(data);
+        }).catch((error) => {
+            console.error("Error fetching supplements:", error);
+        });
+    }, [brand.id]); 
+
+
+    console.log(supplements);
 
 
     const images = [
@@ -70,12 +87,12 @@ export default function ProductCatalog() {
                         className="flex-1 max-w-md px-4 py-2 rounded-lg border-2 border-gray-200 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200 transition-all"
                     />
                     
-                    <button className="px-4 py-2 bg-emerald-500 text-white rounded-lg font-medium hover:bg-emerald-600 transition-colors">
-                        Highest Rated
-                    </button>
-                    <button className="px-4 py-2 bg-white text-gray-700 border-2 border-gray-200 rounded-lg font-medium hover:border-emerald-300 transition-colors">
-                        Most Reviews
-                    </button>
+                    <select className="px-4 py-2 bg-white text-gray-700 border-2 border-gray-200 rounded-lg font-medium hover:border-emerald-300 focus:border-emerald-500 focus:outline-none transition-colors cursor-pointer">
+                            <option value="">Sort By</option>
+                            <option value="highest-rated">Highest Rated</option>
+                            <option value="most-reviews">Most Reviews</option>
+                            <option value="a-z">A-Z</option>
+                        </select>
                     
                     <select className="px-4 py-2 bg-white text-gray-700 border-2 border-gray-200 rounded-lg font-medium hover:border-emerald-300 focus:border-emerald-500 focus:outline-none transition-colors cursor-pointer">
                         <option value="">Filter</option>
@@ -88,11 +105,19 @@ export default function ProductCatalog() {
                 </div>
 
                 <div className="mb-6 text-sm text-gray-600">
-                    Can't find a product? <button className="text-emerald-600 hover:text-emerald-700 font-semibold underline">Add a product here</button>
+                    Can't find what you're looking for? <button className="text-emerald-600 hover:text-emerald-700 font-semibold underline">Add a supplement here</button>
                 </div>
 
                 <div className="flex flex-col gap-4">
-                    <BrandCard/>
+                    {supplements.map((supplement, index) => (
+                    <BrandCard 
+                        key={index}
+                        supplementName={supplement.supplementName}
+                        imageUrl={supplement.imageUrl}
+                        averageRating={supplement.averageRating}
+                        totalReviews={supplement.totalReviews}
+                    />
+                    ))}
                 </div>
             </div>
         </div>

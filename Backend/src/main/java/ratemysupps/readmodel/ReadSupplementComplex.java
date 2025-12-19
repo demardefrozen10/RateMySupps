@@ -1,0 +1,27 @@
+package ratemysupps.readmodel;
+
+
+import lombok.Getter;
+import lombok.Setter;
+
+import java.util.List;
+
+@Getter
+@Setter
+public class ReadSupplementComplex {
+
+    public Long id;
+
+    public String supplementName;
+
+    public double averageRating;
+
+    public int totalReviews;
+
+    public String imageUrl;
+
+    public List<Integer> servingSizes;
+
+    public List<String> flavors;
+
+}

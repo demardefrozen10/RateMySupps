@@ -1,7 +1,10 @@
 import { useState } from "react"
+import { useNavigate } from "react-router-dom"
 
 export default function ProductPage() {
-    const [selectedImage, setSelectedImage] = useState(0)
+    const [selectedImage, setSelectedImage] = useState(0);
+
+    const navigate = useNavigate();
     
     const productImages = [
         "https://via.placeholder.com/500x500/10b981/ffffff?text=Product+Image+1",
@@ -14,6 +17,11 @@ export default function ProductPage() {
         { id: 2, author: "Sarah M.", rating: 4, date: "Dec 8, 2025", comment: "Good quality protein. A bit pricey but worth it for the results.", helpful: 15 },
         { id: 3, author: "Mike R.", rating: 5, date: "Dec 5, 2025", comment: "Best protein powder I've tried. No bloating and tastes great!", helpful: 32 }
     ]
+
+
+    const HandleReviewClick = () => {
+        navigate('/add-review');
+    }
 
     return (
         <div className="min-h-screen to-white">
@@ -87,7 +95,7 @@ export default function ProductPage() {
                             </div>
                         </div>
 
-                        <button className="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-4 rounded-xl transition-colors shadow-lg mb-4">
+                        <button className="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-4 rounded-xl transition-colors shadow-lg mb-4" onClick={HandleReviewClick}>
                             Leave a Review
                         </button>
                         

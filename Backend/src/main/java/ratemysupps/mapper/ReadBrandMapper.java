@@ -16,6 +16,7 @@ public class ReadBrandMapper {
         readBrand.setWebsiteUrl(brand.getWebsiteUrl());
         readBrand.setAverageRating(brand.getAverageRating());
         readBrand.setTotalReviews(brand.getTotalReviews());
+        readBrand.setId(brand.getId());
 
         return readBrand;
     }

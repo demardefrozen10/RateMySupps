@@ -13,4 +13,6 @@ public interface IBrandQueryRepo {
     public List<ReadBrand> getBrandByName(String name);
 
     public List<Brand> getAllBrands();
+
+    public ReadSupplementComplex getSupplementById(Long supplementId);
 }

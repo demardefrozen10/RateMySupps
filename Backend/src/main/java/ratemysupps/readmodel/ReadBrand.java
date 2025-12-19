@@ -16,4 +16,6 @@ public class ReadBrand {
 
     public int totalReviews;
 
+    public Long id;
+
 }

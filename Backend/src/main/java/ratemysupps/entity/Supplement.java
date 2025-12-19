@@ -1,31 +1,50 @@
 package ratemysupps.entity;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
-import java.io.Serializable;
+import java.time.LocalDateTime;
 
 @Entity(name="supplement")
+@Getter
+@Setter
 public class Supplement {
 
 
     @Id
-    @ManyToOne
-    @JoinColumn(name = "brandName", referencedColumnName = "brandName")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "brand_id", nullable = false)
     private Brand brand;
 
-    @Id
     @Column(nullable = false)
     private String supplementName;
 
     private Double averageRating;
 
-    private int totalReviews;
+    private Integer totalReviews;
 
+    private String description;
 
-    public class SupplementId implements Serializable {
-        private Brand brand;
-        private String supplementName;
-    }
+    @Column(nullable = false)
+    private boolean isVerified;
+
+    @Column(nullable = false)
+    private LocalDateTime createdAt;
+
+    @Column(unique = true)
+    private String imageUrl;
+
+    @ManyToMany
+    @JoinTable(
+            name = "supplement_tag",
+            joinColumns = @JoinColumn(name = "supplement_id"),
+            inverseJoinColumns = @JoinColumn(name = "tag_id")
+    )
+    private Set<Tag> tags;
 
 }
-

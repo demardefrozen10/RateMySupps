@@ -23,6 +23,7 @@ public class WriteBrandMapper {
         brand.setAverageRating(0.0);
         brand.setTotalReviews(0);
 
+
         return brand;
     }
 }
