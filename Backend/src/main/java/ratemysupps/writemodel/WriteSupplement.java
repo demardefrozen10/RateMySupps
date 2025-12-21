@@ -2,6 +2,8 @@ package ratemysupps.writemodel;
 
 import lombok.Getter;
 
+import java.util.List;
+
 @Getter
 public class WriteSupplement {
 
@@ -14,4 +16,6 @@ public class WriteSupplement {
     private String productUrl;
 
     private String imageUrl;
+
+    public List<String> getServingSizes;
 }

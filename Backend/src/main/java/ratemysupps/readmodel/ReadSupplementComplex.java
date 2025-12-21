@@ -20,7 +20,7 @@ public class ReadSupplementComplex {
 
     public String imageUrl;
 
-    public List<Integer> servingSizes;
+    public List<String> servingSizes;
 
     public List<String> flavors;
 

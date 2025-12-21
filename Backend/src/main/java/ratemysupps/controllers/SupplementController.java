@@ -11,6 +11,7 @@ import ratemysupps.entity.Supplement;
 import ratemysupps.icommandrepo.ISupplementCommandRepo;
 import ratemysupps.iqueryrepo.ISupplementQueryRepo;
 import ratemysupps.readmodel.ReadSupplement;
+import ratemysupps.readmodel.ReadSupplementComplex;
 import ratemysupps.writemodel.WriteSupplement;
 
 import java.util.List;

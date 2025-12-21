@@ -24,7 +24,7 @@ public class BrandQueryRepo implements IBrandQueryRepo {
 
     public List<ReadBrand> getBrandByName(String name) {
 
-        return brandRepo.findBybrandNameContainingIgnoreCase(name).stream().map(mapper::toEntity).collect(Collectors.toList());
+        return brandRepo.findBybrandNameContainingIgnoreCase(name).stream().map(mapper::fromEntity).collect(Collectors.toList());
     }
 
     @Override

@@ -1,10 +1,13 @@
 package ratemysupps.iqueryrepo;
 
 import ratemysupps.readmodel.ReadSupplement;
+import ratemysupps.readmodel.ReadSupplementComplex;
 
 import java.util.List;
 
 public interface ISupplementQueryRepo {
 
-    public List<ReadSupplement> getAllSupplementsByBrand(Long brandId);
+    List<ReadSupplement> getAllSupplementsByBrand(Long brandId);
+
+    ReadSupplementComplex getSupplementById(Long supplementId);
 }

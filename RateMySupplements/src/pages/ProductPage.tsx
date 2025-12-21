@@ -1,10 +1,41 @@
-import { useState } from "react"
-import { useNavigate } from "react-router-dom"
-
+import { useState, useEffect } from "react"
+import { useLocation, useNavigate } from "react-router-dom"
+import useFetch from "../hooks/useFetch";
+import type { Supplement } from "../types/Supplement";
+import type { Review } from "../types/Review";
+import ReviewStrip from "../components/ReviewStrip";
 export default function ProductPage() {
     const [selectedImage, setSelectedImage] = useState(0);
+    const [supplement, setSupplement] = useState<Supplement>();
+    const [reviews, setReviews] = useState<Review[]>([]);
+    
 
     const navigate = useNavigate();
+    const location = useLocation();
+
+    const supplementId: number = location.state?.supplementId; 
+    const brandName: string = location.state?.brandName;
+
+
+
+    const {get} = useFetch("http://localhost:8080/api/");
+
+
+    useEffect(() => {
+        get(`supplement/getSupplement?supplementId=${supplementId}`).then((data) => {
+            setSupplement(data);
+        });
+    }, []);
+
+
+    useEffect(() => {
+        get(`review/getReviews?supplementId=${supplementId}`).then((data) => {
+            setReviews(data);
+        });
+    }, [])
+
+    console.log(reviews);
+
     
     const productImages = [
         "https://via.placeholder.com/500x500/10b981/ffffff?text=Product+Image+1",
@@ -12,16 +43,32 @@ export default function ProductPage() {
         "https://via.placeholder.com/500x500/047857/ffffff?text=Product+Image+3"
     ]
 
-    const reviews = [
-        { id: 1, author: "John D.", rating: 5, date: "Dec 10, 2025", comment: "Amazing product! Really helped with my gains. The chocolate flavor is delicious and mixes well.", helpful: 24 },
-        { id: 2, author: "Sarah M.", rating: 4, date: "Dec 8, 2025", comment: "Good quality protein. A bit pricey but worth it for the results.", helpful: 15 },
-        { id: 3, author: "Mike R.", rating: 5, date: "Dec 5, 2025", comment: "Best protein powder I've tried. No bloating and tastes great!", helpful: 32 }
-    ]
 
 
     const HandleReviewClick = () => {
         navigate('/add-review');
     }
+
+    const getRatingBgColor = (rating: number, totalReviews: number) => {
+        if (totalReviews === 0) return 'bg-gray-400';
+        if (rating <= 2) return 'bg-gradient-to-br from-red-400 to-red-500';
+        if (rating <= 3) return 'bg-gradient-to-br from-yellow-400 to-yellow-500';
+        return 'bg-gradient-to-br from-emerald-400 to-emerald-500';
+    }
+
+    const getRatingDistribution = () => {
+        const distribution: Record<number, number> = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
+        reviews.forEach((review) => {
+            const rating = Math.floor(review.rating);
+            if (rating >= 1 && rating <= 5) {
+                distribution[rating]++;
+            }
+        });
+        return distribution;
+    };
+
+    const ratingDistribution = getRatingDistribution();
+    const totalReviewCount = reviews.length;
 
     return (
         <div className="min-h-screen to-white">
@@ -55,19 +102,19 @@ export default function ProductPage() {
                     <div>
                         <div className="mb-4">
                             <a href="#" className="text-emerald-600 hover:text-emerald-700 font-semibold mb-2 inline-block">
-                                Revolution Nutrition
+                                {brandName}
                             </a>
                             <h1 className="text-4xl font-bold text-gray-800 mb-4">
-                                Gold Standard Whey Protein
+                                {supplement?.supplementName}
                             </h1>
                             <div className="flex items-center gap-4 mb-4">
                                 <div className="flex items-center gap-2">
-                                    <div className="bg-gradient-to-br from-emerald-400 to-emerald-500 rounded-lg px-4 py-2 shadow-md">
-                                        <span className="text-3xl font-bold text-white">4.8</span>
+                                    <div className={`${getRatingBgColor(supplement?.averageRating ?? 0, supplement?.totalReviews ?? 0)} rounded-lg px-4 py-2 shadow-md`}>
+                                        <span className="text-3xl font-bold text-white">{supplement?.averageRating?.toFixed(2)}</span>
                                     </div>
                                     <div>
-                                        <div className="text-sm font-semibold text-gray-700">Excellent</div>
-                                        <div className="text-xs text-gray-500">Based on 156 reviews</div>
+                                        <div className="text-sm font-semibold text-gray-700">No Reviews Yet</div>
+                                        <div className="text-xs text-gray-500">Based on {supplement?.totalReviews} reviews</div>
                                     </div>
                                 </div>
                             </div>
@@ -87,10 +134,6 @@ export default function ProductPage() {
                                 <div className="flex justify-between">
                                     <span className="text-gray-600">Protein per Serving:</span>
                                     <span className="font-semibold">24g</span>
-                                </div>
-                                <div className="flex justify-between">
-                                    <span className="text-gray-600">Flavors:</span>
-                                    <span className="font-semibold">Chocolate, Vanilla, Strawberry</span>
                                 </div>
                             </div>
                         </div>
@@ -122,56 +165,27 @@ export default function ProductPage() {
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8 pb-8 border-b">
-                        {[5, 4, 3, 2, 1].map((stars) => (
-                            <div key={stars} className="flex items-center gap-2">
-                                <span className="text-sm font-medium">{stars}★</span>
-                                <div className="flex-1 bg-gray-200 rounded-full h-2">
-                                    <div 
-                                        className="bg-emerald-500 h-2 rounded-full" 
-                                        style={{ width: `${stars === 5 ? 70 : stars === 4 ? 20 : 5}%` }}
-                                    />
+                        {[5, 4, 3, 2, 1].map((stars) => {
+                            const count = ratingDistribution[stars];
+                            const percentage = totalReviewCount > 0 ? (count / totalReviewCount) * 100 : 0;
+                            return (
+                                <div key={stars} className="flex items-center gap-2">
+                                    <span className="text-sm font-medium">{stars}★</span>
+                                    <div className="flex-1 bg-gray-200 rounded-full h-2">
+                                        <div 
+                                            className="bg-emerald-500 h-2 rounded-full" 
+                                            style={{ width: `${percentage}%` }}
+                                        />
+                                    </div>
+                                    <span className="text-xs text-gray-500">{count}</span>
                                 </div>
-                                <span className="text-xs text-gray-500">{stars === 5 ? 110 : stars === 4 ? 31 : 5}</span>
-                            </div>
-                        ))}
+                            );
+                        })}
                     </div>
 
                     <div className="space-y-6">
                         {reviews.map((review) => (
-                            <div key={review.id} className="border-b pb-6 last:border-b-0">
-                                <div className="flex items-start justify-between mb-3">
-                                    <div>
-                                        <div className="flex items-center gap-2 mb-2">
-                                            <div className="flex items-center gap-1 bg-emerald-50 px-3 py-1 rounded-full">
-                                                <svg className="w-4 h-4 text-emerald-600" fill="currentColor" viewBox="0 0 20 20">
-                                                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                                                </svg>
-                                                <span className="text-sm font-semibold text-emerald-700">Verified Purchase</span>
-                                            </div>
-                                            <span className="text-xs text-gray-500">{review.date}</span>
-                                        </div>
-                                        <div className="flex gap-1 mb-2">
-                                            {[...Array(5)].map((_, idx) => (
-                                                <span key={idx} className={idx < review.rating ? "text-yellow-400" : "text-gray-300"}>
-                                                    ★
-                                                </span>
-                                            ))}
-                                        </div>
-                                    </div>
-                                </div>
-                                <p className="text-gray-700 mb-3">{review.comment}</p>
-                                <div className="flex items-center gap-4 text-sm">
-                                    <button className="text-gray-500 hover:text-emerald-600 flex items-center gap-1">
-                                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5" />
-                                        </svg>
-                                        Helpful ({review.helpful})
-                                    </button>
-                                    <button className="text-gray-500 hover:text-red-600">
-                                        Report
-                                    </button>
-                                </div>
-                            </div>
+                           <ReviewStrip key={review.id} {...review} />
                         ))}
                     </div>
 

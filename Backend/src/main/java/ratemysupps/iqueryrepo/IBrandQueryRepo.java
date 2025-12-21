@@ -14,5 +14,4 @@ public interface IBrandQueryRepo {
 
     public List<Brand> getAllBrands();
 
-    public ReadSupplementComplex getSupplementById(Long supplementId);
 }
