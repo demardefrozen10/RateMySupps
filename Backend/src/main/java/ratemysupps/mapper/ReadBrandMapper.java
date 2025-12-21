@@ -7,8 +7,9 @@ import ratemysupps.readmodel.ReadBrand;
 @Component
 public class ReadBrandMapper {
 
-    public ReadBrand toEntity(Brand brand) {
+    public ReadBrand fromEntity(Brand brand) {
         ReadBrand readBrand = new ReadBrand();
+
 
         readBrand.setBrandName(brand.getBrandName());
         readBrand.setCountry(brand.getCountry());

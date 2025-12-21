@@ -26,8 +26,6 @@ export default function ProductCatalog() {
     }, [brand.id]); 
 
 
-    console.log(supplements);
-
 
     const images = [
         "https://via.placeholder.com/1200x300/10b981/ffffff?text=Revolution+Nutrition",
@@ -112,10 +110,12 @@ export default function ProductCatalog() {
                     {supplements.map((supplement, index) => (
                     <BrandCard 
                         key={index}
+                        id={supplement.id}
                         supplementName={supplement.supplementName}
                         imageUrl={supplement.imageUrl}
                         averageRating={supplement.averageRating}
                         totalReviews={supplement.totalReviews}
+                        brand={brand.brandName}
                     />
                     ))}
                 </div>

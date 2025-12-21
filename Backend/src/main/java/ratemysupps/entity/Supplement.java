@@ -1,11 +1,14 @@
 package ratemysupps.entity;
 
-import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @Entity(name="supplement")
 @Getter
@@ -39,12 +42,19 @@ public class Supplement {
     @Column(unique = true)
     private String imageUrl;
 
-    @ManyToMany
+    @Column(nullable = false)
+    private List<String> servingSizes;
+
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "supplement_tag",
             joinColumns = @JoinColumn(name = "supplement_id"),
             inverseJoinColumns = @JoinColumn(name = "tag_id")
     )
     private Set<Tag> tags;
+
+
+    @OneToMany(mappedBy = "supplement", orphanRemoval = true)
+    private List<Review> reviews = new ArrayList<>();
 
 }

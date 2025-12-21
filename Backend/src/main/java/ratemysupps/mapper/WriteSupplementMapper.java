@@ -31,6 +31,8 @@ public class WriteSupplementMapper {
 
         supplement.setCreatedAt(LocalDateTime.now());
 
+        supplement.setServingSizes(writeSupplement.getGetServingSizes());
+
 
         return supplement;
     }
