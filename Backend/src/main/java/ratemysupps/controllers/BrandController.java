@@ -6,8 +6,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ratemysupps.entity.Brand;
-import ratemysupps.icommandrepo.IBrandCommandRepo;
-import ratemysupps.iqueryrepo.IBrandQueryRepo;
+import ratemysupps.icommandservice.IBrandCommandService;
+import ratemysupps.iqueryservice.IBrandQueryService;
 import ratemysupps.readmodel.ReadBrand;
 import ratemysupps.writemodel.WriteBrand;
 
@@ -18,11 +18,11 @@ import java.util.List;
 public class BrandController {
 
 
-    private final IBrandQueryRepo queryRepo;
-    private final IBrandCommandRepo commandRepo;
+    private final IBrandQueryService queryRepo;
+    private final IBrandCommandService commandRepo;
 
     @Autowired
-    public BrandController(IBrandQueryRepo queryRepo, IBrandCommandRepo commandRepo) {
+    public BrandController(IBrandQueryService queryRepo, IBrandCommandService commandRepo) {
         this.queryRepo = queryRepo;
         this.commandRepo = commandRepo;
     }

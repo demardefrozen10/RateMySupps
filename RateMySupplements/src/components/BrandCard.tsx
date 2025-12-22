@@ -40,7 +40,7 @@ export default function BrandCard(props: Supplement) {
                                 ? 'bg-gradient-to-br from-yellow-400 to-yellow-500'
                                 : 'bg-gradient-to-br from-emerald-400 to-emerald-500'
                     }`}>
-                    <span className="text-3xl font-bold text-white">{props.averageRating}</span>
+                    <span className="text-3xl font-bold text-white">{props.averageRating.toFixed(1)}</span>
                 </div>
                     <span className="text-xs text-gray-500 mt-2">{props.totalReviews} ratings</span>
                 </div>

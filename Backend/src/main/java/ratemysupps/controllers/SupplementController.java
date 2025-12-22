@@ -6,10 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ratemysupps.entity.Brand;
 import ratemysupps.entity.Supplement;
-import ratemysupps.icommandrepo.ISupplementCommandRepo;
-import ratemysupps.iqueryrepo.ISupplementQueryRepo;
+import ratemysupps.icommandservice.ISupplementCommandService;
+import ratemysupps.iqueryservice.ISupplementQueryService;
 import ratemysupps.readmodel.ReadSupplement;
 import ratemysupps.readmodel.ReadSupplementComplex;
 import ratemysupps.writemodel.WriteSupplement;
@@ -20,12 +19,12 @@ import java.util.List;
 @RequestMapping("/api/supplement")
 public class SupplementController {
 
-    private final ISupplementCommandRepo commandRepo;
-    private final ISupplementQueryRepo queryRepo;
+    private final ISupplementCommandService commandRepo;
+    private final ISupplementQueryService queryRepo;
 
 
     @Autowired
-    public SupplementController(ISupplementQueryRepo queryRepo, ISupplementCommandRepo commandRepo) {
+    public SupplementController(ISupplementQueryService queryRepo, ISupplementCommandService commandRepo) {
         this.queryRepo = queryRepo;
         this.commandRepo = commandRepo;
     }

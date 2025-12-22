@@ -5,13 +5,10 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ratemysupps.entity.Brand;
 import ratemysupps.entity.Review;
-import ratemysupps.icommandrepo.IReviewCommandRepo;
-import ratemysupps.iqueryrepo.IReviewQueryRepo;
+import ratemysupps.icommandservice.IReviewCommandService;
+import ratemysupps.iqueryservice.IReviewQueryService;
 import ratemysupps.readmodel.ReadReview;
-import ratemysupps.repository.IReviewRepository;
-import ratemysupps.writemodel.WriteBrand;
 import ratemysupps.writemodel.WriteReview;
 
 import java.util.List;
@@ -21,9 +18,9 @@ import java.util.List;
 
 public class ReviewController {
 
-    IReviewCommandRepo commandRepo;
-    IReviewQueryRepo queryRepo;
-    public ReviewController(IReviewCommandRepo commandRepo, IReviewQueryRepo repo) {
+    IReviewCommandService commandRepo;
+    IReviewQueryService queryRepo;
+    public ReviewController(IReviewCommandService commandRepo, IReviewQueryService repo) {
         this.commandRepo = commandRepo;
         this.queryRepo = repo;
     }

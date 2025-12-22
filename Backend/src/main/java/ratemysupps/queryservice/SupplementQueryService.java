@@ -1,27 +1,23 @@
-package ratemysupps.queryrepo;
+package ratemysupps.queryservice;
 
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import ratemysupps.entity.Supplement;
-import ratemysupps.iqueryrepo.ISupplementQueryRepo;
-import ratemysupps.mapper.ReadBrandMapper;
+import ratemysupps.iqueryservice.ISupplementQueryService;
 import ratemysupps.mapper.ReadSupplementMapper;
-import ratemysupps.mapper.WriteBrandMapper;
 import ratemysupps.readmodel.ReadSupplement;
 import ratemysupps.readmodel.ReadSupplementComplex;
-import ratemysupps.repository.IBrandRepository;
 import ratemysupps.repository.ISupplementRepository;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
-@Component
-public class SupplementQueryRepo implements ISupplementQueryRepo {
+@Service
+public class SupplementQueryService implements ISupplementQueryService {
 
 
     private final ReadSupplementMapper mapper;
     private final ISupplementRepository repo;
-    public SupplementQueryRepo(ReadSupplementMapper mapper, ISupplementRepository repo) {
+    public SupplementQueryService(ReadSupplementMapper mapper, ISupplementRepository repo) {
         this.mapper = mapper;
         this.repo = repo;
     }

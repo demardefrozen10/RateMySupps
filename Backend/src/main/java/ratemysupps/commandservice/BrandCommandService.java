@@ -1,18 +1,18 @@
-package ratemysupps.commandrepo;
+package ratemysupps.commandservice;
 
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import ratemysupps.entity.Brand;
-import ratemysupps.icommandrepo.IBrandCommandRepo;
+import ratemysupps.icommandservice.IBrandCommandService;
 import ratemysupps.repository.IBrandRepository;
 import ratemysupps.mapper.WriteBrandMapper;
 import ratemysupps.writemodel.WriteBrand;
 
-@Component
-public class BrandCommandRepo implements IBrandCommandRepo {
+@Service
+public class BrandCommandService implements IBrandCommandService {
 
     private final WriteBrandMapper mapper;
     private final IBrandRepository repo;
-    public BrandCommandRepo(WriteBrandMapper mapper, IBrandRepository repo) {
+    public BrandCommandService(WriteBrandMapper mapper, IBrandRepository repo) {
         this.mapper = mapper;
         this.repo = repo;
     }
