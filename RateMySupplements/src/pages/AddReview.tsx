@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { useNavigate } from "react-router-dom"
+import { useNavigate, useLocation } from "react-router-dom"
 export default function AddReview() {
     const [rating, setRating] = useState(0);
     const [hoverRating, setHoverRating] = useState(0);
@@ -8,6 +8,14 @@ export default function AddReview() {
     const [images, setImages] = useState<File[]>([]);
     const [proofOfPurchase, setProofOfPurchase] = useState<File | null>(null);
     const navigate = useNavigate();
+    const location = useLocation();
+
+    const supplementId: number = location.state?.supplementId;
+    const brandName: string = location.state?.brandName;
+    const supplementName: string = location.state?.supplementName;
+    const imageUrl: string = location.state?.imageUrl;
+
+
 
     const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         const files = Array.from(e.target.files || []);
@@ -31,6 +39,35 @@ export default function AddReview() {
         setProofOfPurchase(null);
     }
 
+    const handleStarClick = (star: number, e: React.MouseEvent<HTMLButtonElement>) => {
+        const rect = e.currentTarget.getBoundingClientRect();
+        const clickX = e.clientX - rect.left;
+        const isLeftHalf = clickX < rect.width / 2;
+        setRating(isLeftHalf ? star - 0.5 : star);
+    };
+
+    const handleStarHover = (star: number, e: React.MouseEvent<HTMLButtonElement>) => {
+        const rect = e.currentTarget.getBoundingClientRect();
+        const hoverX = e.clientX - rect.left;
+        const isLeftHalf = hoverX < rect.width / 2;
+        setHoverRating(isLeftHalf ? star - 0.5 : star);
+    };
+
+    const renderStar = (star: number, currentRating: number) => {
+        if (star <= currentRating) {
+            return <span className="text-yellow-400">★</span>;
+        } else if (star - 0.5 === currentRating) {
+            return (
+                <span className="relative inline-block">
+                    <span className="text-gray-300">★</span>
+                    <span className="absolute left-0 top-0 overflow-hidden text-yellow-400" style={{ width: '50%' }}>★</span>
+                </span>
+            );
+        } else {
+            return <span className="text-gray-300">★</span>;
+        }
+    };
+
     return (
         <div className="min-h-screen">
             <div className="max-w-3xl mx-auto px-4 py-12">
@@ -44,14 +81,14 @@ export default function AddReview() {
                         <div className="flex items-center gap-4">
                             <div className="w-16 h-16 bg-gray-100 rounded-lg">
                                 <img 
-                                    src="https://via.placeholder.com/64" 
+                                    src={imageUrl}
                                     alt="Product" 
                                     className="w-full h-full object-cover rounded-lg"
                                 />
                             </div>
                             <div>
-                                <p className="text-sm text-emerald-600 font-semibold">Revolution Nutrition</p>
-                                <h3 className="text-xl font-bold text-gray-800">Gold Standard Whey Protein</h3>
+                                <p className="text-sm text-emerald-600 font-semibold">{brandName}</p>
+                                <h3 className="text-xl font-bold text-gray-800">{supplementName}</h3>
                             </div>
                         </div>
                     </div>
@@ -64,18 +101,12 @@ export default function AddReview() {
                             {[1, 2, 3, 4, 5].map((star) => (
                                 <button
                                     key={star}
-                                    onClick={() => setRating(star)}
-                                    onMouseEnter={() => setHoverRating(star)}
+                                    onClick={(e) => handleStarClick(star, e)}
+                                    onMouseMove={(e) => handleStarHover(star, e)}
                                     onMouseLeave={() => setHoverRating(0)}
                                     className="text-5xl transition-colors focus:outline-none"
                                 >
-                                    <span className={
-                                        star <= (hoverRating || rating) 
-                                            ? "text-yellow-400" 
-                                            : "text-gray-300"
-                                    }>
-                                        ★
-                                    </span>
+                                    {renderStar(star, hoverRating || rating)}
                                 </button>
                             ))}
                         </div>

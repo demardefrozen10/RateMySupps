@@ -5,7 +5,6 @@ import type { Supplement } from "../types/Supplement";
 import type { Review } from "../types/Review";
 import ReviewStrip from "../components/ReviewStrip";
 export default function ProductPage() {
-    const [selectedImage, setSelectedImage] = useState(0);
     const [supplement, setSupplement] = useState<Supplement>();
     const [reviews, setReviews] = useState<Review[]>([]);
     
@@ -34,19 +33,13 @@ export default function ProductPage() {
         });
     }, [])
 
-    console.log(reviews);
-
     
-    const productImages = [
-        "https://via.placeholder.com/500x500/10b981/ffffff?text=Product+Image+1",
-        "https://via.placeholder.com/500x500/059669/ffffff?text=Product+Image+2",
-        "https://via.placeholder.com/500x500/047857/ffffff?text=Product+Image+3"
-    ]
+  
 
 
 
     const HandleReviewClick = () => {
-        navigate('/add-review');
+        navigate('/add-review', { state: { supplementId, brandName, supplementName: supplement?.supplementName, imageUrl: supplement?.imageUrl } });
     }
 
     const getRatingBgColor = (rating: number, totalReviews: number) => {
@@ -77,28 +70,14 @@ export default function ProductPage() {
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-12">
                     <div>
-                        <div className="bg-white rounded-xl shadow-lg p-8 mb-4">
+                        <div className="bg-white rounded-xl shadow-lg overflow-hidden mb-4">
                             <img 
-                                src={productImages[selectedImage]} 
+                                src={supplement?.imageUrl} 
                                 alt="Product" 
-                                className="w-full h-96 object-contain"
+                                className="w-full h-[500px] object-cover"
                             />
                         </div>
-                        <div className="flex gap-4 justify-center">
-                            {productImages.map((img, idx) => (
-                                <button
-                                    key={idx}
-                                    onClick={() => setSelectedImage(idx)}
-                                    className={`w-20 h-20 rounded-lg overflow-hidden border-2 ${
-                                        idx === selectedImage ? 'border-emerald-500' : 'border-gray-200'
-                                    }`}
-                                >
-                                    <img src={img} alt={`Thumbnail ${idx + 1}`} className="w-full h-full object-cover" />
-                                </button>
-                            ))}
-                        </div>
                     </div>
-
                     <div>
                         <div className="mb-4">
                             <a href="#" className="text-emerald-600 hover:text-emerald-700 font-semibold mb-2 inline-block">
@@ -110,7 +89,7 @@ export default function ProductPage() {
                             <div className="flex items-center gap-4 mb-4">
                                 <div className="flex items-center gap-2">
                                     <div className={`${getRatingBgColor(supplement?.averageRating ?? 0, supplement?.totalReviews ?? 0)} rounded-lg px-4 py-2 shadow-md`}>
-                                        <span className="text-3xl font-bold text-white">{supplement?.averageRating?.toFixed(2)}</span>
+                                        <span className="text-3xl font-bold text-white">{supplement?.averageRating?.toFixed(1)}</span>
                                     </div>
                                     <div>
                                         <div className="text-sm font-semibold text-gray-700">No Reviews Yet</div>

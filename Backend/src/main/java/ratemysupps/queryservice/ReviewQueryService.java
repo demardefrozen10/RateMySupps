@@ -1,29 +1,23 @@
-package ratemysupps.queryrepo;
+package ratemysupps.queryservice;
 
-import org.springframework.stereotype.Component;
-import ratemysupps.entity.Brand;
+import org.springframework.stereotype.Service;
 import ratemysupps.entity.Review;
-import ratemysupps.iqueryrepo.IBrandQueryRepo;
-import ratemysupps.iqueryrepo.IReviewQueryRepo;
-import ratemysupps.mapper.ReadBrandMapper;
+import ratemysupps.iqueryservice.IReviewQueryService;
 import ratemysupps.mapper.ReadReviewMapper;
-import ratemysupps.readmodel.ReadBrand;
 import ratemysupps.readmodel.ReadReview;
-import ratemysupps.repository.IBrandRepository;
 import ratemysupps.repository.IReviewRepository;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream. Collectors;
 
 
-@Component
-public class ReviewQueryRepo implements IReviewQueryRepo {
+@Service
+public class ReviewQueryService implements IReviewQueryService {
 
     private ReadReviewMapper mapper;
 
     IReviewRepository reviewRepo;
-    public ReviewQueryRepo(IReviewRepository reviewRepo, ReadReviewMapper mapper) {
+    public ReviewQueryService(IReviewRepository reviewRepo, ReadReviewMapper mapper) {
         this.reviewRepo = reviewRepo;
         this.mapper = mapper;
     }

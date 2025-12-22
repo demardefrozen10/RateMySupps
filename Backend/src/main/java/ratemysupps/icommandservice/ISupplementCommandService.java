@@ -1,10 +1,10 @@
-package ratemysupps.icommandrepo;
+package ratemysupps.icommandservice;
 
 
 import ratemysupps.entity.Supplement;
 import ratemysupps.writemodel.WriteSupplement;
 
-public interface ISupplementCommandRepo {
+public interface ISupplementCommandService {
 
     public Supplement submitSupplement(WriteSupplement supplement);
 

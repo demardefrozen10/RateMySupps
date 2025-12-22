@@ -1,8 +1,8 @@
-package ratemysupps.queryrepo;
+package ratemysupps.queryservice;
 
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import ratemysupps.entity.Brand;
-import ratemysupps.iqueryrepo.IBrandQueryRepo;
+import ratemysupps.iqueryservice.IBrandQueryService;
 import ratemysupps.mapper.ReadBrandMapper;
 import ratemysupps.readmodel.ReadBrand;
 import ratemysupps.repository.IBrandRepository;
@@ -11,13 +11,13 @@ import java.util.List;
 import java.util.stream. Collectors;
 
 
-@Component
-public class BrandQueryRepo implements IBrandQueryRepo {
+@Service
+public class BrandQueryService implements IBrandQueryService {
 
     private ReadBrandMapper mapper;
 
     IBrandRepository brandRepo;
-    public BrandQueryRepo(IBrandRepository brandRepo, ReadBrandMapper mapper) {
+    public BrandQueryService(IBrandRepository brandRepo, ReadBrandMapper mapper) {
         this.brandRepo = brandRepo;
         this.mapper = mapper;
     }

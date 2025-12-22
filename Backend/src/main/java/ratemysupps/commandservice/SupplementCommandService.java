@@ -1,21 +1,20 @@
-package ratemysupps.commandrepo;
+package ratemysupps.commandservice;
 
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import ratemysupps.entity.Supplement;
-import ratemysupps.icommandrepo.ISupplementCommandRepo;
-import ratemysupps.mapper.WriteBrandMapper;
+import ratemysupps.icommandservice.ISupplementCommandService;
 import ratemysupps.mapper.WriteSupplementMapper;
 import ratemysupps.repository.ISupplementRepository;
 import ratemysupps.writemodel.WriteSupplement;
 
-@Component
-public class SupplementCommandRepo implements ISupplementCommandRepo {
+@Service
+public class SupplementCommandService implements ISupplementCommandService {
 
 
     private final WriteSupplementMapper mapper;
     private final ISupplementRepository repo;
 
-    public SupplementCommandRepo(WriteSupplementMapper mapper, ISupplementRepository repo) {
+    public SupplementCommandService(WriteSupplementMapper mapper, ISupplementRepository repo) {
         this.mapper = mapper;
         this.repo = repo;
     }

@@ -1,17 +1,16 @@
-package ratemysupps.commandrepo;
+package ratemysupps.commandservice;
 
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import ratemysupps.entity.Review;
 import ratemysupps.entity.Supplement;
-import ratemysupps.icommandrepo.IReviewCommandRepo;
+import ratemysupps.icommandservice.IReviewCommandService;
 import ratemysupps.mapper.WriteReviewMapper;
-import ratemysupps.mapper.WriteSupplementMapper;
 import ratemysupps.repository.IReviewRepository;
 import ratemysupps.repository.ISupplementRepository;
 import ratemysupps.writemodel.WriteReview;
 
-@Component
-public class ReviewCommandRepo implements IReviewCommandRepo {
+@Service
+public class ReviewCommandService implements IReviewCommandService {
 
 
     private final WriteReviewMapper mapper;
@@ -19,7 +18,7 @@ public class ReviewCommandRepo implements IReviewCommandRepo {
     private final ISupplementRepository suppRepo;
 
 
-    public ReviewCommandRepo(WriteReviewMapper mapper, IReviewRepository repo, ISupplementRepository suppRepo) {
+    public ReviewCommandService(WriteReviewMapper mapper, IReviewRepository repo, ISupplementRepository suppRepo) {
         this.mapper = mapper;
         this.repo = repo;
         this.suppRepo = suppRepo;

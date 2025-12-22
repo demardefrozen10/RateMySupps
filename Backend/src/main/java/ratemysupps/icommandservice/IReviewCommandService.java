@@ -1,9 +1,9 @@
-package ratemysupps.icommandrepo;
+package ratemysupps.icommandservice;
 
 import ratemysupps.entity.Review;
 import ratemysupps.writemodel.WriteReview;
 
-public interface IReviewCommandRepo {
+public interface IReviewCommandService {
 
     public Review submitReview(WriteReview review);
 }
