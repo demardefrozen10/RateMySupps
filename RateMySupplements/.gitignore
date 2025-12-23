@@ -23,4 +23,3 @@ dist-ssr
 *.sln
 *.sw?
 
-Backend/target/classes/application.properties
