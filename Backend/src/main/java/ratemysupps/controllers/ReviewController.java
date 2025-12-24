@@ -32,10 +32,24 @@ public class ReviewController {
     }
 
     @PostMapping("/createReview")
-    public ResponseEntity<ReadReview> createReview(@RequestBody @Valid WriteReview review) {
-        ReadReview created = commandRepo.submitReview(review);
+    public ResponseEntity<Review> createReview(@RequestBody @Valid WriteReview review) {
+        Review created = commandRepo.submitReview(review);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
+    }
+
+    @GetMapping("/getVerifiedReviews")
+    public List<ReadReview> getVerifiedReviewsBySupplementId(@RequestParam Long supplementId
+    ) {
+        return queryRepo.getVerifiedReviewsBySupplementId(supplementId);
+    }
+
+    @GetMapping("/getReviewsWithMinRating")
+    public List<ReadReview> getReviewsBySupplementIdWithMinRating(
+            @RequestParam Long supplementId,
+            @RequestParam Double minRating
+    ) {
+        return queryRepo.getReviewsBySupplementIdWithMinRating(supplementId, minRating);
     }
 
 }

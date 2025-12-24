@@ -8,5 +8,8 @@ import java.util.List;
 public interface IReviewRepository extends JpaRepository<Review, Long> {
 
     List<Review> findBySupplementId(Long supplementId);
+    List<Review> findBySupplementIdAndRatingGreaterThanEqual(Long supplementId, Double minRating);
+    List<Review> findBySupplementIdAndIsVerified(Long supplementId, boolean isVerified);
+
 
 }
