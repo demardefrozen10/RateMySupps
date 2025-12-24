@@ -23,7 +23,7 @@ export default function ProductCatalog() {
         }).catch((error) => {
             console.error("Error fetching supplements:", error);
         });
-    }, [brand.id]); 
+    }, []); 
 
 
 
