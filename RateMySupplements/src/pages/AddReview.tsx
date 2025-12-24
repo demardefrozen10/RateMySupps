@@ -1,12 +1,16 @@
 import { useState } from "react"
 import { useNavigate, useLocation } from "react-router-dom"
+import useFetch from "../hooks/useFetch";
+import type { S3Request } from "../types/S3Request";
 export default function AddReview() {
     const [rating, setRating] = useState(0);
     const [hoverRating, setHoverRating] = useState(0);
-    const [wouldPurchaseAgain, setWouldPurchaseAgain] = useState<boolean | null>(null);
+    //const [wouldPurchaseAgain, setWouldPurchaseAgain] = useState<boolean | null>(null);
     const [review, setReview] = useState("");
     const [images, setImages] = useState<File[]>([]);
     const [proofOfPurchase, setProofOfPurchase] = useState<File | null>(null);
+    const [anonymous, setAnonymous] = useState(false);
+    const [name, setName] = useState("");
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -14,6 +18,9 @@ export default function AddReview() {
     const brandName: string = location.state?.brandName;
     const supplementName: string = location.state?.supplementName;
     const imageUrl: string = location.state?.imageUrl;
+
+    const {post} = useFetch("http://localhost:8080/api/");
+
 
 
 
@@ -68,6 +75,53 @@ export default function AddReview() {
         }
     };
 
+const HandleSubmitReview = async () => {
+    const imageUploadPromises = images.map(async (image) => {
+        const data: S3Request = await post("s3/presigned-url", {fileName: "test123", contentType: image.type, fileSize: image.size, imageType: "ReviewImages"});
+        await fetch(data.uploadUrl, {
+            method: "PUT",
+            headers: { "Content-Type": image.type },
+            body: image
+        });
+        return data.publicUrl;
+    });
+    const uploadedImageUrls = await Promise.all(imageUploadPromises);
+
+    console.log("Uploaded image URLs:", uploadedImageUrls);
+
+    let proofS3Url: string = "";
+    if (proofOfPurchase) {
+        const response: S3Request = await post("s3/presigned-url", { fileName: "proof123", contentType: proofOfPurchase.type, fileSize: proofOfPurchase.size, imageType: "PurchaseImages" });
+        await fetch(response.uploadUrl, {
+            method: "PUT",
+            headers: { "Content-Type": proofOfPurchase.type },
+            body: proofOfPurchase
+        });
+        proofS3Url = response.publicUrl;
+    }
+
+    await post("review/createReview", {
+        username: name,
+        supplementId: supplementId,
+        rating: rating,
+        comment: review,
+        imageUrls: uploadedImageUrls,
+        purchaseImageUrl: proofS3Url
+    }).then((data) => {
+    console.log("Review submitted:", data);
+    const supplementId = location.state?.supplementId;
+    const brandName = location.state?.brandName;
+    navigate(`/product/${supplementId}`, { state: { supplementId, brandName, reviewSubmitted: true } });
+    }).finally(() => {
+        console.log("Finished submitting review");
+    });
+}
+
+
+    
+
+  
+
     return (
         <div className="min-h-screen">
             <div className="max-w-3xl mx-auto px-4 py-12">
@@ -116,7 +170,31 @@ export default function AddReview() {
                             </p>
                         )}
                     </div>
-
+                    <div className="mb-8">
+                        <label className="block text-lg font-bold text-gray-800 mb-3">
+                            Your Name <span className="text-red-500">*</span>
+                        </label>
+                        <p className="text-sm text-gray-600 mb-3">Enter your name that will appear with your review, or you can remain anonymous.</p>
+                        <input
+                            className={`w-full px-4 py-3 rounded-lg border-2 border-gray-200 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200 transition-all${anonymous ? " bg-gray-100 text-gray-400 cursor-not-allowed" : ""}`}
+                            value={name}
+                            onChange={e => setName(e.target.value)}
+                            disabled={anonymous}
+                        />
+                        <div className="flex items-center gap-2 mt-2">
+                            <input
+                                type="checkbox"
+                                className="ml-1  text-emerald-600 border-emerald-300 rounded focus:ring-emerald-500 accent-emerald-600"
+                                checked={anonymous}
+                                onChange={() => {
+                                    setAnonymous(!anonymous);
+                                    setName("");
+                                }}
+                            />
+                            <p className="text-sm text-gray-600 mt-1">Remain anonymous</p>
+                        </div>
+                    </div>
+                    {/*}
                     <div className="mb-8">
                         <label className="block text-lg font-bold text-gray-800 mb-3">
                             Would you purchase this product again? <span className="text-red-500">*</span>
@@ -144,7 +222,7 @@ export default function AddReview() {
                             </button>
                         </div>
                     </div>
-
+                    */}
                     <div className="mb-8">
                         <label className="block text-lg font-bold text-gray-800 mb-3">
                             Your Review <span className="text-red-500">*</span>
@@ -155,7 +233,7 @@ export default function AddReview() {
                             onChange={(e) => setReview(e.target.value)}
                             placeholder="Share your experience with this product..."
                             className="w-full h-48 px-4 py-3 rounded-lg border-2 border-gray-200 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200 transition-all resize-none"
-                            maxLength={1000}
+                            maxLength={200}
                         />
                         <div className="flex justify-between items-center mt-2">
                             
@@ -291,8 +369,9 @@ export default function AddReview() {
                             Cancel
                         </button>
                         <button 
-                            disabled={!rating || wouldPurchaseAgain === null || !review.trim() || !proofOfPurchase}
+                            disabled={!rating || !review.trim() || !proofOfPurchase}
                             className="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-4 rounded-xl transition-colors shadow-lg disabled:bg-gray-300 disabled:cursor-not-allowed"
+                            onClick={HandleSubmitReview}
                         >
                             Submit Review
                         </button>

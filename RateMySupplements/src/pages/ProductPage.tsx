@@ -7,8 +7,9 @@ import ReviewStrip from "../components/ReviewStrip";
 export default function ProductPage() {
     const [supplement, setSupplement] = useState<Supplement>();
     const [reviews, setReviews] = useState<Review[]>([]);
-    
+    const [showNotification, setShowNotification] = useState(false);
 
+    
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -33,8 +34,13 @@ export default function ProductPage() {
         });
     }, [])
 
-    
-  
+    useEffect(() => {
+        if (location.state?.reviewSubmitted) {
+            setShowNotification(true);
+            navigate(location.pathname, { replace: true, state: { ...location.state, reviewSubmitted: undefined } });
+            setTimeout(() => setShowNotification(false), 3000);
+        }
+    }, [location.state, navigate, location.pathname]);
 
 
 
@@ -66,7 +72,17 @@ export default function ProductPage() {
     return (
         <div className="min-h-screen to-white">
             <div className="max-w-7xl mx-auto px-4 py-12">
-         
+                {/* Notification */}
+                {showNotification && (
+                    <div className="fixed top-6 left-1/2 transform -translate-x-1/2 z-50">
+                        <div className="flex items-center gap-2 bg-emerald-500 text-white px-6 py-3 rounded-lg shadow-lg">
+                            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                            </svg>
+                            <span className="font-semibold">Review Submitted</span>
+                        </div>
+                    </div>
+                )}
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-12">
                     <div>
@@ -135,13 +151,24 @@ export default function ProductPage() {
                 <div className="bg-white rounded-xl shadow-sm p-8">
                     <div className="flex items-center justify-between mb-6">
                         <h2 className="text-3xl font-bold text-gray-800">Customer Reviews</h2>
-                        <select className="px-4 py-2 bg-white text-gray-700 border-2 border-gray-200 rounded-lg font-medium hover:border-emerald-300 focus:border-emerald-500 focus:outline-none transition-colors cursor-pointer">
-                            <option value="recent">Most Recent</option>
-                            <option value="helpful">Most Helpful</option>
-                            <option value="highest">Highest Rated</option>
-                            <option value="lowest">Lowest Rated</option>
-                        </select>
+                        <div className="flex gap-4">
+                            <select className="px-4 py-2 bg-white text-gray-700 border-2 border-gray-200 rounded-lg font-medium hover:border-emerald-300 focus:border-emerald-500 focus:outline-none transition-colors cursor-pointer">
+                                <option value="recent">Most Recent</option>
+                                <option value="helpful">Most Helpful</option>
+                                <option value="highest">Highest Rated</option>
+                                <option value="lowest">Lowest Rated</option>
+                            </select>
+                            <select className="px-4 py-2 bg-white text-gray-700 border-2 border-gray-200 rounded-lg font-medium hover:border-emerald-300 focus:border-emerald-500 focus:outline-none transition-colors cursor-pointer">
+                                <option value="">Variations</option>
+                                <option value="vanilla">Vanilla</option>
+                                <option value="chocolate">Chocolate</option>
+                                <option value="strawberry">Strawberry</option>
+                                <option value="cookies">Cookies & Cream</option>
+                            </select>
+                        </div>
                     </div>
+
+                    
 
                     <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8 pb-8 border-b">
                         {[5, 4, 3, 2, 1].map((stars) => {

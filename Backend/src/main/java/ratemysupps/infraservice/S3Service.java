@@ -3,15 +3,20 @@ package ratemysupps.infraservice;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import ratemysupps.iinfraservice.IS3Service;
+import ratemysupps.readmodel.ReadS3;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software. amazon.awssdk.services. s3.presigner.S3Presigner;
-import software.amazon.awssdk.services.s3.presigner.model. PresignedPutObjectRequest;
+import software.amazon.awssdk.services.s3.presigner.model.PresignedPutObjectRequest;
 import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignRequest;
 
 import java.time.Duration;
 import java.util.UUID;
+
+import static sun.font.CreatedFontTracker.MAX_FILE_SIZE;
+
 @Service
-public class S3Service {
+public class S3Service implements IS3Service {
 
     @Value("${aws.s3.bucket-name}")
     private String bucketName;
@@ -23,55 +28,50 @@ public class S3Service {
     private S3Presigner s3Presigner;
 
 
-    public PresignedUrlResponse generatePresignedUploadUrl(String fileName, String contentType, Long fileSize) {
-        if (fileSize > 5 * 1024 * 1024) { 
-            throw new IllegalArgumentException("File too large");
+
+    public ReadS3 createPresignedUrl(String fileName, String contentType, Long fileSize, String imageType) {
+        if (fileSize > MAX_FILE_SIZE) {
+            throw new IllegalArgumentException("File too large (max 5MB)");
         }
 
-        String key = "reviews/" + UUID.randomUUID() + getFileExtension(fileName);
+        String key = imageType + "/" + UUID.randomUUID() + getFileExtension(fileName);
 
-        PutObjectRequest putObjectRequest = PutObjectRequest.builder()
+        PutObjectRequest objectRequest = PutObjectRequest.builder()
                 .bucket(bucketName)
                 .key(key)
-                .contentType(contentType)
-                .contentLength(fileSize)
                 .build();
 
+        //Create presigned request
         PutObjectPresignRequest presignRequest = PutObjectPresignRequest.builder()
-                .signatureDuration(Duration.ofMinutes(5))
-                .putObjectRequest(putObjectRequest)
+                .signatureDuration(Duration.ofMinutes(10))
+                .putObjectRequest(objectRequest)
                 .build();
 
+        //Generate presigned URL
         PresignedPutObjectRequest presignedRequest = s3Presigner.presignPutObject(presignRequest);
+        String uploadUrl = presignedRequest.url().toString();
 
-        String uploadUrl = presignedRequest. url().toString();
         String publicUrl = getPublicUrl(key);
 
-        return new PresignedUrlResponse(uploadUrl, publicUrl, key);
+        System.out.println("Upload URL: " + uploadUrl);
+        System.out.println("Public URL: " + publicUrl);
+
+        return new ReadS3(uploadUrl, publicUrl);
     }
 
-    public String getPublicUrl(String key) {
-        return String.format("https://%s.s3.%s.amazonaws.com/%s", bucketName, region, key);
+    private String getPublicUrl(String key) {
+        return String.format("https://%s.s3.%s.amazonaws.com/%s",
+                bucketName, region, key);
     }
 
     private String getFileExtension(String fileName) {
-        int lastDot = fileName.lastIndexOf('.');
-        return (lastDot == -1) ? "" : fileName.substring(lastDot).toLowerCase();
-    }
-
-    public static class PresignedUrlResponse {
-        private String uploadUrl;
-        private String publicUrl;
-        private String key;
-
-        public PresignedUrlResponse(String uploadUrl, String publicUrl, String key) {
-            this.uploadUrl = uploadUrl;
-            this. publicUrl = publicUrl;
-            this.key = key;
+        if (fileName == null || fileName.isEmpty()) {
+            return ".jpg";
         }
-
-        public String getUploadUrl() { return uploadUrl; }
-        public String getPublicUrl() { return publicUrl; }
-        public String getKey() { return key; }
+        int lastDot = fileName.lastIndexOf('.');
+        if (lastDot == -1) {
+            return ".jpg";
+        }
+        return fileName.substring(lastDot).toLowerCase();
     }
 }
