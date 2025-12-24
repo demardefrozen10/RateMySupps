@@ -35,8 +35,8 @@ public class BrandController {
     }
 
     @PostMapping("/createBrand")
-    public ResponseEntity<Brand> createBrand(@RequestBody @Valid WriteBrand brand) {
-        Brand created = commandRepo.submitBrand(brand);
+    public ResponseEntity<ReadBrand> createBrand(@RequestBody @Valid WriteBrand brand) {
+        ReadBrand created = commandRepo.submitBrand(brand);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }

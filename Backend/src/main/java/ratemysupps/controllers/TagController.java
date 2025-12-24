@@ -32,8 +32,8 @@ public class TagController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<Tag> createTag(@RequestBody WriteTag tag) {
-        Tag created = commandService.submitTag(tag);
+    public ResponseEntity<ReadTag> createTag(@RequestBody WriteTag tag) {
+        ReadTag created = commandService.submitTag(tag);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 

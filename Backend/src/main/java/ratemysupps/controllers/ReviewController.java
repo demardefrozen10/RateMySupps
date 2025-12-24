@@ -31,8 +31,8 @@ public class ReviewController {
     }
 
     @PostMapping("/createReview")
-    public ResponseEntity<Review> createReview(@RequestBody @Valid WriteReview review) {
-        Review created = commandRepo.submitReview(review);
+    public ResponseEntity<ReadReview> createReview(@RequestBody @Valid WriteReview review) {
+        ReadReview created = commandRepo.submitReview(review);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
