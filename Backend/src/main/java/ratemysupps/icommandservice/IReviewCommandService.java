@@ -1,9 +1,10 @@
 package ratemysupps.icommandservice;
 
 import ratemysupps.entity.Review;
+import ratemysupps.readmodel.ReadReview;
 import ratemysupps.writemodel.WriteReview;
 
 public interface IReviewCommandService {
 
-    public Review submitReview(WriteReview review);
+    public ReadReview submitReview(WriteReview review);
 }

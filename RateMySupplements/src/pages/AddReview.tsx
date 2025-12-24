@@ -6,7 +6,6 @@ export default function AddReview() {
     const [rating, setRating] = useState(0);
     const [hoverRating, setHoverRating] = useState(0);
     //const [wouldPurchaseAgain, setWouldPurchaseAgain] = useState<boolean | null>(null);
-    const [s3Urls, setS3Urls] = useState<string[]>([]);
     const [review, setReview] = useState("");
     const [images, setImages] = useState<File[]>([]);
     const [proofOfPurchase, setProofOfPurchase] = useState<File | null>(null);
@@ -109,16 +108,12 @@ const HandleSubmitReview = async () => {
         imageUrls: uploadedImageUrls,
         purchaseImageUrl: proofS3Url
     }).then((data) => {
-        console.log("Review submitted:", data);
-        navigate(`/product/${supplementId}`, { 
-            state: { 
-                supplementId, 
-                brandName, 
-                supplementName, 
-                imageUrl, 
-                reviewSubmitted: true 
-            } 
-        });
+    console.log("Review submitted:", data);
+    const supplementId = location.state?.supplementId;
+    const brandName = location.state?.brandName;
+    navigate(`/product/${supplementId}`, { state: { supplementId, brandName, reviewSubmitted: true } });
+    }).finally(() => {
+        console.log("Finished submitting review");
     });
 }
 
@@ -191,7 +186,10 @@ const HandleSubmitReview = async () => {
                                 type="checkbox"
                                 className="ml-1  text-emerald-600 border-emerald-300 rounded focus:ring-emerald-500 accent-emerald-600"
                                 checked={anonymous}
-                                onChange={() => setAnonymous(!anonymous)}
+                                onChange={() => {
+                                    setAnonymous(!anonymous);
+                                    setName("");
+                                }}
                             />
                             <p className="text-sm text-gray-600 mt-1">Remain anonymous</p>
                         </div>

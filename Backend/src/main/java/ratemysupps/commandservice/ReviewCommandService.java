@@ -4,7 +4,9 @@ import org.springframework.stereotype.Service;
 import ratemysupps.entity.Review;
 import ratemysupps.entity.Supplement;
 import ratemysupps.icommandservice.IReviewCommandService;
+import ratemysupps.mapper.ReadReviewMapper;
 import ratemysupps.mapper.WriteReviewMapper;
+import ratemysupps.readmodel.ReadReview;
 import ratemysupps.repository.IReviewRepository;
 import ratemysupps.repository.ISupplementRepository;
 import ratemysupps.writemodel.WriteReview;
@@ -13,22 +15,24 @@ import ratemysupps.writemodel.WriteReview;
 public class ReviewCommandService implements IReviewCommandService {
 
 
-    private final WriteReviewMapper mapper;
+    private final WriteReviewMapper writeMapper;
+    private final ReadReviewMapper readMapper;
     private final IReviewRepository repo;
     private final ISupplementRepository suppRepo;
 
 
-    public ReviewCommandService(WriteReviewMapper mapper, IReviewRepository repo, ISupplementRepository suppRepo) {
-        this.mapper = mapper;
+    public ReviewCommandService(WriteReviewMapper writeMapper, IReviewRepository repo, ISupplementRepository suppRepo, ReadReviewMapper readMapper) {
+        this.writeMapper = writeMapper;
         this.repo = repo;
         this.suppRepo = suppRepo;
+        this.readMapper = readMapper;
     }
 
 
     @Override
-    public Review submitReview(WriteReview review) {
+    public ReadReview submitReview(WriteReview review) {
 
-        Review entityReview = mapper.toEntity(review);
+        Review entityReview = writeMapper.toEntity(review);
 
         Supplement supplement = suppRepo.findById(review.getSupplementId())
                 .orElseThrow(() -> new RuntimeException("Supplement not found"));
@@ -47,6 +51,6 @@ public class ReviewCommandService implements IReviewCommandService {
         supplement.setTotalReviews(oldCount + 1);
 
 
-        return repo.save(entityReview);
+        return readMapper.fromEntity(repo.save(entityReview));
     }
 }
