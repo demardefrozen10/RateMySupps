@@ -25,7 +25,6 @@ public class ReviewController {
         this.queryRepo = repo;
     }
 
-
     @GetMapping("/getReviews")
     public List<ReadReview> getReviewBySupplementId(@RequestParam Long supplementId) {
         return queryRepo.getReviewBySupplementId(supplementId);
