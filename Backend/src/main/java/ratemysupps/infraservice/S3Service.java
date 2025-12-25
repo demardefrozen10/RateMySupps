@@ -16,7 +16,7 @@ import java.time.Duration;
 import java.util.List;
 import java.util.UUID;
 
-//import static sun.font.CreatedFontTracker.MAX_FILE_SIZE;
+import static sun.font.CreatedFontTracker.MAX_FILE_SIZE;
 
 @Service
 public class S3Service implements IS3Service {

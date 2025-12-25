@@ -39,8 +39,6 @@ public class ReviewCommandService implements IReviewCommandService {
         Supplement supplement = suppRepo.findById(review.getSupplementId())
                 .orElseThrow(() -> new RuntimeException("Supplement not found"));
 
-        supplement.setTotalReviews(supplement.getTotalReviews() + 1);
-
         entityReview.setSupplement(supplement);
 
         double oldAvg = supplement.getAverageRating();

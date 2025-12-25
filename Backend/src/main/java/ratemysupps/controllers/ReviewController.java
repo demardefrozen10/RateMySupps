@@ -37,17 +37,25 @@ public class ReviewController {
     }
 
     @GetMapping("/getVerifiedReviews")
-    public List<ReadReview> getVerifiedReviewsBySupplementId(@RequestParam Long supplementId
-    ) {
+    public List<ReadReview> getVerifiedReviewsBySupplementId(@RequestParam Long supplementId) {
         return queryRepo.getVerifiedReviewsBySupplementId(supplementId);
     }
 
-    @GetMapping("/getReviewsWithMinRating")
-    public List<ReadReview> getReviewsBySupplementIdWithMinRating(
-            @RequestParam Long supplementId,
-            @RequestParam Double minRating
-    ) {
-        return queryRepo.getReviewsBySupplementIdWithMinRating(supplementId, minRating);
+    @GetMapping("/getReviewsByMinRating")
+    public List<ReadReview> getReviewsBySupplementIdByMinRating(@RequestParam Long supplementId) {
+        return queryRepo.getReviewsBySupplementIdByMinRating(supplementId);
     }
+
+
+    @GetMapping("/getReviewsByMaxRating")
+    public List<ReadReview> getReviewsBySupplementIdByMaxRating(@RequestParam Long supplementId) {
+        return queryRepo.getReviewsBySupplementIdByMaxRating(supplementId);
+    }
+
+    @GetMapping("/getReviewsByDate")
+    public List<ReadReview> getReviewsBySupplementIdByMaxDate(@RequestParam Long supplementId) {
+        return queryRepo.getReviewsBySupplementIdByMaxRating(supplementId);
+    }
+
 
 }

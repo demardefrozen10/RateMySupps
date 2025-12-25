@@ -21,6 +21,17 @@ export default function ReviewStrip(props: Review) {
             }
         });
     };
+
+    const formatLocalDate = (isoDate?: string) => {
+        if (!isoDate) return "";
+        const date = new Date(isoDate);
+        return date.toLocaleDateString(undefined, {
+            year: "numeric",
+            month: "short",
+            day: "numeric"
+        });
+    };
+
     return <>        
             <div key={props.id} className="border-b pb-6 last:border-b-0">
                 <div className="flex items-start justify-between mb-3">
@@ -32,7 +43,6 @@ export default function ReviewStrip(props: Review) {
                                 </svg>
                                 <span className="text-sm font-semibold text-emerald-700">Verified Purchase</span>
                             </div>
-                            <span className="text-xs text-gray-500">{props.date}</span>
                         </div>
                         <div className="flex gap-1">
                             {renderStars(props.rating)}
@@ -44,14 +54,21 @@ export default function ReviewStrip(props: Review) {
                 {props.imageUrls && props.imageUrls.length > 0 && (
                     <div className="flex gap-2 mb-3 flex-wrap">
                         {props.imageUrls.map((url, idx) => (
-                            <img 
-                                key={idx} 
-                                src={url} 
-                                alt={`Review image ${idx + 1}`} 
-                                className="w-40 h-40 object-cover rounded-lg border border-gray-200"
-                            />
+                            <div key={idx} className="flex flex-col items-start">
+                                <img 
+                                    src={url} 
+                                    alt={`Review image ${idx + 1}`} 
+                                    className="w-40 h-40 object-cover rounded-lg border border-gray-200"
+                                />
+                                {idx === 0 && (
+                                    <span className="text-xs text-gray-500 mt-2">{formatLocalDate(props.createdAt)}</span>
+                                )}
+                            </div>
                         ))}
                     </div>
+                )}
+                {(!props.imageUrls || props.imageUrls.length === 0) && (
+                    <span className="text-xs text-gray-500 mb-3 block">{formatLocalDate(props.createdAt)}</span>
                 )}
                 <div className="flex items-center gap-4 text-sm">
                     {/*

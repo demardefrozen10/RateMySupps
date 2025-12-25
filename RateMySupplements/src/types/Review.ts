@@ -5,7 +5,7 @@ interface Review {
     rating: number;
     username: string;
     imageUrls: string[];
-    date: string;
+    createdAt: string;
     helpful: number;
 }
 

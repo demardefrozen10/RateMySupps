@@ -8,6 +8,7 @@ export default function ProductPage() {
     const [supplement, setSupplement] = useState<Supplement>();
     const [reviews, setReviews] = useState<Review[]>([]);
     const [showNotification, setShowNotification] = useState(false);
+    const [sortOption, setSortOption] = useState<"recent" | "highest" | "lowest">("recent");
 
     
     const navigate = useNavigate();
@@ -29,10 +30,18 @@ export default function ProductPage() {
 
 
     useEffect(() => {
-        get(`review/getReviews?supplementId=${supplementId}`).then((data) => {
+        let endpoint = "";
+        if (sortOption === "recent") {
+            endpoint = `review/getReviewsByDate?supplementId=${supplementId}`;
+        } else if (sortOption === "highest") {
+            endpoint = `review/getReviewsByMaxRating?supplementId=${supplementId}`;
+        } else if (sortOption === "lowest") {
+            endpoint = `review/getReviewsByMinRating?supplementId=${supplementId}`;
+        }
+        get(endpoint).then((data) => {
             setReviews(data);
         });
-    }, [])
+    }, [sortOption, supplementId, get])
 
     useEffect(() => {
         if (location.state?.reviewSubmitted) {
@@ -68,6 +77,7 @@ export default function ProductPage() {
 
     const ratingDistribution = getRatingDistribution();
     const totalReviewCount = reviews.length;
+
 
     return (
         <div className="min-h-screen to-white">
@@ -152,9 +162,12 @@ export default function ProductPage() {
                         <h2 className="text-3xl font-bold text-gray-800">Customer Reviews</h2>
                         {totalReviewCount > 0 && (
                             <div className="flex gap-4">
-                                <select className="px-4 py-2 bg-white text-gray-700 border-2 border-gray-200 rounded-lg font-medium hover:border-emerald-300 focus:border-emerald-500 focus:outline-none transition-colors cursor-pointer">
+                                <select
+                                    className="px-4 py-2 bg-white text-gray-700 border-2 border-gray-200 rounded-lg font-medium hover:border-emerald-300 focus:border-emerald-500 focus:outline-none transition-colors cursor-pointer"
+                                    value={sortOption}
+                                    onChange={e => setSortOption(e.target.value as "recent" | "highest" | "lowest")}
+                                >
                                     <option value="recent">Most Recent</option>
-                                    <option value="helpful">Most Helpful</option>
                                     <option value="highest">Highest Rated</option>
                                     <option value="lowest">Lowest Rated</option>
                                 </select>

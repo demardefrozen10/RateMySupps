@@ -76,28 +76,42 @@ export default function AddReview() {
     };
 
 const HandleSubmitReview = async () => {
-    const imageUploadPromises = images.map(async (image) => {
-        const data: S3Request = await post("s3/presigned-url", {fileName: "test123", contentType: image.type, fileSize: image.size, imageType: "ReviewImages"});
-        await fetch(data.uploadUrl, {
-            method: "PUT",
-            headers: { "Content-Type": image.type },
-            body: image
-        });
-        return data.publicUrl;
-    });
-    const uploadedImageUrls = await Promise.all(imageUploadPromises);
+    const batchPayload = images.map((image) => ({
+        fileName: image.name,
+        contentType: image.type,
+        fileSize: image.size,
+        imageType: "ReviewImages"
+    }));
 
-    console.log("Uploaded image URLs:", uploadedImageUrls);
+    let uploadedImageUrls: string[] = [];
+    if (images.length > 0) {
+        const data = await post("s3/presigned-url", batchPayload);
+        await Promise.all(
+            images.map((image, idx) =>
+                fetch(data[idx].uploadUrl, {
+                    method: "PUT",
+                    headers: { "Content-Type": image.type },
+                    body: image
+                })
+            )
+        );
+        uploadedImageUrls = data.map((item: { publicUrl: string }) => item.publicUrl);
+    }
 
     let proofS3Url: string = "";
     if (proofOfPurchase) {
-        const response: S3Request = await post("s3/presigned-url", { fileName: "proof123", contentType: proofOfPurchase.type, fileSize: proofOfPurchase.size, imageType: "PurchaseImages" });
-        await fetch(response.uploadUrl, {
+        const response: any = await post("s3/presigned-url", [{
+            fileName: proofOfPurchase.name,
+            contentType: proofOfPurchase.type,
+            fileSize: proofOfPurchase.size,
+            imageType: "PurchaseImages"
+        }]);
+        await fetch(response[0].uploadUrl, {
             method: "PUT",
             headers: { "Content-Type": proofOfPurchase.type },
             body: proofOfPurchase
         });
-        proofS3Url = response.publicUrl;
+        proofS3Url = response[0].publicUrl;
     }
 
     await post("review/createReview", {
@@ -108,9 +122,9 @@ const HandleSubmitReview = async () => {
         imageUrls: uploadedImageUrls,
         purchaseImageUrl: proofS3Url
     }).then(() => {
-    const supplementId = location.state?.supplementId;
-    const brandName = location.state?.brandName;
-    navigate(`/product/${supplementId}`, { state: { supplementId, brandName, reviewSubmitted: true } });
+        const supplementId = location.state?.supplementId;
+        const brandName = location.state?.brandName;
+        navigate(`/product/${supplementId}`, { state: { supplementId, brandName, reviewSubmitted: true } });
     })
 }
 

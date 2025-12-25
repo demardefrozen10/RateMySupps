@@ -48,10 +48,10 @@ public class ReviewQueryService implements IReviewQueryService {
     }
 
     @Override
-    public List<ReadReview> getReviewsBySupplementIdWithMinRating(Long supplementId, Double minRating) {
-        List<Review> reviews = reviewRepo.findBySupplementIdAndRatingGreaterThanEqual(supplementId, minRating);
-
+    public List<ReadReview> getReviewsBySupplementIdByMinRating(Long supplementId) {
         List<ReadReview> readReviews = new ArrayList<>();
+        List<Review> reviews = reviewRepo.findBySupplementIdOrderByRatingAsc(supplementId);
+
         for (Review review : reviews) {
             readReviews.add(mapper.fromEntity(review));
         }
@@ -59,5 +59,29 @@ public class ReviewQueryService implements IReviewQueryService {
         return readReviews;
     }
 
-    
+    @Override
+    public List<ReadReview> getReviewsBySupplementIdByMaxRating(Long supplementId) {
+        List<ReadReview> readReviews = new ArrayList<>();
+        List<Review> reviews = reviewRepo.findBySupplementIdOrderByRatingDesc(supplementId);
+
+        for (Review review : reviews) {
+            readReviews.add(mapper.fromEntity(review));
+        }
+
+        return readReviews;
+    }
+
+    @Override
+    public List<ReadReview> getReviewsBySupplementIdByMaxDate(Long supplementId) {
+        List<ReadReview> readReviews = new ArrayList<>();
+        List<Review> reviews = reviewRepo.findBySupplementIdOrderByCreatedAtDesc(supplementId);
+
+        for (Review review : reviews) {
+            readReviews.add(mapper.fromEntity(review));
+        }
+
+        return readReviews;
+    }
+
+
 }
