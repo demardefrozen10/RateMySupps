@@ -6,10 +6,10 @@
 # Datasource local storage ignored files
 /dataSources/
 /dataSources.local.xml
-# Maven
+# Maven build
 target/
 *.class
 
-# VS Code
+# IDE folders
 .vscode/
-
+.idea/
