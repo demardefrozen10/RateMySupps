@@ -7,6 +7,7 @@ import ratemysupps.mapper.ReadSupplementMapper;
 import ratemysupps.readmodel.ReadSupplement;
 import ratemysupps.readmodel.ReadSupplementComplex;
 import ratemysupps.repository.ISupplementRepository;
+import ratemysupps.repository.ICategoryRepository;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -17,9 +18,11 @@ public class SupplementQueryService implements ISupplementQueryService {
 
     private final ReadSupplementMapper mapper;
     private final ISupplementRepository repo;
-    public SupplementQueryService(ReadSupplementMapper mapper, ISupplementRepository repo) {
+    private final ICategoryRepository categoryRepo;
+    public SupplementQueryService(ReadSupplementMapper mapper, ISupplementRepository repo, ICategoryRepository categoryRepo) {
         this.mapper = mapper;
         this.repo = repo;
+        this.categoryRepo = categoryRepo;
     }
 
     @Override
@@ -37,6 +40,13 @@ public class SupplementQueryService implements ISupplementQueryService {
         return mapper.fromEntityComplex(supplement);
 
     }
+
+    @Override
+    public List<String> getCategories() {
+        return mapper.fromEntityVariant(categoryRepo.findAll());
+    }
+
+
 
 
 }

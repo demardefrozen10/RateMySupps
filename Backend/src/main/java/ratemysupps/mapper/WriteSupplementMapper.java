@@ -5,7 +5,6 @@ import org.springframework.stereotype.Component;
 import ratemysupps.entity.Brand;
 import ratemysupps.entity.Supplement;
 import ratemysupps.repository.IBrandRepository;
-import ratemysupps.writemodel.WriteBrand;
 import ratemysupps.writemodel.WriteSupplement;
 
 import java.time.LocalDateTime;
@@ -31,8 +30,10 @@ public class WriteSupplementMapper {
 
         supplement.setCreatedAt(LocalDateTime.now());
 
-        supplement.setServingSizes(writeSupplement.getGetServingSizes());
+        supplement.setServingSizes(writeSupplement.getServingSizes());
 
+        supplement.setImageUrl(writeSupplement.getImageUrl());
+        supplement.setWebsiteUrl(writeSupplement.getWebsiteUrl());
 
         return supplement;
     }

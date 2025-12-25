@@ -10,4 +10,6 @@ public interface ISupplementQueryService {
     List<ReadSupplement> getAllSupplementsByBrand(Long brandId);
 
     ReadSupplementComplex getSupplementById(Long supplementId);
+
+    List<String> getCategories();
 }

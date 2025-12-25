@@ -107,14 +107,11 @@ const HandleSubmitReview = async () => {
         comment: review,
         imageUrls: uploadedImageUrls,
         purchaseImageUrl: proofS3Url
-    }).then((data) => {
-    console.log("Review submitted:", data);
+    }).then(() => {
     const supplementId = location.state?.supplementId;
     const brandName = location.state?.brandName;
     navigate(`/product/${supplementId}`, { state: { supplementId, brandName, reviewSubmitted: true } });
-    }).finally(() => {
-        console.log("Finished submitting review");
-    });
+    })
 }
 
 
@@ -127,7 +124,7 @@ const HandleSubmitReview = async () => {
             <div className="max-w-3xl mx-auto px-4 py-12">
                 <div className="mb-8">
                     <h1 className="text-4xl font-bold text-gray-800 mb-2">Leave a Review</h1>
-                    <p className="text-gray-600">Share your experience with this supplement</p>
+                    <p className="text-gray-600">Share your experience with this supplement.</p>
                 </div>
 
                 <div className="bg-white rounded-xl shadow-lg p-8">

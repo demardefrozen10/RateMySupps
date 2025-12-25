@@ -1,4 +1,4 @@
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import BrandCard from "../components/BrandCard"
 import { useState, useEffect } from "react"
 import type { Brand } from "../types/Brand";
@@ -9,8 +9,10 @@ import type {Supplement} from "../types/Supplement";
 export default function ProductCatalog() {
     const [currentImage, setCurrentImage] = useState(0);
     const [supplements, setSupplements] = useState<Supplement[]>([]);
+    const [showNotification, setShowNotification] = useState(false);
 
     const { get } = useFetch("http://localhost:8080/api/supplement/");
+    const navigate = useNavigate();
 
 
     const location = useLocation();
@@ -25,6 +27,15 @@ export default function ProductCatalog() {
         });
     }, []); 
 
+    
+    useEffect(() => {
+        if (location.state?.supplementSubmitted) {
+            setShowNotification(true);
+            navigate(location.pathname, { replace: true, state: { ...location.state, supplementSubmitted: undefined } });
+            setTimeout(() => setShowNotification(false), 3000);
+        }
+    }, [location.state, navigate, location.pathname]);
+
 
 
     const images = [
@@ -36,8 +47,22 @@ export default function ProductCatalog() {
     const nextImage = () => setCurrentImage((prev) => (prev + 1) % images.length)
     const prevImage = () => setCurrentImage((prev) => (prev - 1 + images.length) % images.length)
 
-    return (
+    const HandleAddSupplementClick = () => {
+        navigate('/product/add-supplement', { state: { brand: brand } });
+    }
+
+    return (   
         <div className="min-h-screen to-white">
+        {showNotification && (
+                    <div className="fixed top-6 left-1/2 transform -translate-x-1/2 z-50">
+                        <div className="flex items-center gap-2 bg-emerald-500 text-white px-6 py-3 rounded-lg shadow-lg">
+                            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                            </svg>
+                            <span className="font-semibold">Supplement Submitted</span>
+                        </div>
+                    </div>
+            )}
             <div className="max-w-7xl mx-auto px-4 py-12">
                 <div className="mb-8 relative rounded-xl overflow-hidden shadow-lg">
                     <div className="relative h-64 bg-cover bg-center" style={{ backgroundImage: `url(${images[currentImage]})` }}>
@@ -103,7 +128,7 @@ export default function ProductCatalog() {
                 </div>
 
                 <div className="mb-6 text-sm text-gray-600">
-                    Can't find what you're looking for? <button className="text-emerald-600 hover:text-emerald-700 font-semibold underline">Add a supplement here</button>
+                    Can't find what you're looking for? <button className="text-emerald-600 hover:text-emerald-700 font-semibold underline cursor-pointer" onClick={HandleAddSupplementClick}>Add a supplement here</button>
                 </div>
 
                 <div className="flex flex-col gap-4">
@@ -116,6 +141,7 @@ export default function ProductCatalog() {
                         averageRating={supplement.averageRating}
                         totalReviews={supplement.totalReviews}
                         brand={brand.brandName}
+                        category={supplement.category}
                     />
                     ))}
                 </div>

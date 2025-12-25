@@ -4,6 +4,7 @@ import ProductCatalog from '../pages/ProductCatalog';
 import ProductPage from '../pages/ProductPage';
 import BrandCatalog from '../pages/BrandCatalog';
 import AddReview from '../pages/AddReview';
+import AddSupplement from '../pages/AddSupplement';
 
 function Router() {
   return (
@@ -12,6 +13,7 @@ function Router() {
       <Route path="/brands" element={<BrandCatalog />} />
       <Route path="/products/:brandId" element={<ProductCatalog />} />
       <Route path="/product/:supplementId" element={<ProductPage />} />
+      <Route path="/product/add-supplement" element={<AddSupplement />} />
       <Route path="/add-review" element={<AddReview />} />
     </Routes>
   )

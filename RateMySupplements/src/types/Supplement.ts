@@ -5,6 +5,7 @@ interface Supplement {
     totalReviews: number;
     imageUrl: string;
     brand: string;
+    category: string;
 
 
 }

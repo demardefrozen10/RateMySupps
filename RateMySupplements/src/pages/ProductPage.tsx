@@ -72,7 +72,6 @@ export default function ProductPage() {
     return (
         <div className="min-h-screen to-white">
             <div className="max-w-7xl mx-auto px-4 py-12">
-                {/* Notification */}
                 {showNotification && (
                     <div className="fixed top-6 left-1/2 transform -translate-x-1/2 z-50">
                         <div className="flex items-center gap-2 bg-emerald-500 text-white px-6 py-3 rounded-lg shadow-lg">
@@ -120,7 +119,7 @@ export default function ProductPage() {
                             <div className="space-y-3 text-sm">
                                 <div className="flex justify-between">
                                     <span className="text-gray-600">Category:</span>
-                                    <span className="font-semibold">Protein Powder</span>
+                                    <span className="font-semibold">{supplement?.category}</span>
                                 </div>
                                 <div className="flex justify-between">
                                     <span className="text-gray-600">Serving Size:</span>
@@ -151,53 +150,64 @@ export default function ProductPage() {
                 <div className="bg-white rounded-xl shadow-sm p-8">
                     <div className="flex items-center justify-between mb-6">
                         <h2 className="text-3xl font-bold text-gray-800">Customer Reviews</h2>
-                        <div className="flex gap-4">
-                            <select className="px-4 py-2 bg-white text-gray-700 border-2 border-gray-200 rounded-lg font-medium hover:border-emerald-300 focus:border-emerald-500 focus:outline-none transition-colors cursor-pointer">
-                                <option value="recent">Most Recent</option>
-                                <option value="helpful">Most Helpful</option>
-                                <option value="highest">Highest Rated</option>
-                                <option value="lowest">Lowest Rated</option>
-                            </select>
-                            <select className="px-4 py-2 bg-white text-gray-700 border-2 border-gray-200 rounded-lg font-medium hover:border-emerald-300 focus:border-emerald-500 focus:outline-none transition-colors cursor-pointer">
-                                <option value="">Variations</option>
-                                <option value="vanilla">Vanilla</option>
-                                <option value="chocolate">Chocolate</option>
-                                <option value="strawberry">Strawberry</option>
-                                <option value="cookies">Cookies & Cream</option>
-                            </select>
+                        {totalReviewCount > 0 && (
+                            <div className="flex gap-4">
+                                <select className="px-4 py-2 bg-white text-gray-700 border-2 border-gray-200 rounded-lg font-medium hover:border-emerald-300 focus:border-emerald-500 focus:outline-none transition-colors cursor-pointer">
+                                    <option value="recent">Most Recent</option>
+                                    <option value="helpful">Most Helpful</option>
+                                    <option value="highest">Highest Rated</option>
+                                    <option value="lowest">Lowest Rated</option>
+                                </select>
+                                <select className="px-4 py-2 bg-white text-gray-700 border-2 border-gray-200 rounded-lg font-medium hover:border-emerald-300 focus:border-emerald-500 focus:outline-none transition-colors cursor-pointer">
+                                    <option value="">Variations</option>
+                                    <option value="vanilla">Vanilla</option>
+                                    <option value="chocolate">Chocolate</option>
+                                    <option value="strawberry">Strawberry</option>
+                                    <option value="cookies">Cookies & Cream</option>
+                                </select>
+                            </div>
+                        )}
+                    </div>
+
+                    {totalReviewCount === 0 ? (
+                        <div
+                            className="text-center text-emerald-600 text-lg py-12 font-semibold cursor-pointer hover:underline"
+                            onClick={HandleReviewClick}
+                        >
+                            Be the first to leave a review
                         </div>
-                    </div>
+                    ) : (
+                        <>
+                            <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8 pb-8 border-b">
+                                {[5, 4, 3, 2, 1].map((stars) => {
+                                    const count = ratingDistribution[stars];
+                                    const percentage = totalReviewCount > 0 ? (count / totalReviewCount) * 100 : 0;
+                                    return (
+                                        <div key={stars} className="flex items-center gap-2">
+                                            <span className="text-sm font-medium">{stars}★</span>
+                                            <div className="flex-1 bg-gray-200 rounded-full h-2">
+                                                <div 
+                                                    className="bg-emerald-500 h-2 rounded-full" 
+                                                    style={{ width: `${percentage}%` }}
+                                                />
+                                            </div>
+                                            <span className="text-xs text-gray-500">{count}</span>
+                                        </div>
+                                    );
+                                })}
+                            </div>
 
-                    
+                            <div className="space-y-6">
+                                {reviews.map((review) => (
+                                   <ReviewStrip key={review.id} {...review} />
+                                ))}
+                            </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8 pb-8 border-b">
-                        {[5, 4, 3, 2, 1].map((stars) => {
-                            const count = ratingDistribution[stars];
-                            const percentage = totalReviewCount > 0 ? (count / totalReviewCount) * 100 : 0;
-                            return (
-                                <div key={stars} className="flex items-center gap-2">
-                                    <span className="text-sm font-medium">{stars}★</span>
-                                    <div className="flex-1 bg-gray-200 rounded-full h-2">
-                                        <div 
-                                            className="bg-emerald-500 h-2 rounded-full" 
-                                            style={{ width: `${percentage}%` }}
-                                        />
-                                    </div>
-                                    <span className="text-xs text-gray-500">{count}</span>
-                                </div>
-                            );
-                        })}
-                    </div>
-
-                    <div className="space-y-6">
-                        {reviews.map((review) => (
-                           <ReviewStrip key={review.id} {...review} />
-                        ))}
-                    </div>
-
-                    <button className="w-full mt-8 py-3 border-2 border-emerald-300 text-emerald-600 hover:bg-emerald-50 font-semibold rounded-lg transition-colors">
-                        Load More Reviews
-                    </button>
+                            <button className="w-full mt-8 py-3 border-2 border-emerald-300 text-emerald-600 hover:bg-emerald-50 font-semibold rounded-lg transition-colors">
+                                Load More Reviews
+                            </button>
+                        </>
+                    )}
                 </div>
             </div>
         </div>

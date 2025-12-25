@@ -18,10 +18,12 @@ public class ReadSupplementComplex {
 
     public int totalReviews;
 
-    public String imageUrl;
+    public List<String> imageUrl;
 
     public List<String> servingSizes;
 
     public List<String> flavors;
+
+    public String category;
 
 }

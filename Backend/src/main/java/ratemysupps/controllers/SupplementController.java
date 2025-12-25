@@ -41,9 +41,14 @@ public class SupplementController {
         return ResponseEntity.ok(supplement);
     }
 
+    @GetMapping("/getCategories")
+    public List<String> getAllCategories() {
+        return queryRepo.getCategories();
+    }
+
     @PostMapping("/createSupplement")
-    public ResponseEntity<Supplement> createBrand(@RequestBody @Valid WriteSupplement supplement) {
-        Supplement created = commandRepo.submitSupplement(supplement);
+    public ResponseEntity<ReadSupplement> createSupplement(@RequestBody @Valid WriteSupplement supplement) {
+        ReadSupplement created = commandRepo.submitSupplement(supplement);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }

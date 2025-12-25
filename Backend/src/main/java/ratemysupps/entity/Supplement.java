@@ -40,9 +40,11 @@ public class Supplement {
     private LocalDateTime createdAt;
 
     @Column(unique = true)
-    private String imageUrl;
+    private List<String> imageUrl;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "TEXT")
+    private String websiteUrl;
+
     private List<String> servingSizes;
 
     @ManyToMany(fetch = FetchType.LAZY)
@@ -52,6 +54,11 @@ public class Supplement {
             inverseJoinColumns = @JoinColumn(name = "tag_id")
     )
     private Set<Tag> tags;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "category_id", nullable = false)
+    private Category category;
+
 
 
     @OneToMany(mappedBy = "supplement", orphanRemoval = true)

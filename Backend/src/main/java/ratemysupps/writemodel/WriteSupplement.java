@@ -15,7 +15,11 @@ public class WriteSupplement {
 
     private String productUrl;
 
-    private String imageUrl;
+    private List<String> imageUrl;
 
-    public List<String> getServingSizes;
+    private List<String> servingSizes;
+
+    private String websiteUrl;
+
+    private String category;
 }

@@ -5,12 +5,14 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import ratemysupps.iinfraservice.IS3Service;
 import ratemysupps.readmodel.ReadS3;
+import ratemysupps.writemodel.WriteS3;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software. amazon.awssdk.services. s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.PresignedPutObjectRequest;
 import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignRequest;
 
 import java.time.Duration;
+import java.util.List;
 import java.util.UUID;
 
 import static sun.font.CreatedFontTracker.MAX_FILE_SIZE;
@@ -29,35 +31,43 @@ public class S3Service implements IS3Service {
 
 
 
-    public ReadS3 createPresignedUrl(String fileName, String contentType, Long fileSize, String imageType) {
-        if (fileSize > MAX_FILE_SIZE) {
-            throw new IllegalArgumentException("File too large (max 5MB)");
-        }
+    public List<ReadS3> createPresignedUrls(List<WriteS3> requests) {
 
-        String key = imageType + "/" + UUID.randomUUID() + getFileExtension(fileName);
+        return requests.stream().map(request -> {
 
-        PutObjectRequest objectRequest = PutObjectRequest.builder()
-                .bucket(bucketName)
-                .key(key)
-                .build();
+            if (request.getFileSize() > MAX_FILE_SIZE) {
+                throw new IllegalArgumentException(
+                        "File too large (max 5MB): " + request.getFileName()
+                );
+            }
 
-        //Create presigned request
-        PutObjectPresignRequest presignRequest = PutObjectPresignRequest.builder()
-                .signatureDuration(Duration.ofMinutes(10))
-                .putObjectRequest(objectRequest)
-                .build();
+            String key = request.getImageType()
+                    + "/"
+                    + UUID.randomUUID()
+                    + getFileExtension(request.getFileName());
 
-        //Generate presigned URL
-        PresignedPutObjectRequest presignedRequest = s3Presigner.presignPutObject(presignRequest);
-        String uploadUrl = presignedRequest.url().toString();
+            PutObjectRequest objectRequest = PutObjectRequest.builder()
+                    .bucket(bucketName)
+                    .key(key)
+                    .contentType(request.getContentType())
+                    .build();
 
-        String publicUrl = getPublicUrl(key);
+            PutObjectPresignRequest presignRequest = PutObjectPresignRequest.builder()
+                    .signatureDuration(Duration.ofMinutes(10))
+                    .putObjectRequest(objectRequest)
+                    .build();
 
-        System.out.println("Upload URL: " + uploadUrl);
-        System.out.println("Public URL: " + publicUrl);
+            PresignedPutObjectRequest presignedRequest =
+                    s3Presigner.presignPutObject(presignRequest);
 
-        return new ReadS3(uploadUrl, publicUrl);
+            String uploadUrl = presignedRequest.url().toString();
+            String publicUrl = getPublicUrl(key);
+
+            return new ReadS3(uploadUrl, publicUrl);
+
+        }).toList();
     }
+
 
     private String getPublicUrl(String key) {
         return String.format("https://%s.s3.%s.amazonaws.com/%s",
