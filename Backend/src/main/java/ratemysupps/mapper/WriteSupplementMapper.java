@@ -5,7 +5,6 @@ import org.springframework.stereotype.Component;
 import ratemysupps.entity.Brand;
 import ratemysupps.entity.Supplement;
 import ratemysupps.repository.IBrandRepository;
-import ratemysupps.writemodel.WriteBrand;
 import ratemysupps.writemodel.WriteSupplement;
 
 import java.time.LocalDateTime;

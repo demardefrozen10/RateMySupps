@@ -4,8 +4,6 @@ import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-
-import ratemysupps.entity.Supplement;
 import ratemysupps.entity.Tag;
 
 public interface ITagRepository extends JpaRepository<Tag, Long> {

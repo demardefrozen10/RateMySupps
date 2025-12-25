@@ -1,8 +1,6 @@
 package ratemysupps.iqueryservice;
 
 import java.util.List;
-
-import ratemysupps.entity.Tag;
 import ratemysupps.readmodel.ReadTag;
 
 public interface ITagQueryService {

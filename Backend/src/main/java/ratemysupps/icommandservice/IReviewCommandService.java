@@ -1,6 +1,5 @@
 package ratemysupps.icommandservice;
 
-import ratemysupps.entity.Review;
 import ratemysupps.readmodel.ReadReview;
 import ratemysupps.writemodel.WriteReview;
 
