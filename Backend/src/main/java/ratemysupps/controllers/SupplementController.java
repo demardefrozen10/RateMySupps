@@ -6,12 +6,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ratemysupps.entity.Supplement;
 import ratemysupps.icommandservice.ISupplementCommandService;
 import ratemysupps.iqueryservice.ISupplementQueryService;
 import ratemysupps.readmodel.ReadSupplement;
 import ratemysupps.readmodel.ReadSupplementComplex;
 import ratemysupps.writemodel.WriteSupplement;
+import org.springframework.data.domain.Sort;
+
 
 import java.util.List;
 
@@ -42,12 +43,37 @@ public class SupplementController {
     }
 
     @PostMapping("/createSupplement")
-    public ResponseEntity<Supplement> createBrand(@RequestBody @Valid WriteSupplement supplement) {
-        Supplement created = commandRepo.submitSupplement(supplement);
+    public ResponseEntity<ReadSupplement> createBrand(@RequestBody @Valid WriteSupplement supplement) {
+        ReadSupplement created = commandRepo.submitSupplement(supplement);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
+     @GetMapping("/filterByRating")
+    public List<ReadSupplement> filterByRating(
+            @RequestParam Double minRating,
+            @RequestParam(defaultValue = "averageRating") String sortBy,
+            @RequestParam(defaultValue = "desc") String sortOrder
+    ) {
+        Sort.Direction direction = sortOrder.equalsIgnoreCase("desc") ? Sort.Direction.DESC : Sort.Direction.ASC;
+        Sort sort = Sort.by(direction, sortBy);
+        return queryRepo.searchSupplementsByMinRating(minRating, sort);
+    }
 
+
+    @GetMapping("/top-rated")
+    public List<ReadSupplement> getTopRated() {
+        return queryRepo.getTopRatedSupplements();
+    }
+
+    @GetMapping("/most-reviewed")
+    public List<ReadSupplement> getMostReviewed() {
+        return queryRepo.getMostReviewedSupplements();
+    }
+
+    @GetMapping("/searchByExactRating")
+    public List<ReadSupplement> searchByExactRating( @RequestParam Double rating) {
+        return queryRepo.searchSupplementsByExactRating(rating);
+    }
 
 }

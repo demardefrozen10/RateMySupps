@@ -1,9 +1,7 @@
 package ratemysupps.mapper;
 
 import org.springframework.stereotype.Component;
-import ratemysupps.entity.Brand;
 import ratemysupps.entity.Supplement;
-import ratemysupps.readmodel.ReadBrand;
 import ratemysupps.readmodel.ReadSupplement;
 import ratemysupps.readmodel.ReadSupplementComplex;
 

@@ -6,14 +6,15 @@ import org.springframework.stereotype.Service;
 import ratemysupps.iinfraservice.IS3Service;
 import ratemysupps.readmodel.ReadS3;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
-import software. amazon.awssdk.services. s3.presigner.S3Presigner;
+import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.PresignedPutObjectRequest;
 import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignRequest;
+
 
 import java.time.Duration;
 import java.util.UUID;
 
-import static sun.font.CreatedFontTracker.MAX_FILE_SIZE;
+//import static sun.font.CreatedFontTracker.MAX_FILE_SIZE;
 
 @Service
 public class S3Service implements IS3Service {
@@ -30,7 +31,7 @@ public class S3Service implements IS3Service {
 
 
     public ReadS3 createPresignedUrl(String fileName, String contentType, Long fileSize, String imageType) {
-        if (fileSize > MAX_FILE_SIZE) {
+        if (fileSize > 5 * 1024 * 1024) {
             throw new IllegalArgumentException("File too large (max 5MB)");
         }
 

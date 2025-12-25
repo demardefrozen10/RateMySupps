@@ -14,20 +14,22 @@ import ratemysupps.writemodel.WriteReview;
 @Service
 public class ReviewCommandService implements IReviewCommandService {
 
-
     private final WriteReviewMapper writeMapper;
     private final ReadReviewMapper readMapper;
     private final IReviewRepository repo;
     private final ISupplementRepository suppRepo;
 
-
-    public ReviewCommandService(WriteReviewMapper writeMapper, IReviewRepository repo, ISupplementRepository suppRepo, ReadReviewMapper readMapper) {
+    public ReviewCommandService(
+            WriteReviewMapper writeMapper,
+            IReviewRepository repo,
+            ISupplementRepository suppRepo,
+            ReadReviewMapper readMapper
+    ) {
         this.writeMapper = writeMapper;
         this.repo = repo;
         this.suppRepo = suppRepo;
         this.readMapper = readMapper;
     }
-
 
     @Override
     public ReadReview submitReview(WriteReview review) {
@@ -49,7 +51,6 @@ public class ReviewCommandService implements IReviewCommandService {
 
         supplement.setAverageRating(newAvg);
         supplement.setTotalReviews(oldCount + 1);
-
 
         return readMapper.fromEntity(repo.save(entityReview));
     }

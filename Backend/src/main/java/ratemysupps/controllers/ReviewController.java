@@ -5,7 +5,6 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ratemysupps.entity.Review;
 import ratemysupps.icommandservice.IReviewCommandService;
 import ratemysupps.iqueryservice.IReviewQueryService;
 import ratemysupps.readmodel.ReadReview;
@@ -25,7 +24,6 @@ public class ReviewController {
         this.queryRepo = repo;
     }
 
-
     @GetMapping("/getReviews")
     public List<ReadReview> getReviewBySupplementId(@RequestParam Long supplementId) {
         return queryRepo.getReviewBySupplementId(supplementId);
@@ -36,6 +34,20 @@ public class ReviewController {
         ReadReview created = commandRepo.submitReview(review);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
+    }
+
+    @GetMapping("/getVerifiedReviews")
+    public List<ReadReview> getVerifiedReviewsBySupplementId(@RequestParam Long supplementId
+    ) {
+        return queryRepo.getVerifiedReviewsBySupplementId(supplementId);
+    }
+
+    @GetMapping("/getReviewsWithMinRating")
+    public List<ReadReview> getReviewsBySupplementIdWithMinRating(
+            @RequestParam Long supplementId,
+            @RequestParam Double minRating
+    ) {
+        return queryRepo.getReviewsBySupplementIdWithMinRating(supplementId, minRating);
     }
 
 }
