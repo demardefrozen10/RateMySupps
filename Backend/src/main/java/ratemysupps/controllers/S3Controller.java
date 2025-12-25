@@ -15,7 +15,8 @@ import java.util.List;
 @RequestMapping("/api/s3")
 public class S3Controller {
 
-    IS3Service s3Service;
+    private final IS3Service s3Service;
+
     public S3Controller(IS3Service s3Service) {
         this.s3Service = s3Service;
     }

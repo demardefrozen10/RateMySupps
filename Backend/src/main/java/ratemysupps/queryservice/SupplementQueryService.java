@@ -1,5 +1,6 @@
 package ratemysupps.queryservice;
 
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ratemysupps.entity.Supplement;
 import ratemysupps.iqueryservice.ISupplementQueryService;
@@ -48,5 +49,38 @@ public class SupplementQueryService implements ISupplementQueryService {
 
 
 
+    public List<ReadSupplement> searchSupplementsByMinRating(Double minRating, Sort sort) {
+        return repo.findByAverageRatingGreaterThanEqual(minRating, sort)
+                .stream()
+                .map(mapper::fromEntity)
+                .collect(Collectors.toList());
+    }
 
+    @Override
+    public List<ReadSupplement> getTopRatedSupplements() {
+        return repo.findByOrderByAverageRatingDesc()
+                .stream()
+                .map(mapper::fromEntity)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ReadSupplement> getMostReviewedSupplements() {
+        return repo.findByOrderByTotalReviewsDesc()
+                .stream()
+                .map(mapper::fromEntity)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ReadSupplement> searchSupplementsByExactRating(Double rating) {
+        return repo.findByAverageRating(rating)
+                .stream()
+                .map(mapper::fromEntity)
+                .collect(Collectors.toList());
+    }
+
+    
+
+    
 }

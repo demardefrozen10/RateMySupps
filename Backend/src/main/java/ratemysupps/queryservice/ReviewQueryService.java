@@ -34,4 +34,30 @@ public class ReviewQueryService implements IReviewQueryService {
 
         return readReviews;
     }
+
+    @Override
+    public List<ReadReview> getVerifiedReviewsBySupplementId(Long supplementId) {
+        List<Review> reviews = reviewRepo.findBySupplementIdAndIsVerified(supplementId, true);
+
+        List<ReadReview> readReviews = new ArrayList<>();
+        for (Review review : reviews) {
+            readReviews.add(mapper.fromEntity(review));
+        }
+
+        return readReviews;
+    }
+
+    @Override
+    public List<ReadReview> getReviewsBySupplementIdWithMinRating(Long supplementId, Double minRating) {
+        List<Review> reviews = reviewRepo.findBySupplementIdAndRatingGreaterThanEqual(supplementId, minRating);
+
+        List<ReadReview> readReviews = new ArrayList<>();
+        for (Review review : reviews) {
+            readReviews.add(mapper.fromEntity(review));
+        }
+
+        return readReviews;
+    }
+
+    
 }

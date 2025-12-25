@@ -5,7 +5,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ratemysupps.entity.Brand;
 import ratemysupps.icommandservice.IBrandCommandService;
 import ratemysupps.iqueryservice.IBrandQueryService;
 import ratemysupps.readmodel.ReadBrand;
@@ -35,11 +34,13 @@ public class BrandController {
     }
 
     @PostMapping("/createBrand")
-    public ResponseEntity<Brand> createBrand(@RequestBody @Valid WriteBrand brand) {
-        Brand created = commandRepo.submitBrand(brand);
+    public ResponseEntity<ReadBrand> createBrand(@RequestBody @Valid WriteBrand brand) {
+        ReadBrand created = commandRepo.submitBrand(brand);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
+
+    
 
 
 }
