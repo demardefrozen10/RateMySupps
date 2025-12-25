@@ -5,7 +5,6 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ratemysupps.entity.Review;
 import ratemysupps.icommandservice.IReviewCommandService;
 import ratemysupps.iqueryservice.IReviewQueryService;
 import ratemysupps.readmodel.ReadReview;

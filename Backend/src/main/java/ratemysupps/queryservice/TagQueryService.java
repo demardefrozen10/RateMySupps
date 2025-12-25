@@ -3,18 +3,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
-
-import io.swagger.v3.oas.annotations.servers.Server;
-import ratemysupps.entity.Review;
 import ratemysupps.entity.Tag;
 import ratemysupps.iqueryservice.ITagQueryService;
-import ratemysupps.mapper.ReadReviewMapper;
-import ratemysupps.mapper.ReadSupplementMapper;
 import ratemysupps.mapper.ReadTagMapper;
-import ratemysupps.readmodel.ReadReview;
 import ratemysupps.readmodel.ReadTag;
-import ratemysupps.repository.IReviewRepository;
-import ratemysupps.repository.ISupplementRepository;
 import ratemysupps.repository.ITagRepository;
 
 @Service

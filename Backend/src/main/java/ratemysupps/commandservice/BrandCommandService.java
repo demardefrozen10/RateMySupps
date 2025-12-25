@@ -1,7 +1,6 @@
 package ratemysupps.commandservice;
 
 import org.springframework.stereotype.Service;
-import ratemysupps.entity.Brand;
 import ratemysupps.icommandservice.IBrandCommandService;
 import ratemysupps.repository.IBrandRepository;
 import ratemysupps.mapper.ReadBrandMapper;

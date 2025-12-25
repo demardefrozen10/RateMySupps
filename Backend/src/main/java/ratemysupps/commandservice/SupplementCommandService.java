@@ -1,7 +1,6 @@
 package ratemysupps.commandservice;
 
 import org.springframework.stereotype.Service;
-import ratemysupps.entity.Supplement;
 import ratemysupps.icommandservice.ISupplementCommandService;
 import ratemysupps.mapper.ReadSupplementMapper;
 import ratemysupps.mapper.WriteSupplementMapper;
