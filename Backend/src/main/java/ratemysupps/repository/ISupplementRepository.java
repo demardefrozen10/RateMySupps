@@ -10,9 +10,7 @@ public interface ISupplementRepository extends JpaRepository<Supplement, Long> {
 
 
     List<Supplement> findByBrandId(Long brandId);
-   
     List<Supplement> findByAverageRatingGreaterThanEqual(Double minRating, Sort sort);
-
     List<Supplement> findByOrderByAverageRatingDesc(); 
     List<Supplement> findByOrderByTotalReviewsDesc();
     List<Supplement> findByAverageRating(Double rating);
