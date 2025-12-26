@@ -12,7 +12,8 @@ Application inspired by RateMyProfessor, this app allows you to rate & view supp
 
 # Prerequisites
 - [Docker Desktop](https://www.docker.com/products/docker-desktop/) installed
-- [Node.js](https://nodejs.org/) (v18 or higher)
+- [Java 21+](https://adoptium.net/) installed
+- [Node.js](https://nodejs.org/) (v18 or higher) and npm installed
 
 # Installation
 
