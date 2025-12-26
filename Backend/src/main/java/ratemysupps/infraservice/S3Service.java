@@ -16,7 +16,6 @@ import java.time.Duration;
 import java.util.List;
 import java.util.UUID;
 
-import static sun.font.CreatedFontTracker.MAX_FILE_SIZE;
 
 @Service
 public class S3Service implements IS3Service {
@@ -36,7 +35,7 @@ public class S3Service implements IS3Service {
 
         return requests.stream().map(request -> {
 
-            if (request.getFileSize() > MAX_FILE_SIZE) {
+            if (request.getFileSize() > 9999) {
                 throw new IllegalArgumentException(
                         "File too large (max 5MB): " + request.getFileName()
                 );
