@@ -24,13 +24,15 @@ Application inspired by RateMyProfessor, this app allows you to rate & view supp
    cd Backend
    cp .env.example .env
 ```
-   Edit `.env` with your AWS credentials
+   Edit `.env` with your AWS credentials. It requires AWS access key and AWS secret key, a IAM role with full permission to AWS S3 bucket is required.
 
 2. Build and run with Docker Compose:
 ```bash
    docker compose up --build
 ```
    Backend runs on `http://localhost:8080`
+
+   This runs a containerized version of Spring Boot and a PostgreSQL instance (built from the official PostgreSQL image).
 
 ## Frontend
 
