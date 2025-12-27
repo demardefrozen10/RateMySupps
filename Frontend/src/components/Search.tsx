@@ -48,32 +48,32 @@ export default function Search() {
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
-    useEffect(() => {
-        if (!debouncedSearchQuery.trim()) {
-            setResults({ brands: [], supplements: [] });
-            return;
-        }
+   useEffect(() => {
+    if (!debouncedSearchQuery.trim() || debouncedSearchQuery.trim().length < 2) {
+        setResults({ brands: [], supplements: [] });
+        return;
+    }
 
-        const fetchResults = async () => {
-            setLoading(true);
-            setError(null);
-            try {
-                const [brandsData, supplementsData] = await Promise.all([
-                    get(`brand/getBrand?name=${debouncedSearchQuery}`),
-                    get(`supplement/searchByName?name=${debouncedSearchQuery}`)
-                ]);
-                setResults({
-                    brands: brandsData || [],
-                    supplements: supplementsData || []
-                });
-            } catch (err) {
-                setError(err instanceof Error ? err.message : 'An error occurred');
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchResults();
-    }, [debouncedSearchQuery]);
+    const fetchResults = async () => {
+        setLoading(true);
+        setError(null);
+        try {
+            const [brandsData, supplementsData] = await Promise.all([
+                get(`brand/getBrandByName?name=${debouncedSearchQuery}`),  // Fixed endpoint
+                get(`supplement/searchByName?name=${debouncedSearchQuery}`)
+            ]);
+            setResults({
+                brands: brandsData || [],
+                supplements: supplementsData || []
+            });
+        } catch (err) {
+            setError(err instanceof Error ? err.message : 'An error occurred');
+        } finally {
+            setLoading(false);
+        }
+    };
+    fetchResults();
+}, [debouncedSearchQuery]);
 
     const hasResults = results.brands.length > 0 || results.supplements.length > 0;
 
