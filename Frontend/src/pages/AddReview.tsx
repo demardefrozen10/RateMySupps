@@ -86,6 +86,11 @@ const HandleSubmitReview = async () => {
     let uploadedImageUrls: string[] = [];
     if (images.length > 0) {
         const data = await post("s3/presigned-url", batchPayload);
+
+        if (!data || !Array.isArray(data)) {
+            console.error("Failed to get presigned URLs from server");
+            return; 
+        }
         await Promise.all(
             images.map((image, idx) =>
                 fetch(data[idx].uploadUrl, {
@@ -128,10 +133,6 @@ const HandleSubmitReview = async () => {
     })
 }
 
-
-    
-
-  
 
     return (
         <div className="min-h-screen">
