@@ -107,7 +107,7 @@ export default function Search() {
                             type="text" 
                             value={searchQuery}
                             placeholder="Search brands or products..." 
-                            className="w-full pl-12 pr-28 py-4 text-base rounded-xl shadow-xl focus:ring-2 focus:ring-emerald-500/20 focus:outline-none text-gray-900 bg-white border-none"
+                            className="w-full pl-14  py-4 text-base rounded-xl shadow-xl focus:ring-2 focus:ring-emerald-500/20 focus:outline-none text-gray-900 bg-white border-none"
                             onChange={handleChange}
                             onFocus={() => hasResults && setShowDropdown(true)}
                         />
@@ -116,7 +116,7 @@ export default function Search() {
                         </button>
                     </div>
 
-                    {showDropdown && (
+                    {showDropdown && (loading || error || hasResults || (debouncedSearchQuery && !loading && !error && !hasResults)) && (
                         <div className="absolute top-full mt-3 w-full bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200">
                             <div className="max-h-[420px] overflow-y-auto custom-scrollbar">
                                 {loading && (
