@@ -41,7 +41,7 @@ export default function ProductPage() {
         get(endpoint).then((data) => {
             setReviews(data);
         });
-    }, [sortOption, supplementId, get])
+    }, [sortOption])
 
     useEffect(() => {
         if (location.state?.reviewSubmitted) {
