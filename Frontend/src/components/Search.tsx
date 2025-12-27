@@ -87,7 +87,6 @@ export default function Search() {
             }}
         >
             <div className="max-w-4xl w-full text-center space-y-8 relative z-10">
-                {/* Hero Text */}
                 <div className="space-y-4">
                     <h2 className="text-3xl md:text-5xl text-white font-extrabold tracking-tight drop-shadow-md">
                         Real Reviews. <span className="text-emerald-400">Verified Buyers.</span>
@@ -97,7 +96,6 @@ export default function Search() {
                     </p>
                 </div>
                 
-                {/* Search Bar Container */}
                 <div className="relative max-w-3xl mx-auto w-full" ref={dropdownRef}>
                     <div className="relative flex items-center group">
                         <div className="absolute left-6 text-gray-400">
@@ -109,16 +107,15 @@ export default function Search() {
                             type="text" 
                             value={searchQuery}
                             placeholder="Search brands or products..." 
-                            className="w-full pl-16 pr-36 py-6 text-lg rounded-2xl shadow-2xl focus:ring-4 focus:ring-emerald-500/20 focus:outline-none text-gray-900 bg-white border-none"
+                            className="w-full pl-12 pr-28 py-4 text-base rounded-xl shadow-xl focus:ring-2 focus:ring-emerald-500/20 focus:outline-none text-gray-900 bg-white border-none"
                             onChange={handleChange}
                             onFocus={() => hasResults && setShowDropdown(true)}
                         />
-                        <button className="absolute right-3 bg-emerald-500 hover:bg-emerald-600 text-white px-8 py-3.5 rounded-xl font-bold transition-all active:scale-95 shadow-lg">
+                        <button className="absolute right-2 bg-emerald-500 hover:bg-emerald-600 text-white px-6 py-2 rounded-lg font-bold transition-all active:scale-95 shadow-md">
                             Search
                         </button>
                     </div>
 
-                    {/* Improved Dropdown Results */}
                     {showDropdown && (
                         <div className="absolute top-full mt-3 w-full bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200">
                             <div className="max-h-[420px] overflow-y-auto custom-scrollbar">
@@ -143,7 +140,6 @@ export default function Search() {
                                 
                                 {!loading && !error && hasResults && (
                                     <div className="divide-y divide-gray-50">
-                                        {/* Brands Section */}
                                         {results.brands.length > 0 && (
                                             <div>
                                                 <div className="px-5 py-3 bg-gray-50/80 text-[11px] font-bold text-gray-400 uppercase tracking-[0.2em]">
@@ -175,7 +171,6 @@ export default function Search() {
                                             </div>
                                         )}
 
-                                        {/* Products Section */}
                                         {results.supplements.length > 0 && (
                                             <div>
                                                 <div className="px-5 py-3 bg-gray-50/80 text-[11px] font-bold text-gray-400 uppercase tracking-[0.2em]">
