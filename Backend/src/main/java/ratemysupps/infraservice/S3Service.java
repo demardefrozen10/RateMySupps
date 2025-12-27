@@ -35,11 +35,11 @@ public class S3Service implements IS3Service {
 
         return requests.stream().map(request -> {
 
-            if (request.getFileSize() > 9999) {
-                throw new IllegalArgumentException(
-                        "File too large (max 5MB): " + request.getFileName()
-                );
-            }
+            if (request.getFileSize() > 5 * 1024 * 1024) { // 5MB Limit
+            throw new IllegalArgumentException(
+                "File too large (max 5MB): " + request.getFileName()
+            );
+        }
 
             String key = request.getImageType()
                     + "/"

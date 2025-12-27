@@ -27,6 +27,17 @@ public class BrandController {
     }
 
     @GetMapping("/getBrand")
+    public ResponseEntity<ReadBrand> getBrandById(@RequestParam Long brandId) {  
+    ReadBrand brand = queryRepo.getBrandById(brandId);
+    
+    if (brand == null) {
+        return ResponseEntity.notFound().build(); 
+    }
+    
+    return ResponseEntity.ok(brand);  
+    }
+    
+    @GetMapping("/getBrandByName")
     public List<ReadBrand> getBrandByName(@RequestParam String name){
 
         return queryRepo.getBrandByName(name);

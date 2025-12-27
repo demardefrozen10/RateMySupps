@@ -1,5 +1,6 @@
 package ratemysupps.iqueryservice;
 
+import ratemysupps.entity.Supplement;
 import ratemysupps.readmodel.ReadSupplement;
 import ratemysupps.readmodel.ReadSupplementComplex;
 import org.springframework.data.domain.Sort;
@@ -17,5 +18,6 @@ public interface ISupplementQueryService {
     List<ReadSupplement> getMostReviewedSupplements();
     List<ReadSupplement>searchSupplementsByExactRating(Double rating);
     List<ReadSupplement> searchSupplementsByName(String name);
+    List<ReadSupplement> getSupplementsByBrand(Long brandId, String search, String filter, String sortOption);
 
 }
