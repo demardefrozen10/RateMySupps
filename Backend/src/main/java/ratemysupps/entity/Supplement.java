@@ -38,13 +38,20 @@ public class Supplement {
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
-    @Column(unique = true)
-    private List<String> imageUrl;
+    
+    @ElementCollection
+    @Column(name = "image_url")
+    private List<String> imageUrl = new ArrayList<>();
+
+    @ElementCollection
+    @Column(name = "serving_size")
+    private List<String> servingSizes = new ArrayList<>();
+
 
     @Column(nullable = false, columnDefinition = "TEXT")
     private String websiteUrl;
 
-    private List<String> servingSizes;
+    
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(

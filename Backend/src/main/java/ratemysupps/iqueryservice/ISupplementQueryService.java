@@ -16,5 +16,6 @@ public interface ISupplementQueryService {
     List<ReadSupplement> getTopRatedSupplements();
     List<ReadSupplement> getMostReviewedSupplements();
     List<ReadSupplement>searchSupplementsByExactRating(Double rating);
+    List<ReadSupplement> searchSupplementsByName(String name);
 
 }

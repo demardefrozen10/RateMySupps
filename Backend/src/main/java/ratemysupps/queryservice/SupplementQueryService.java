@@ -80,6 +80,14 @@ public class SupplementQueryService implements ISupplementQueryService {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public List<ReadSupplement> searchSupplementsByName(String name) {
+        return repo.findBySupplementNameContainingIgnoreCase(name)
+                .stream()
+                .map(mapper::fromEntity)
+                .collect(Collectors.toList());
+    }
+
     
 
     

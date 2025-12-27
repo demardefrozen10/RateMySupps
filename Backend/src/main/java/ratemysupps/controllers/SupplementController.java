@@ -81,4 +81,9 @@ public class SupplementController {
         return queryRepo.searchSupplementsByExactRating(rating);
     }
 
+    @GetMapping("/searchByName")
+    public List<ReadSupplement> searchByName(@RequestParam String name) {
+        return queryRepo.searchSupplementsByName(name);
+    }
+
 }
