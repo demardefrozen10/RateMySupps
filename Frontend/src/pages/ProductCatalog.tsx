@@ -5,6 +5,8 @@ import { useState, useEffect } from "react"
 import type { Brand } from "../types/Brand";
 import useFetch from "../hooks/useFetch";
 import type {Supplement} from "../types/Supplement";
+import useDebounce from '../hooks/useDebounce';
+
 
 
 export default function ProductCatalog() {
@@ -18,6 +20,7 @@ export default function ProductCatalog() {
 
     const { get: getSupplementsApi } = useFetch("http://localhost:8080/api/supplement/");
     const { get: getBrandApi } = useFetch("http://localhost:8080/api/brand/");
+    const debouncedSearchQuery = useDebounce(searchQuery, 500);
     const navigate = useNavigate();
 
 
@@ -26,18 +29,20 @@ export default function ProductCatalog() {
     const location = useLocation();
 
     useEffect(() => {
-    if (!brandId) return;
+        if (!brandId) return;
 
-    getBrandApi(`getBrand?brandId=${brandId}`) 
-        .then((data: Brand) => setBrand(data))
-        .catch((error) => console.error("Error fetching brand:", error));
-}, [brandId]);
+        getBrandApi(`getBrand?brandId=${brandId}`) 
+            .then((data: Brand) => setBrand(data))
+            .catch((error) => console.error("Error fetching brand:", error));
+    }, [brandId]);
 
     useEffect(() => {
-  if (!brandId) return;
-
+    if (!debouncedSearchQuery.trim() || debouncedSearchQuery.trim().length < 2) {
+        setSupplements([]);
+        return;
+    }
   const url = `getSupplements?brandId=${brandId}` +
-              (searchQuery ? `&search=${searchQuery}` : "") +
+              (debouncedSearchQuery ? `&search=${debouncedSearchQuery}` : "") +
               (filterOption ? `&filter=${filterOption}` : "") +
               (sortOption ? `&sortOption=${sortOption}` : ""); 
 
@@ -45,7 +50,7 @@ export default function ProductCatalog() {
     .then((data: Supplement[]) => setSupplements(data))
     .catch((error) => console.error("Error fetching supplements:", error));
 
-}, [brandId, searchQuery, filterOption, sortOption]);
+}, [debouncedSearchQuery, filterOption, sortOption]);
 
 
 
@@ -178,18 +183,28 @@ export default function ProductCatalog() {
                 </div>
 
                 <div className="flex flex-col gap-4">
-                    {supplements.map((supplement, index) => (
-                    <BrandCard 
-                        key={index}
-                        id={supplement.id}
-                        supplementName={supplement.supplementName}
-                        imageUrl={supplement.imageUrl}
-                        averageRating={supplement.averageRating}
-                        totalReviews={supplement.totalReviews}
-                        brand={brand.brandName}
-                        category={supplement.category}
-                    />
-                    ))}
+                    {supplements.length === 0 ? (
+                        <div className="flex flex-col items-center justify-center py-16 text-gray-400">
+                            <svg className="w-16 h-16 mb-4 text-emerald-200" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4m0 4h.01M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9 9 4.03 9 9z" />
+                            </svg>
+                            <span className="text-lg font-semibold">No results found</span>
+                            <span className="text-sm mt-1">Try adjusting your search or filters.</span>
+                        </div>
+                    ) : (
+                        supplements.map((supplement, index) => (
+                            <BrandCard 
+                                key={index}
+                                id={supplement.id}
+                                supplementName={supplement.supplementName}
+                                imageUrl={supplement.imageUrl}
+                                averageRating={supplement.averageRating}
+                                totalReviews={supplement.totalReviews}
+                                brand={brand.brandName}
+                                category={supplement.category}
+                            />
+                        ))
+                    )}
                 </div>
             </div>
         </div>
