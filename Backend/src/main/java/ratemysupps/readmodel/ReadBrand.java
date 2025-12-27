@@ -1,8 +1,10 @@
 package ratemysupps.readmodel;
 
 import lombok.Setter;
+import lombok.Getter;
 
 @Setter
+@Getter
 public class ReadBrand {
     public String brandName;
 

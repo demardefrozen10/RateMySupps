@@ -1,4 +1,5 @@
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import BrandCard from "../components/BrandCard"
 import { useState, useEffect } from "react"
 import type { Brand } from "../types/Brand";
@@ -11,21 +12,42 @@ export default function ProductCatalog() {
     const [supplements, setSupplements] = useState<Supplement[]>([]);
     const [showNotification, setShowNotification] = useState(false);
 
-    const { get } = useFetch("http://localhost:8080/api/supplement/");
+    const [searchQuery, setSearchQuery] = useState("");
+    const[sortOption, setSortOption] = useState("");
+    const [filterOption, setFilterOption] = useState("");
+
+    const { get: getSupplementsApi } = useFetch("http://localhost:8080/api/supplement/");
+    const { get: getBrandApi } = useFetch("http://localhost:8080/api/brand/");
     const navigate = useNavigate();
 
 
+    const { brandId } = useParams();
+    const [brand, setBrand] = useState<Brand | null>(null);
     const location = useLocation();
-    const brand: Brand = location.state?.brand;
-
 
     useEffect(() => {
-        get(`getSupplements?brandId=${brand.id}`).then((data: Supplement[]) => {
-            setSupplements(data);
-        }).catch((error) => {
-            console.error("Error fetching supplements:", error);
-        });
-    }, []); 
+    if (!brandId) return;
+
+    getBrandApi(`getBrand?brandId=${brandId}`) 
+        .then((data: Brand) => setBrand(data))
+        .catch((error) => console.error("Error fetching brand:", error));
+}, [brandId]);
+
+    useEffect(() => {
+  if (!brandId) return;
+
+  const url = `getSupplements?brandId=${brandId}` +
+              (searchQuery ? `&search=${searchQuery}` : "") +
+              (filterOption ? `&filter=${filterOption}` : "") +
+              (sortOption ? `&sortOption=${sortOption}` : ""); 
+
+  getSupplementsApi(url)
+    .then((data: Supplement[]) => setSupplements(data))
+    .catch((error) => console.error("Error fetching supplements:", error));
+
+}, [brandId, searchQuery, filterOption, sortOption]);
+
+
 
     
     useEffect(() => {
@@ -48,8 +70,21 @@ export default function ProductCatalog() {
     const prevImage = () => setCurrentImage((prev) => (prev - 1 + images.length) % images.length)
 
     const HandleAddSupplementClick = () => {
-        navigate('/product/add-supplement', { state: { brand: brand } });
+
+       if (!brand) return;
+
+       console.log("Navigating with brandId:", brand.id); 
+
+       navigate(`/product/add-supplement/${brand.id}`, { state: { brand } });
+
+   };
+
+
+    if (!brand) {
+    return <div className="p-8 text-gray-500">Loading brand…</div>;
     }
+
+
 
     return (   
         <div className="min-h-screen to-white">
@@ -107,25 +142,36 @@ export default function ProductCatalog() {
                     <input 
                         type="text" 
                         placeholder="Search for a supplement..." 
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
                         className="flex-1 max-w-md px-4 py-2 rounded-lg border-2 border-gray-200 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200 transition-all"
                     />
                     
-                    <select className="px-4 py-2 bg-white text-gray-700 border-2 border-gray-200 rounded-lg font-medium hover:border-emerald-300 focus:border-emerald-500 focus:outline-none transition-colors cursor-pointer">
+                    <select 
+                    value={sortOption}
+                    onChange={(e) => setSortOption(e.target.value)}
+                    className="px-4 py-2 bg-white text-gray-700 border-2 border-gray-200 rounded-lg font-medium hover:border-emerald-300 focus:border-emerald-500 focus:outline-none transition-colors cursor-pointer">
                             <option value="">Sort By</option>
                             <option value="highest-rated">Highest Rated</option>
                             <option value="most-reviews">Most Reviews</option>
                             <option value="a-z">A-Z</option>
                         </select>
                     
-                    <select className="px-4 py-2 bg-white text-gray-700 border-2 border-gray-200 rounded-lg font-medium hover:border-emerald-300 focus:border-emerald-500 focus:outline-none transition-colors cursor-pointer">
-                        <option value="">Filter</option>
-                        <option value="protein">Protein</option>
-                        <option value="pre-workout">Pre-Workout</option>
-                        <option value="creatine">Creatine</option>
-                        <option value="bcaa">BCAA</option>
-                        <option value="vitamins">Vitamins</option>
-                    </select>
+                    <select
+                    value={filterOption}
+                    onChange={(e) => setFilterOption(e.target.value)}
+                    className="px-4 py-2 bg-white text-gray-700 border-2 border-gray-200 rounded-lg font-medium hover:border-emerald-300 focus:border-emerald-500 focus:outline-none transition-colors cursor-pointer"
+                >
+                    <option value="">Filter</option>
+                    <option value="protein">Protein</option>
+                    <option value="pre-workout">Pre-Workout</option>
+                    <option value="creatine">Creatine</option>
+                    <option value="bcaa">BCAA</option>
+                    <option value="vitamins">Vitamins</option>
+                </select>
                 </div>
+
+                
 
                 <div className="mb-6 text-sm text-gray-600">
                     Can't find what you're looking for? <button className="text-emerald-600 hover:text-emerald-700 font-semibold underline cursor-pointer" onClick={HandleAddSupplementClick}>Add a supplement here</button>

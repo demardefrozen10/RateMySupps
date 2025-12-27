@@ -2,6 +2,9 @@ package ratemysupps.queryservice;
 
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
 import ratemysupps.entity.Supplement;
 import ratemysupps.iqueryservice.ISupplementQueryService;
 import ratemysupps.mapper.ReadSupplementMapper;
@@ -27,12 +30,13 @@ public class SupplementQueryService implements ISupplementQueryService {
     }
 
     @Override
-    public List<ReadSupplement> getAllSupplementsByBrand(Long brandId) {
-        return repo.findByBrandId(brandId)
-                .stream()
-                .map(mapper::fromEntity)
-                .collect(Collectors.toList());
-    }
+public List<ReadSupplement> getAllSupplementsByBrand(Long brandId) {
+    return repo.findAllWithReviewsByBrandId(brandId) 
+            .stream()
+            .map(mapper::fromEntity)
+            .collect(Collectors.toList());
+}
+
 
     @Override
     public ReadSupplementComplex getSupplementById(Long supplementId) {
@@ -88,7 +92,26 @@ public class SupplementQueryService implements ISupplementQueryService {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public List<ReadSupplement> getSupplementsByBrand(Long brandId, String search, String filter, String sortOption) {
     
+    Sort sortObj = Sort.by(Sort.Direction.ASC, "supplementName");
 
-    
+    if (sortOption != null) {
+        if (sortOption.equalsIgnoreCase("highest-rated")) {
+            sortObj = Sort.by(Sort.Direction.DESC, "averageRating");
+        } else if (sortOption.equalsIgnoreCase("most-reviews")) {
+            sortObj = Sort.by(Sort.Direction.DESC, "totalReviews");
+        }
+    }
+
+    String searchParam = (search != null && !search.isBlank()) ? "%" + search + "%" : null;
+    String filterParam = (filter != null && !filter.isBlank()) ? filter : null;
+
+    return repo.findByBrandWithFilters(brandId, searchParam, filterParam, sortObj)
+               .stream()
+               .map(mapper::fromEntity)
+               
+               .toList();
+}
 }

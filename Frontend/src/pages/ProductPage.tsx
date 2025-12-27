@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import { useLocation, useNavigate } from "react-router-dom"
+import { useLocation, useNavigate, useParams } from "react-router-dom"
 import useFetch from "../hooks/useFetch";
 import type { Supplement } from "../types/Supplement";
 import type { Review } from "../types/Review";
@@ -10,26 +10,25 @@ export default function ProductPage() {
     const [showNotification, setShowNotification] = useState(false);
     const [sortOption, setSortOption] = useState<"recent" | "highest" | "lowest">("recent");
 
-    
     const navigate = useNavigate();
     const location = useLocation();
-
-    const supplementId: number = location.state?.supplementId; 
-    const brandName: string = location.state?.brandName;
-
-
+    const brandName = location.state?.brandName || location.state?.supplement?.brandName;
+    
+    const { supplementId } = useParams();
 
     const {get} = useFetch("http://localhost:8080/api/");
 
-
     useEffect(() => {
+        if (!supplementId) return;
+
         get(`supplement/getSupplement?supplementId=${supplementId}`).then((data) => {
             setSupplement(data);
         });
-    }, []);
-
+    }, [supplementId]); 
 
     useEffect(() => {
+        if (!supplementId) return;
+
         let endpoint = "";
         if (sortOption === "recent") {
             endpoint = `review/getReviewsByDate?supplementId=${supplementId}`;
@@ -38,10 +37,11 @@ export default function ProductPage() {
         } else if (sortOption === "lowest") {
             endpoint = `review/getReviewsByMinRating?supplementId=${supplementId}`;
         }
+        
         get(endpoint).then((data) => {
-            setReviews(data);
+            setReviews(Array.isArray(data) ? data : []);
         });
-    }, [sortOption, supplementId, get])
+    }, [sortOption, supplementId]); 
 
     useEffect(() => {
         if (location.state?.reviewSubmitted) {
@@ -65,15 +65,18 @@ export default function ProductPage() {
     }
 
     const getRatingDistribution = () => {
-        const distribution: Record<number, number> = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
-        reviews.forEach((review) => {
-            const rating = Math.floor(review.rating);
-            if (rating >= 1 && rating <= 5) {
-                distribution[rating]++;
-            }
-        });
-        return distribution;
-    };
+    const distribution: Record<number, number> = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
+    
+    if (!Array.isArray(reviews)) return distribution;
+
+    reviews.forEach((review) => {
+        const rating = Math.floor(review.rating);
+        if (rating >= 1 && rating <= 5) {
+            distribution[rating]++;
+        }
+    });
+    return distribution;
+};
 
     const ratingDistribution = getRatingDistribution();
     const totalReviewCount = reviews.length;
