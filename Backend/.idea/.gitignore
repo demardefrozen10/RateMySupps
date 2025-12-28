@@ -13,3 +13,6 @@ target/
 # IDE folders
 .vscode/
 .idea/
+
+# Java build output
+target/
