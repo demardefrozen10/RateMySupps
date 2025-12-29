@@ -4,6 +4,7 @@ import useFetch from "../hooks/useFetch";
 import type { Supplement } from "../types/Supplement";
 import type { Review } from "../types/Review";
 import ReviewStrip from "../components/ReviewStrip";
+import type { Brand } from "../types/Brand";
 export default function ProductPage() {
     const [supplement, setSupplement] = useState<Supplement>();
     const [reviews, setReviews] = useState<Review[]>([]);
@@ -16,8 +17,7 @@ export default function ProductPage() {
     const location = useLocation();
 
     const supplementId: number = location.state?.supplementId; 
-    const brandName: string = location.state?.brandName;
-
+    const brand: Brand = location.state?.brand;
 
 
     const {get} = useFetch("http://localhost:8080/api/");
@@ -64,7 +64,7 @@ export default function ProductPage() {
 
 
     const HandleReviewClick = () => {
-        navigate('/add-review', { state: { supplementId, brandName, supplementName: supplement?.supplementName, imageUrl: supplement?.imageUrl, variants: supplement?.variants } });
+        navigate('/add-review', { state: { supplementId, brandName: brand.brandName, supplementName: supplement?.supplementName, imageUrl: supplement?.imageUrl, variants: supplement?.variants } });
     }
 
     const getRatingBgColor = (rating: number, totalReviews: number) => {
@@ -122,8 +122,8 @@ export default function ProductPage() {
                     </div>
                     <div>
                         <div className="mb-4">
-                            <a href="#" className="text-emerald-600 hover:text-emerald-700 font-semibold mb-2 inline-block">
-                                {brandName}
+                            <a onClick={() =>    navigate(`/products/${brand.brandName}`, { state: { brand } })} className="text-emerald-600 hover:text-emerald-700 font-semibold mb-2 inline-block cursor-pointer">
+                                {brand.brandName}
                             </a>
                             <h1 className="text-4xl font-bold text-gray-800 mb-4">
                                 {supplement?.supplementName}

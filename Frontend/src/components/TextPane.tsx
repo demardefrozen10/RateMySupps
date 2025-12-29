@@ -21,16 +21,8 @@ export default function TextPane() {
   ];
 
   return (
-    <section className="pt-10 pb-20">
+    <section className="pt-5 pb-20">
       <div className="max-w-7xl mx-auto px-6">
-        <div className="mb-16 text-center md:text-left">
-          <span className="text-emerald-600 font-bold tracking-widest uppercase text-xs">
-            Platform Features
-          </span>
-          <h2 className="mt-3 text-4xl font-extrabold text-gray-900 tracking-tight sm:text-5xl">
-             Enhance Your Experience
-          </h2>
-        </div>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {features.map((feature, idx) => (

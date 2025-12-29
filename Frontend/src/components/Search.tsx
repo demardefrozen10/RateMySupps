@@ -27,7 +27,7 @@ export default function Search() {
     }
 
     const handleBrandClick = (brand: Brand) => {
-        navigate(`/products/${brand.id}`, { state: { brand } });
+        navigate(`/products/${brand.brandName}`, { state: { brand } });
         setShowDropdown(false);
         setSearchQuery('');
     }

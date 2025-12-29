@@ -161,9 +161,10 @@ export default function ProductCatalog() {
                         imageUrl={supplement.imageUrl}
                         averageRating={supplement.averageRating}
                         totalReviews={supplement.totalReviews}
-                        brand={brand.brandName}
+                        brand={brand}
                         category={supplement.category}
                         variants={supplement.variants}
+                        servingSizes={supplement.servingSizes}
                     />
                     ))}
                 </div>
