@@ -47,6 +47,25 @@ export default function ProductCatalog() {
         navigate('/product/add-supplement', { state: { brand: brand } });
     }
 
+    const renderStars = (rating: number) => {
+        const fullStars = Math.floor(rating);
+        const hasHalfStar = rating % 1 >= 0.5;
+        return [...Array(5)].map((_, idx) => {
+            if (idx < fullStars) {
+                return <span key={idx} className="text-yellow-400">★</span>;
+            } else if (idx === fullStars && hasHalfStar) {
+                return (
+                    <span key={idx} className="relative">
+                        <span className="text-gray-300">★</span>
+                        <span className="absolute left-0 top-0 overflow-hidden w-1/2 text-yellow-400">★</span>
+                    </span>
+                );
+            } else {
+                return <span key={idx} className="text-gray-300">★</span>;
+            }
+        });
+    };
+
     return (   
         <div className="min-h-screen to-white">
         {showNotification && (
@@ -62,10 +81,16 @@ export default function ProductCatalog() {
             <div className="max-w-7xl mx-auto px-4 py-12">
                 <div className="mb-8 relative rounded-xl overflow-hidden shadow-lg">
                     <div className="relative h-64 bg-cover bg-center" style={{ backgroundImage: `url(${images[currentImage]})` }}>
-                        <div className="absolute inset-0 bg-black/40"></div>
+                        <div className="absolute inset-0 bg-black/65"></div>
                         
-                        <div className="absolute inset-0 flex items-center justify-center">
+                        <div className="absolute inset-0 flex flex-col items-center justify-center">
                             <h1 className="text-4xl sm:text-6xl font-bold text-white drop-shadow-lg text-center w-full break-words">{brand.brandName}</h1>
+                            <div className="mt-2 flex items-center justify-center">
+                                <span className="flex text-5xl sm:text-4xl">
+                                    {renderStars(brand.averageRating)}
+                                </span>
+                            </div>
+                            <p className="mt-1 font-bold text-white drop-shadow-lg text-center w-full break-words">Based on {brand.totalReviews} reviews</p>
                         </div>
 
                         <button 

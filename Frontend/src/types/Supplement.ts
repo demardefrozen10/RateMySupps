@@ -7,6 +7,7 @@ interface Supplement {
     brand: string;
     category: string;
     variants: string[];
+    servingSizes: string[];
 
 
 }

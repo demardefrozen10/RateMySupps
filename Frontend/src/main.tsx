@@ -4,12 +4,14 @@ import { BrowserRouter } from 'react-router-dom'
 import './index.css'
 import Router from './misc/Router';
 import NavBar from './components/NavBar';
+import Footer from './components/Footer';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <BrowserRouter>
     <NavBar/>
       <Router />
+      <Footer/>
     </BrowserRouter>
   </StrictMode>,
 )

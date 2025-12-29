@@ -74,6 +74,13 @@ export default function ProductPage() {
         return 'bg-gradient-to-br from-emerald-400 to-emerald-500';
     }
 
+    const getRatingLabel = (rating: number, totalReviews: number) => {
+        if (totalReviews === 0) return "No Ratings Yet";
+        if (rating <= 2) return "Poor Rating";
+        if (rating <= 3) return "Average Rating";
+        return "Great Rating";
+    }
+
     const getRatingDistribution = () => {
         const distribution: Record<number, number> = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
         reviews.forEach((review) => {
@@ -88,7 +95,6 @@ export default function ProductPage() {
     const ratingDistribution = getRatingDistribution();
     const totalReviewCount = reviews.length;
 
-    console.log(variant.length);
 
     return (
         <div className="min-h-screen to-white">
@@ -128,7 +134,9 @@ export default function ProductPage() {
                                         <span className="text-3xl font-bold text-white">{supplement?.averageRating?.toFixed(1)}</span>
                                     </div>
                                     <div>
-                                        <div className="text-sm font-semibold text-gray-700">No Reviews Yet</div>
+                                        <div className="text-sm font-semibold text-gray-700">
+                                            {getRatingLabel(supplement?.averageRating ?? 0, supplement?.totalReviews ?? 0)}
+                                        </div>
                                         <div className="text-xs text-gray-500">Based on {supplement?.totalReviews} reviews</div>
                                     </div>
                                 </div>
@@ -143,12 +151,20 @@ export default function ProductPage() {
                                     <span className="font-semibold">{supplement?.category}</span>
                                 </div>
                                 <div className="flex justify-between">
-                                    <span className="text-gray-600">Serving Size:</span>
-                                    <span className="font-semibold">30g</span>
+                                    <span className="text-gray-600">Serving Sizes:</span>
+                                    <span className="font-semibold">
+                                        {supplement?.servingSizes
+                                            ? Array.isArray(supplement.servingSizes)
+                                                ? supplement.servingSizes.join(", ")
+                                                : supplement.servingSizes
+                                            : "N/A"}
+                                    </span>
                                 </div>
                                 <div className="flex justify-between">
-                                    <span className="text-gray-600">Protein per Serving:</span>
-                                    <span className="font-semibold">24g</span>
+                                    <span className="text-gray-600">Flavors:</span>
+                                    <span className="font-semibold">
+                                        {supplement?.variants?.join(", ")}
+                                    </span>
                                 </div>
                             </div>
                         </div>

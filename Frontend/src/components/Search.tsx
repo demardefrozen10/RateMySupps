@@ -92,7 +92,7 @@ export default function Search() {
                         Real Reviews. <span className="text-emerald-400">Verified Buyers.</span>
                     </h2>
                     <p className="text-lg text-gray-200 font-medium max-w-2xl mx-auto">
-                        Search thousands of supplement brands and products to find what actually works.
+                        Search over <span className="text-emerald-400 font-bold">1000+</span> supplement brands & products with over <span className="text-emerald-400 font-bold">2000+</span> verified reviews.
                     </p>
                 </div>
                 
