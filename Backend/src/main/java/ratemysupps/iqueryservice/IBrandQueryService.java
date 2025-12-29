@@ -5,7 +5,6 @@ import ratemysupps.readmodel.ReadBrand;
 
 import java.util.List;
 
-import lombok.Locked.Read;
 
 public interface IBrandQueryService {
 
