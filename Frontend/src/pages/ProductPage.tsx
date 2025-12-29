@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react"
-import { useLocation, useNavigate } from "react-router-dom"
+import { useLocation, useNavigate, useParams } from "react-router-dom"
 import useFetch from "../hooks/useFetch";
 import type { Supplement } from "../types/Supplement";
 import type { Review } from "../types/Review";
 import ReviewStrip from "../components/ReviewStrip";
 import type { Brand } from "../types/Brand";
+
 export default function ProductPage() {
     const [supplement, setSupplement] = useState<Supplement>();
     const [reviews, setReviews] = useState<Review[]>([]);
@@ -12,11 +13,10 @@ export default function ProductPage() {
     const [sortOption, setSortOption] = useState<"recent" | "highest" | "lowest">("recent");
     const [variant, setVariant] = useState<string>("");
 
-    
     const navigate = useNavigate();
     const location = useLocation();
+    const { supplementId } = useParams<{ supplementId: string }>();
 
-    const supplementId: number = location.state?.supplementId; 
     const brand: Brand = location.state?.brand;
 
 
@@ -24,13 +24,14 @@ export default function ProductPage() {
 
 
     useEffect(() => {
+        if (!supplementId) return;
         get(`supplement/getSupplement?supplementId=${supplementId}`).then((data) => {
             setSupplement(data);
         });
-
-        }, []);
+    }, [supplementId]);
     
     useEffect(() => {
+        if (!supplementId) return;
         let orderBy: string = "";
         let sort: string = "";
         if (sortOption === "highest") {
@@ -49,7 +50,7 @@ export default function ProductPage() {
         get(`review/getReviews?supplementId=${supplementId}&sortBy=${sort}&sortOrder=${orderBy}&variant=${variant}`).then((data: Review[]) => {
             setReviews(data)
         });
-    }, [sortOption, variant]);
+    }, [sortOption, variant, supplementId]);
 
 
 
@@ -64,7 +65,13 @@ export default function ProductPage() {
 
 
     const HandleReviewClick = () => {
-        navigate('/add-review', { state: { supplementId, brandName: brand.brandName, supplementName: supplement?.supplementName, imageUrl: supplement?.imageUrl, variants: supplement?.variants } });
+        navigate('/add-review', { state: { 
+            supplementId: supplementId ? Number(supplementId) : undefined, 
+            brandName: brand?.brandName, 
+            supplementName: supplement?.supplementName, 
+            imageUrl: supplement?.imageUrl, 
+            variants: supplement?.variants 
+        } });
     }
 
     const getRatingBgColor = (rating: number, totalReviews: number) => {

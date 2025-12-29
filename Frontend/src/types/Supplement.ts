@@ -6,7 +6,7 @@ interface Supplement {
     averageRating: number;
     totalReviews: number;
     imageUrl: string;
-    brand: Brand;
+    brandId: number;
     category: string;
     variants: string[];
     servingSizes: string[];
