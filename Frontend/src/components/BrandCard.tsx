@@ -5,10 +5,8 @@ export default function BrandCard(props: Supplement) {
     const navigate = useNavigate();
 
     const handleCardClick = () => {
-    navigate(`/product/${props.id}`, { 
-        state: { brandName: props.brand } 
-    });
-}
+        navigate(`/product/${props.id}`, { state: { supplementId: props.id, brand: props.brand } });
+    }
 
     return (
         <div onClick={handleCardClick} className="flex items-center justify-between bg-white border-2 border-emerald-100 rounded-xl p-6 shadow-sm hover:shadow-lg hover:border-emerald-300 transition-all cursor-pointer">

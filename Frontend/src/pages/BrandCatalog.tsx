@@ -29,9 +29,9 @@ export default function Catalog() {
                 </div>
 
                 <div className="flex flex-col gap-4">
-                    <BrandCard id={0} supplementName={""} averageRating={0} totalReviews={0} imageUrl={""} brand={""} category={""}/>
-                    <BrandCard id={0} supplementName={""} averageRating={0} totalReviews={0} imageUrl={""} brand={""} category={""}/>
-                    <BrandCard id={0} supplementName={""} averageRating={0} totalReviews={0} imageUrl={""} brand={""} category={""}/>
+                    <BrandCard/>
+                    <BrandCard/>
+                    <BrandCard/>
                 </div>
             </div>
         </div>

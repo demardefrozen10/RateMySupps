@@ -1,6 +1,5 @@
 package ratemysupps.iqueryservice;
 
-import ratemysupps.entity.Supplement;
 import ratemysupps.readmodel.ReadSupplement;
 import ratemysupps.readmodel.ReadSupplementComplex;
 import org.springframework.data.domain.Sort;

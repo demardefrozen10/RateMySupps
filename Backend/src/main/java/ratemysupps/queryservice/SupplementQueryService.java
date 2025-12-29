@@ -2,8 +2,6 @@ package ratemysupps.queryservice;
 
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import ratemysupps.entity.Supplement;
 import ratemysupps.iqueryservice.ISupplementQueryService;

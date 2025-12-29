@@ -1,14 +1,14 @@
 export default function TextPane() {
   const features = [
     {
-      title: "Manage Your Ratings",
-      description: "Edit and update your supplement reviews anytime.",
+      title: "View Real & Authentic Reviews",
+      description: "See what verified customers are saying about this supplement.",
       iconColor: "from-emerald-400 to-emerald-600",
       iconPath: "M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
     },
     {
-      title: "Always Anonymous",
-      description: "Your ratings remain private and confidential.",
+      title: "Confidentiality Guaranteed",
+      description: "Feel free to use your name or remain completely anonymous in your review.",
       iconColor: "from-emerald-300 to-emerald-500",
       iconPath: "M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
     },
@@ -21,26 +21,15 @@ export default function TextPane() {
   ];
 
   return (
-    <section className="bg-gray-50 py-24">
+    <section className="pt-5 pb-20">
       <div className="max-w-7xl mx-auto px-6">
-        {/* Header Section */}
-        <div className="mb-16 text-center md:text-left">
-          <span className="text-emerald-600 font-bold tracking-widest uppercase text-xs">
-            Platform Features
-          </span>
-          <h2 className="mt-3 text-4xl font-extrabold text-gray-900 tracking-tight sm:text-5xl">
-             Enhance Your Experience
-          </h2>
-        </div>
         
-        {/* Card Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {features.map((feature, idx) => (
             <div 
               key={idx} 
               className="bg-white border border-gray-200 p-10 rounded-xl flex flex-col items-start"
             >
-              {/* Circular Icon restored to your original style */}
               <div className={`
                 w-16 h-16 rounded-full mb-8 
                 flex items-center justify-center 
@@ -51,7 +40,6 @@ export default function TextPane() {
                 </svg>
               </div>
               
-              {/* Content */}
               <h3 className="text-xl font-bold text-gray-900 mb-4">
                 {feature.title}
               </h3>

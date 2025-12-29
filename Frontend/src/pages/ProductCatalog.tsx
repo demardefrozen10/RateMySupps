@@ -1,12 +1,9 @@
-import { useNavigate, useParams } from "react-router-dom";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import BrandCard from "../components/BrandCard"
 import { useState, useEffect } from "react"
 import type { Brand } from "../types/Brand";
 import useFetch from "../hooks/useFetch";
 import type {Supplement} from "../types/Supplement";
-import useDebounce from '../hooks/useDebounce';
-
 
 
 export default function ProductCatalog() {
@@ -14,45 +11,21 @@ export default function ProductCatalog() {
     const [supplements, setSupplements] = useState<Supplement[]>([]);
     const [showNotification, setShowNotification] = useState(false);
 
-    const [searchQuery, setSearchQuery] = useState("");
-    const[sortOption, setSortOption] = useState("");
-    const [filterOption, setFilterOption] = useState("");
-
-    const { get: getSupplementsApi } = useFetch("http://localhost:8080/api/supplement/");
-    const { get: getBrandApi } = useFetch("http://localhost:8080/api/brand/");
-    const debouncedSearchQuery = useDebounce(searchQuery, 500);
+    const { get } = useFetch("http://localhost:8080/api/supplement/");
     const navigate = useNavigate();
 
 
-    const { brandId } = useParams();
-    const [brand, setBrand] = useState<Brand | null>(null);
     const location = useLocation();
+    const brand: Brand = location.state?.brand;
+
 
     useEffect(() => {
-        if (!brandId) return;
-
-        getBrandApi(`getBrand?brandId=${brandId}`) 
-            .then((data: Brand) => setBrand(data))
-            .catch((error) => console.error("Error fetching brand:", error));
-    }, [brandId]);
-
-    useEffect(() => {
-    if (!debouncedSearchQuery.trim() || debouncedSearchQuery.trim().length < 2) {
-        setSupplements([]);
-        return;
-    }
-  const url = `getSupplements?brandId=${brandId}` +
-              (debouncedSearchQuery ? `&search=${debouncedSearchQuery}` : "") +
-              (filterOption ? `&filter=${filterOption}` : "") +
-              (sortOption ? `&sortOption=${sortOption}` : ""); 
-
-  getSupplementsApi(url)
-    .then((data: Supplement[]) => setSupplements(data))
-    .catch((error) => console.error("Error fetching supplements:", error));
-
-}, [debouncedSearchQuery, filterOption, sortOption]);
-
-
+        get(`getSupplements?brandId=${brand.id}`).then((data: Supplement[]) => {
+            setSupplements(data);
+        }).catch((error) => {
+            console.error("Error fetching supplements:", error);
+        });
+    }, []); 
 
     
     useEffect(() => {
@@ -65,31 +38,33 @@ export default function ProductCatalog() {
 
 
 
-    const images = [
-        "https://via.placeholder.com/1200x300/10b981/ffffff?text=Revolution+Nutrition",
-        "https://via.placeholder.com/1200x300/059669/ffffff?text=Revolution+Nutrition",
-        "https://via.placeholder.com/1200x300/047857/ffffff?text=Revolution+Nutrition"
-    ]
+    const images = [brand.imageUrl];
 
     const nextImage = () => setCurrentImage((prev) => (prev + 1) % images.length)
     const prevImage = () => setCurrentImage((prev) => (prev - 1 + images.length) % images.length)
 
     const HandleAddSupplementClick = () => {
-
-       if (!brand) return;
-
-       console.log("Navigating with brandId:", brand.id); 
-
-       navigate(`/product/add-supplement/${brand.id}`, { state: { brand } });
-
-   };
-
-
-    if (!brand) {
-    return <div className="p-8 text-gray-500">Loading brand…</div>;
+        navigate('/product/add-supplement', { state: { brand: brand } });
     }
 
-
+    const renderStars = (rating: number) => {
+        const fullStars = Math.floor(rating);
+        const hasHalfStar = rating % 1 >= 0.5;
+        return [...Array(5)].map((_, idx) => {
+            if (idx < fullStars) {
+                return <span key={idx} className="text-yellow-400">★</span>;
+            } else if (idx === fullStars && hasHalfStar) {
+                return (
+                    <span key={idx} className="relative">
+                        <span className="text-gray-300">★</span>
+                        <span className="absolute left-0 top-0 overflow-hidden w-1/2 text-yellow-400">★</span>
+                    </span>
+                );
+            } else {
+                return <span key={idx} className="text-gray-300">★</span>;
+            }
+        });
+    };
 
     return (   
         <div className="min-h-screen to-white">
@@ -106,10 +81,16 @@ export default function ProductCatalog() {
             <div className="max-w-7xl mx-auto px-4 py-12">
                 <div className="mb-8 relative rounded-xl overflow-hidden shadow-lg">
                     <div className="relative h-64 bg-cover bg-center" style={{ backgroundImage: `url(${images[currentImage]})` }}>
-                        <div className="absolute inset-0 bg-black/40"></div>
+                        <div className="absolute inset-0 bg-black/65"></div>
                         
-                        <div className="absolute inset-0 flex items-center justify-center">
-                            <h1 className="text-6xl font-bold text-white drop-shadow-lg">{brand.brandName}</h1>
+                        <div className="absolute inset-0 flex flex-col items-center justify-center">
+                            <h1 className="text-4xl sm:text-6xl font-bold text-white drop-shadow-lg text-center w-full break-words">{brand.brandName}</h1>
+                            <div className="mt-2 flex items-center justify-center">
+                                <span className="flex text-5xl sm:text-4xl">
+                                    {renderStars(brand.averageRating)}
+                                </span>
+                            </div>
+                            <p className="mt-1 font-bold text-white drop-shadow-lg text-center w-full break-words">Based on {brand.totalReviews} reviews</p>
                         </div>
 
                         <button 
@@ -143,68 +124,49 @@ export default function ProductCatalog() {
                     </div>
                 </div>
 
-                <div className="mb-6 flex gap-3 items-center">
+                <div className="mb-6 flex flex-col gap-3 items-center sm:flex-row sm:gap-3">
                     <input 
                         type="text" 
                         placeholder="Search for a supplement..." 
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        className="flex-1 max-w-md px-4 py-2 rounded-lg border-2 border-gray-200 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200 transition-all"
+                        className="flex-1 w-full sm:w-auto max-w-md px-4 py-2 rounded-lg border-2 border-gray-200 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200 transition-all"
                     />
                     
-                    <select 
-                    value={sortOption}
-                    onChange={(e) => setSortOption(e.target.value)}
-                    className="px-4 py-2 bg-white text-gray-700 border-2 border-gray-200 rounded-lg font-medium hover:border-emerald-300 focus:border-emerald-500 focus:outline-none transition-colors cursor-pointer">
+                    <select className="w-full sm:w-auto px-4 py-2 bg-white text-gray-700 border-2 border-gray-200 rounded-lg font-medium hover:border-emerald-300 focus:border-emerald-500 focus:outline-none transition-colors cursor-pointer">
                             <option value="">Sort By</option>
                             <option value="highest-rated">Highest Rated</option>
                             <option value="most-reviews">Most Reviews</option>
                             <option value="a-z">A-Z</option>
                         </select>
                     
-                    <select
-                    value={filterOption}
-                    onChange={(e) => setFilterOption(e.target.value)}
-                    className="px-4 py-2 bg-white text-gray-700 border-2 border-gray-200 rounded-lg font-medium hover:border-emerald-300 focus:border-emerald-500 focus:outline-none transition-colors cursor-pointer"
-                >
-                    <option value="">Filter</option>
-                    <option value="protein">Protein</option>
-                    <option value="pre-workout">Pre-Workout</option>
-                    <option value="creatine">Creatine</option>
-                    <option value="bcaa">BCAA</option>
-                    <option value="vitamins">Vitamins</option>
-                </select>
+                    <select className="w-full sm:w-auto px-4 py-2 bg-white text-gray-700 border-2 border-gray-200 rounded-lg font-medium hover:border-emerald-300 focus:border-emerald-500 focus:outline-none transition-colors cursor-pointer">
+                        <option value="">Filter</option>
+                        <option value="protein">Protein</option>
+                        <option value="pre-workout">Pre-Workout</option>
+                        <option value="creatine">Creatine</option>
+                        <option value="bcaa">BCAA</option>
+                        <option value="vitamins">Vitamins</option>
+                    </select>
                 </div>
-
-                
 
                 <div className="mb-6 text-sm text-gray-600">
                     Can't find what you're looking for? <button className="text-emerald-600 hover:text-emerald-700 font-semibold underline cursor-pointer" onClick={HandleAddSupplementClick}>Add a supplement here</button>
                 </div>
 
                 <div className="flex flex-col gap-4">
-                    {supplements.length === 0 ? (
-                        <div className="flex flex-col items-center justify-center py-16 text-gray-400">
-                            <svg className="w-16 h-16 mb-4 text-emerald-200" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4m0 4h.01M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9 9 4.03 9 9z" />
-                            </svg>
-                            <span className="text-lg font-semibold">No results found</span>
-                            <span className="text-sm mt-1">Try adjusting your search or filters.</span>
-                        </div>
-                    ) : (
-                        supplements.map((supplement, index) => (
-                            <BrandCard 
-                                key={index}
-                                id={supplement.id}
-                                supplementName={supplement.supplementName}
-                                imageUrl={supplement.imageUrl}
-                                averageRating={supplement.averageRating}
-                                totalReviews={supplement.totalReviews}
-                                brand={brand.brandName}
-                                category={supplement.category}
-                            />
-                        ))
-                    )}
+                    {supplements.map((supplement, index) => (
+                    <BrandCard 
+                        key={index}
+                        id={supplement.id}
+                        supplementName={supplement.supplementName}
+                        imageUrl={supplement.imageUrl}
+                        averageRating={supplement.averageRating}
+                        totalReviews={supplement.totalReviews}
+                        brand={brand}
+                        category={supplement.category}
+                        variants={supplement.variants}
+                        servingSizes={supplement.servingSizes}
+                    />
+                    ))}
                 </div>
             </div>
         </div>

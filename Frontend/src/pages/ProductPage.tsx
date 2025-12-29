@@ -1,20 +1,23 @@
 import { useState, useEffect } from "react"
-import { useLocation, useNavigate, useParams } from "react-router-dom"
+import { useLocation, useNavigate } from "react-router-dom"
 import useFetch from "../hooks/useFetch";
 import type { Supplement } from "../types/Supplement";
 import type { Review } from "../types/Review";
 import ReviewStrip from "../components/ReviewStrip";
+import type { Brand } from "../types/Brand";
 export default function ProductPage() {
     const [supplement, setSupplement] = useState<Supplement>();
     const [reviews, setReviews] = useState<Review[]>([]);
     const [showNotification, setShowNotification] = useState(false);
     const [sortOption, setSortOption] = useState<"recent" | "highest" | "lowest">("recent");
+    const [variant, setVariant] = useState<string>("");
 
     const navigate = useNavigate();
     const location = useLocation();
-    const brandName = location.state?.brandName || location.state?.supplement?.brandName;
-    
-    const { supplementId } = useParams();
+
+    const supplementId: number = location.state?.supplementId; 
+    const brand: Brand = location.state?.brand;
+
 
     const {get} = useFetch("http://localhost:8080/api/");
 
@@ -24,24 +27,31 @@ export default function ProductPage() {
         get(`supplement/getSupplement?supplementId=${supplementId}`).then((data) => {
             setSupplement(data);
         });
-    }, [supplementId]); 
 
+        }, []);
+    
     useEffect(() => {
-        if (!supplementId) return;
-
-        let endpoint = "";
-        if (sortOption === "recent") {
-            endpoint = `review/getReviewsByDate?supplementId=${supplementId}`;
-        } else if (sortOption === "highest") {
-            endpoint = `review/getReviewsByMaxRating?supplementId=${supplementId}`;
-        } else if (sortOption === "lowest") {
-            endpoint = `review/getReviewsByMinRating?supplementId=${supplementId}`;
+        let orderBy: string = "";
+        let sort: string = "";
+        if (sortOption === "highest") {
+            orderBy = "asc"
+            sort = "rating";
         }
-        
-        get(endpoint).then((data) => {
-            setReviews(Array.isArray(data) ? data : []);
+        else if (sortOption === "lowest") {
+            orderBy = "desc"
+            sort = "rating";
+        }
+        else if (sortOption === "recent") {
+            sort = "date";
+        }
+
+
+        get(`review/getReviews?supplementId=${supplementId}&sortBy=${sort}&sortOrder=${orderBy}&variant=${variant}`).then((data: Review[]) => {
+            setReviews(data)
         });
-    }, [sortOption])
+    }, [sortOption, variant]);
+
+
 
     useEffect(() => {
         if (location.state?.reviewSubmitted) {
@@ -54,7 +64,7 @@ export default function ProductPage() {
 
 
     const HandleReviewClick = () => {
-        navigate('/add-review', { state: { supplementId, brandName, supplementName: supplement?.supplementName, imageUrl: supplement?.imageUrl } });
+        navigate('/add-review', { state: { supplementId, brandName: brand.brandName, supplementName: supplement?.supplementName, imageUrl: supplement?.imageUrl, variants: supplement?.variants } });
     }
 
     const getRatingBgColor = (rating: number, totalReviews: number) => {
@@ -62,6 +72,13 @@ export default function ProductPage() {
         if (rating <= 2) return 'bg-gradient-to-br from-red-400 to-red-500';
         if (rating <= 3) return 'bg-gradient-to-br from-yellow-400 to-yellow-500';
         return 'bg-gradient-to-br from-emerald-400 to-emerald-500';
+    }
+
+    const getRatingLabel = (rating: number, totalReviews: number) => {
+        if (totalReviews === 0) return "No Ratings Yet";
+        if (rating <= 2) return "Poor Rating";
+        if (rating <= 3) return "Average Rating";
+        return "Great Rating";
     }
 
     const getRatingDistribution = () => {
@@ -108,8 +125,8 @@ export default function ProductPage() {
                     </div>
                     <div>
                         <div className="mb-4">
-                            <a href="#" className="text-emerald-600 hover:text-emerald-700 font-semibold mb-2 inline-block">
-                                {brandName}
+                            <a onClick={() =>    navigate(`/products/${brand.brandName}`, { state: { brand } })} className="text-emerald-600 hover:text-emerald-700 font-semibold mb-2 inline-block cursor-pointer">
+                                {brand.brandName}
                             </a>
                             <h1 className="text-4xl font-bold text-gray-800 mb-4">
                                 {supplement?.supplementName}
@@ -120,7 +137,9 @@ export default function ProductPage() {
                                         <span className="text-3xl font-bold text-white">{supplement?.averageRating?.toFixed(1)}</span>
                                     </div>
                                     <div>
-                                        <div className="text-sm font-semibold text-gray-700">No Reviews Yet</div>
+                                        <div className="text-sm font-semibold text-gray-700">
+                                            {getRatingLabel(supplement?.averageRating ?? 0, supplement?.totalReviews ?? 0)}
+                                        </div>
                                         <div className="text-xs text-gray-500">Based on {supplement?.totalReviews} reviews</div>
                                     </div>
                                 </div>
@@ -135,17 +154,25 @@ export default function ProductPage() {
                                     <span className="font-semibold">{supplement?.category}</span>
                                 </div>
                                 <div className="flex justify-between">
-                                    <span className="text-gray-600">Serving Size:</span>
-                                    <span className="font-semibold">30g</span>
+                                    <span className="text-gray-600">Serving Sizes:</span>
+                                    <span className="font-semibold">
+                                        {supplement?.servingSizes
+                                            ? Array.isArray(supplement.servingSizes)
+                                                ? supplement.servingSizes.join(", ")
+                                                : supplement.servingSizes
+                                            : "N/A"}
+                                    </span>
                                 </div>
                                 <div className="flex justify-between">
-                                    <span className="text-gray-600">Protein per Serving:</span>
-                                    <span className="font-semibold">24g</span>
+                                    <span className="text-gray-600">Flavors:</span>
+                                    <span className="font-semibold">
+                                        {supplement?.variants?.join(", ")}
+                                    </span>
                                 </div>
                             </div>
                         </div>
 
-                        <button className="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-4 rounded-xl transition-colors shadow-lg mb-4" onClick={HandleReviewClick}>
+                        <button className="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-4 rounded-xl transition-colors shadow-lg mb-4 cursor-pointer" onClick={HandleReviewClick}>
                             Leave a Review
                         </button>
                         
@@ -161,12 +188,12 @@ export default function ProductPage() {
                 </div>
 
                 <div className="bg-white rounded-xl shadow-sm p-8">
-                    <div className="flex items-center justify-between mb-6">
+                    <div className="flex items-center justify-between mb-6 flex-col gap-3 sm:flex-row sm:gap-4">
                         <h2 className="text-3xl font-bold text-gray-800">Customer Reviews</h2>
-                        {totalReviewCount > 0 && (
-                            <div className="flex gap-4">
+                        {true && (
+                            <div className="flex flex-col gap-2 w-full sm:w-auto sm:flex-row sm:gap-4 items-center">
                                 <select
-                                    className="px-4 py-2 bg-white text-gray-700 border-2 border-gray-200 rounded-lg font-medium hover:border-emerald-300 focus:border-emerald-500 focus:outline-none transition-colors cursor-pointer"
+                                    className="w-full sm:w-auto px-4 py-2 bg-white text-gray-700 border-2 border-gray-200 rounded-lg font-medium hover:border-emerald-300 focus:border-emerald-500 focus:outline-none transition-colors cursor-pointer"
                                     value={sortOption}
                                     onChange={e => setSortOption(e.target.value as "recent" | "highest" | "lowest")}
                                 >
@@ -174,17 +201,19 @@ export default function ProductPage() {
                                     <option value="highest">Highest Rated</option>
                                     <option value="lowest">Lowest Rated</option>
                                 </select>
-                                <select className="px-4 py-2 bg-white text-gray-700 border-2 border-gray-200 rounded-lg font-medium hover:border-emerald-300 focus:border-emerald-500 focus:outline-none transition-colors cursor-pointer">
-                                    <option value="">Variations</option>
-                                    <option value="vanilla">Vanilla</option>
-                                    <option value="chocolate">Chocolate</option>
-                                    <option value="strawberry">Strawberry</option>
-                                    <option value="cookies">Cookies & Cream</option>
+                                <select
+                                    className="w-full sm:w-auto px-4 py-2 bg-white text-gray-700 border-2 border-gray-200 rounded-lg font-medium hover:border-emerald-300 focus:border-emerald-500 focus:outline-none transition-colors cursor-pointer"
+                                    value={variant}
+                                    onChange={e => setVariant(e.target.value)}
+                                >
+                                    <option value="">Filter by Flavor</option>
+                                    {supplement?.variants.map((variant, idx) => (
+                                        <option key={idx} value={variant}>{variant}</option>
+                                    ))}
                                 </select>
                             </div>
                         )}
                     </div>
-
                     {totalReviewCount === 0 ? (
                         <div
                             className="text-center text-emerald-600 text-lg py-12 font-semibold cursor-pointer hover:underline"

@@ -5,7 +5,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -42,14 +41,11 @@ public class Supplement {
     private LocalDateTime createdAt;
 
     
-    @ElementCollection
     @Column(name = "image_url")
-    private List<String> imageUrl = new ArrayList<>();
+    private List<String> imageUrl;
 
-    @ElementCollection
     @Column(name = "serving_size")
-    private List<String> servingSizes = new ArrayList<>();
-
+    private List<String> servingSizes;
 
     @Column(nullable = false, columnDefinition = "TEXT")
     private String websiteUrl;
@@ -72,6 +68,8 @@ public class Supplement {
 
 
     @OneToMany(mappedBy = "supplement", orphanRemoval = true)
-    private List<Review> reviews = new ArrayList<>();
+    private List<Review> reviews;
+
+    private List<String> variants;
 
 }

@@ -25,8 +25,8 @@ public class ReviewController {
     }
 
     @GetMapping("/getReviews")
-    public List<ReadReview> getReviewBySupplementId(@RequestParam Long supplementId) {
-        return queryRepo.getReviewBySupplementId(supplementId);
+    public List<ReadReview> getReviewBySupplementId(@RequestParam Long supplementId, @RequestParam(required = false) String sortBy, @RequestParam(required = false) String sortOrder, @RequestParam(required = false) String variant) {
+        return queryRepo.getReviewBySupplementId(supplementId, sortBy, sortOrder, variant);
     }
 
     @PostMapping("/createReview")
@@ -36,26 +36,6 @@ public class ReviewController {
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
-    @GetMapping("/getVerifiedReviews")
-    public List<ReadReview> getVerifiedReviewsBySupplementId(@RequestParam Long supplementId) {
-        return queryRepo.getVerifiedReviewsBySupplementId(supplementId);
-    }
-
-    @GetMapping("/getReviewsByMinRating")
-    public List<ReadReview> getReviewsBySupplementIdByMinRating(@RequestParam Long supplementId) {
-        return queryRepo.getReviewsBySupplementIdByMinRating(supplementId);
-    }
-
-
-    @GetMapping("/getReviewsByMaxRating")
-    public List<ReadReview> getReviewsBySupplementIdByMaxRating(@RequestParam Long supplementId) {
-        return queryRepo.getReviewsBySupplementIdByMaxRating(supplementId);
-    }
-
-    @GetMapping("/getReviewsByDate")
-    public List<ReadReview> getReviewsBySupplementIdByMaxDate(@RequestParam Long supplementId) {
-        return queryRepo.getReviewsBySupplementIdByMaxRating(supplementId);
-    }
 
 
 }

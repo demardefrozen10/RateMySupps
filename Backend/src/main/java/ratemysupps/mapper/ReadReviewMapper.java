@@ -15,6 +15,7 @@ public class ReadReviewMapper {
         readReview.setComment(review.getComment());
         readReview.setImageUrls(review.getImageUrls());
         readReview.setCreatedAt(review.getCreatedAt());
+        readReview.setVariant(review.getVariant());
 
         return readReview;
     }

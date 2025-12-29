@@ -1,6 +1,5 @@
 package ratemysupps.readmodel;
 
-import jakarta.persistence.Column;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -22,4 +21,6 @@ public class ReadReview {
     private List<String> imageUrls;
 
     private LocalDateTime createdAt;
+
+    private String variant;
 }

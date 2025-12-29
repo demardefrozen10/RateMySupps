@@ -7,6 +7,7 @@ interface Review {
     imageUrls: string[];
     createdAt: string;
     helpful: number;
+    variant: string;
 }
 
 export type { Review };
