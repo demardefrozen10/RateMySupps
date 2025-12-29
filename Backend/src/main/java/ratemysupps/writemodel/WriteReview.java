@@ -19,4 +19,5 @@ public class WriteReview {
 
     private String purchaseImageUrl;
 
+    private String variant;
 }

@@ -38,4 +38,6 @@ public class Review {
 
     @Column(nullable = false)
     private LocalDateTime createdAt;
+
+    private String variant;
 }

@@ -9,6 +9,7 @@ export default function ProductPage() {
     const [reviews, setReviews] = useState<Review[]>([]);
     const [showNotification, setShowNotification] = useState(false);
     const [sortOption, setSortOption] = useState<"recent" | "highest" | "lowest">("recent");
+    const [variant, setVariant] = useState<string>("");
 
     
     const navigate = useNavigate();
@@ -26,22 +27,31 @@ export default function ProductPage() {
         get(`supplement/getSupplement?supplementId=${supplementId}`).then((data) => {
             setSupplement(data);
         });
-    }, []);
 
-
+        }, []);
+    
     useEffect(() => {
-        let endpoint = "";
-        if (sortOption === "recent") {
-            endpoint = `review/getReviewsByDate?supplementId=${supplementId}`;
-        } else if (sortOption === "highest") {
-            endpoint = `review/getReviewsByMaxRating?supplementId=${supplementId}`;
-        } else if (sortOption === "lowest") {
-            endpoint = `review/getReviewsByMinRating?supplementId=${supplementId}`;
+        let orderBy: string = "";
+        let sort: string = "";
+        if (sortOption === "highest") {
+            orderBy = "asc"
+            sort = "rating";
         }
-        get(endpoint).then((data) => {
-            setReviews(data);
+        else if (sortOption === "lowest") {
+            orderBy = "desc"
+            sort = "rating";
+        }
+        else if (sortOption === "recent") {
+            sort = "date";
+        }
+
+
+        get(`review/getReviews?supplementId=${supplementId}&sortBy=${sort}&sortOrder=${orderBy}&variant=${variant}`).then((data: Review[]) => {
+            setReviews(data)
         });
-    }, [sortOption])
+    }, [sortOption, variant]);
+
+
 
     useEffect(() => {
         if (location.state?.reviewSubmitted) {
@@ -54,7 +64,7 @@ export default function ProductPage() {
 
 
     const HandleReviewClick = () => {
-        navigate('/add-review', { state: { supplementId, brandName, supplementName: supplement?.supplementName, imageUrl: supplement?.imageUrl } });
+        navigate('/add-review', { state: { supplementId, brandName, supplementName: supplement?.supplementName, imageUrl: supplement?.imageUrl, variants: supplement?.variants } });
     }
 
     const getRatingBgColor = (rating: number, totalReviews: number) => {
@@ -78,6 +88,7 @@ export default function ProductPage() {
     const ratingDistribution = getRatingDistribution();
     const totalReviewCount = reviews.length;
 
+    console.log(variant.length);
 
     return (
         <div className="min-h-screen to-white">
@@ -142,7 +153,7 @@ export default function ProductPage() {
                             </div>
                         </div>
 
-                        <button className="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-4 rounded-xl transition-colors shadow-lg mb-4" onClick={HandleReviewClick}>
+                        <button className="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-4 rounded-xl transition-colors shadow-lg mb-4 cursor-pointer" onClick={HandleReviewClick}>
                             Leave a Review
                         </button>
                         
@@ -158,12 +169,12 @@ export default function ProductPage() {
                 </div>
 
                 <div className="bg-white rounded-xl shadow-sm p-8">
-                    <div className="flex items-center justify-between mb-6">
+                    <div className="flex items-center justify-between mb-6 flex-col gap-3 sm:flex-row sm:gap-4">
                         <h2 className="text-3xl font-bold text-gray-800">Customer Reviews</h2>
-                        {totalReviewCount > 0 && (
-                            <div className="flex gap-4">
+                        {true && (
+                            <div className="flex flex-col gap-2 w-full sm:w-auto sm:flex-row sm:gap-4 items-center">
                                 <select
-                                    className="px-4 py-2 bg-white text-gray-700 border-2 border-gray-200 rounded-lg font-medium hover:border-emerald-300 focus:border-emerald-500 focus:outline-none transition-colors cursor-pointer"
+                                    className="w-full sm:w-auto px-4 py-2 bg-white text-gray-700 border-2 border-gray-200 rounded-lg font-medium hover:border-emerald-300 focus:border-emerald-500 focus:outline-none transition-colors cursor-pointer"
                                     value={sortOption}
                                     onChange={e => setSortOption(e.target.value as "recent" | "highest" | "lowest")}
                                 >
@@ -171,17 +182,19 @@ export default function ProductPage() {
                                     <option value="highest">Highest Rated</option>
                                     <option value="lowest">Lowest Rated</option>
                                 </select>
-                                <select className="px-4 py-2 bg-white text-gray-700 border-2 border-gray-200 rounded-lg font-medium hover:border-emerald-300 focus:border-emerald-500 focus:outline-none transition-colors cursor-pointer">
-                                    <option value="">Variations</option>
-                                    <option value="vanilla">Vanilla</option>
-                                    <option value="chocolate">Chocolate</option>
-                                    <option value="strawberry">Strawberry</option>
-                                    <option value="cookies">Cookies & Cream</option>
+                                <select
+                                    className="w-full sm:w-auto px-4 py-2 bg-white text-gray-700 border-2 border-gray-200 rounded-lg font-medium hover:border-emerald-300 focus:border-emerald-500 focus:outline-none transition-colors cursor-pointer"
+                                    value={variant}
+                                    onChange={e => setVariant(e.target.value)}
+                                >
+                                    <option value="">Filter by Flavor</option>
+                                    {supplement?.variants.map((variant, idx) => (
+                                        <option key={idx} value={variant}>{variant}</option>
+                                    ))}
                                 </select>
                             </div>
                         )}
                     </div>
-
                     {totalReviewCount === 0 ? (
                         <div
                             className="text-center text-emerald-600 text-lg py-12 font-semibold cursor-pointer hover:underline"

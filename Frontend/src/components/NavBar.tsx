@@ -11,8 +11,8 @@ function NavBar() {
   return (
     <>
     <div className="flex flex-col items-center">
-      <div className="w-full h-20">
-      <div className="w-full h-20 flex items-center justify-center px-8 bg-white shadow">
+      <div className="w-full h-15">
+      <div className="w-full h-15 flex items-center justify-center px-8 bg-white shadow">
         <h1 className="text-3xl font-bold cursor-pointer" onClick={HandleClick}>
           RateMy<span className="text-emerald-500">Supplements</span>
         </h1>

@@ -25,6 +25,8 @@ public class ReadSupplementMapper {
 
         readSupplement.setId(supplement.getId());
 
+        readSupplement.setVariants(supplement.getVariants());
+
         return readSupplement;
     }
 
@@ -39,6 +41,7 @@ public class ReadSupplementMapper {
         readSupplementComplex.setServingSizes(supplement.getServingSizes());
         readSupplementComplex.setTotalReviews(supplement.getTotalReviews());
         readSupplementComplex.setCategory(supplement.getCategory().getName());
+        readSupplementComplex.setVariants(supplement.getVariants());
 
         return readSupplementComplex;
     }

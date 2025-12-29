@@ -4,6 +4,8 @@ package ratemysupps.readmodel;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 public class ReadSupplement {
@@ -17,4 +19,6 @@ public class ReadSupplement {
     public int totalReviews;
 
     public String imageUrl;
+
+    public List<String> variants;
 }

@@ -9,14 +9,14 @@ import ratemysupps.repository.IReviewRepository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Service
 public class ReviewQueryService implements IReviewQueryService {
 
     private ReadReviewMapper mapper;
-
-    IReviewRepository reviewRepo;
+    private IReviewRepository reviewRepo;
     public ReviewQueryService(IReviewRepository reviewRepo, ReadReviewMapper mapper) {
         this.reviewRepo = reviewRepo;
         this.mapper = mapper;
@@ -24,31 +24,38 @@ public class ReviewQueryService implements IReviewQueryService {
 
 
     @Override
-    public List<ReadReview> getReviewBySupplementId(Long supplementId) {
-        List<Review> reviews = reviewRepo.findBySupplementId(supplementId);
+    public List<ReadReview> getReviewBySupplementId(Long supplementId, String sortBy, String sortOrder, String variant) {
+        List<ReadReview> reviews;
 
-        List<ReadReview> readReviews = new ArrayList<>();
-        for (Review review : reviews) {
-            readReviews.add(mapper.fromEntity(review));
+        if (sortBy == null) {
+            reviews = getUnsortedReviews(supplementId);
+        } else if ("rating".equals(sortBy)) {
+            reviews = "asc".equals(sortOrder)
+                    ? getReviewsBySupplementIdByMinRating(supplementId)
+                    : getReviewsBySupplementIdByMaxRating(supplementId);
+        } else if ("date".equals(sortBy)) {
+            reviews = getReviewsBySupplementIdByMaxDate(supplementId);
+        } else {
+            reviews = getUnsortedReviews(supplementId);
         }
 
-        return readReviews;
-    }
-
-    @Override
-    public List<ReadReview> getVerifiedReviewsBySupplementId(Long supplementId) {
-        List<Review> reviews = reviewRepo.findBySupplementIdAndIsVerified(supplementId, true);
-
-        List<ReadReview> readReviews = new ArrayList<>();
-        for (Review review : reviews) {
-            readReviews.add(mapper.fromEntity(review));
+        if (!variant.isEmpty()) {
+            reviews = reviews.stream()
+                    .filter(review -> variant.equals(review.getVariant()))
+                    .collect(Collectors.toList());
         }
 
-        return readReviews;
+        return reviews;
     }
 
-    @Override
-    public List<ReadReview> getReviewsBySupplementIdByMinRating(Long supplementId) {
+    private List<ReadReview> getUnsortedReviews(Long supplementId) {
+        return reviewRepo.findBySupplementId(supplementId).stream()
+                .map(mapper::fromEntity)
+                .collect(Collectors.toList());
+    }
+
+
+    private List<ReadReview> getReviewsBySupplementIdByMinRating(Long supplementId) {
         List<ReadReview> readReviews = new ArrayList<>();
         List<Review> reviews = reviewRepo.findBySupplementIdOrderByRatingAsc(supplementId);
 
@@ -59,8 +66,7 @@ public class ReviewQueryService implements IReviewQueryService {
         return readReviews;
     }
 
-    @Override
-    public List<ReadReview> getReviewsBySupplementIdByMaxRating(Long supplementId) {
+    private List<ReadReview> getReviewsBySupplementIdByMaxRating(Long supplementId) {
         List<ReadReview> readReviews = new ArrayList<>();
         List<Review> reviews = reviewRepo.findBySupplementIdOrderByRatingDesc(supplementId);
 
@@ -71,8 +77,7 @@ public class ReviewQueryService implements IReviewQueryService {
         return readReviews;
     }
 
-    @Override
-    public List<ReadReview> getReviewsBySupplementIdByMaxDate(Long supplementId) {
+    private List<ReadReview> getReviewsBySupplementIdByMaxDate(Long supplementId) {
         List<ReadReview> readReviews = new ArrayList<>();
         List<Review> reviews = reviewRepo.findBySupplementIdOrderByCreatedAtDesc(supplementId);
 

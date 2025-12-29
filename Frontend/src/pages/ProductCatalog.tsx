@@ -38,11 +38,7 @@ export default function ProductCatalog() {
 
 
 
-    const images = [
-        "https://via.placeholder.com/1200x300/10b981/ffffff?text=Revolution+Nutrition",
-        "https://via.placeholder.com/1200x300/059669/ffffff?text=Revolution+Nutrition",
-        "https://via.placeholder.com/1200x300/047857/ffffff?text=Revolution+Nutrition"
-    ]
+    const images = [brand.imageUrl];
 
     const nextImage = () => setCurrentImage((prev) => (prev + 1) % images.length)
     const prevImage = () => setCurrentImage((prev) => (prev - 1 + images.length) % images.length)
@@ -69,7 +65,7 @@ export default function ProductCatalog() {
                         <div className="absolute inset-0 bg-black/40"></div>
                         
                         <div className="absolute inset-0 flex items-center justify-center">
-                            <h1 className="text-6xl font-bold text-white drop-shadow-lg">{brand.brandName}</h1>
+                            <h1 className="text-4xl sm:text-6xl font-bold text-white drop-shadow-lg text-center w-full break-words">{brand.brandName}</h1>
                         </div>
 
                         <button 
@@ -103,21 +99,21 @@ export default function ProductCatalog() {
                     </div>
                 </div>
 
-                <div className="mb-6 flex gap-3 items-center">
+                <div className="mb-6 flex flex-col gap-3 items-center sm:flex-row sm:gap-3">
                     <input 
                         type="text" 
                         placeholder="Search for a supplement..." 
-                        className="flex-1 max-w-md px-4 py-2 rounded-lg border-2 border-gray-200 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200 transition-all"
+                        className="flex-1 w-full sm:w-auto max-w-md px-4 py-2 rounded-lg border-2 border-gray-200 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200 transition-all"
                     />
                     
-                    <select className="px-4 py-2 bg-white text-gray-700 border-2 border-gray-200 rounded-lg font-medium hover:border-emerald-300 focus:border-emerald-500 focus:outline-none transition-colors cursor-pointer">
+                    <select className="w-full sm:w-auto px-4 py-2 bg-white text-gray-700 border-2 border-gray-200 rounded-lg font-medium hover:border-emerald-300 focus:border-emerald-500 focus:outline-none transition-colors cursor-pointer">
                             <option value="">Sort By</option>
                             <option value="highest-rated">Highest Rated</option>
                             <option value="most-reviews">Most Reviews</option>
                             <option value="a-z">A-Z</option>
                         </select>
                     
-                    <select className="px-4 py-2 bg-white text-gray-700 border-2 border-gray-200 rounded-lg font-medium hover:border-emerald-300 focus:border-emerald-500 focus:outline-none transition-colors cursor-pointer">
+                    <select className="w-full sm:w-auto px-4 py-2 bg-white text-gray-700 border-2 border-gray-200 rounded-lg font-medium hover:border-emerald-300 focus:border-emerald-500 focus:outline-none transition-colors cursor-pointer">
                         <option value="">Filter</option>
                         <option value="protein">Protein</option>
                         <option value="pre-workout">Pre-Workout</option>
@@ -142,6 +138,7 @@ export default function ProductCatalog() {
                         totalReviews={supplement.totalReviews}
                         brand={brand.brandName}
                         category={supplement.category}
+                        variants={supplement.variants}
                     />
                     ))}
                 </div>

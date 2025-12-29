@@ -55,21 +55,33 @@ export default function ReviewStrip(props: Review) {
                     <div className="flex gap-2 mb-3 flex-wrap">
                         {props.imageUrls.map((url, idx) => (
                             <div key={idx} className="flex flex-col items-start">
+                                {idx === 0 && (
+                                    <>
+                                    <span className="text-xs text-gray-500 mb-3">Flavor: {props.variant}</span>
+                                    </>
+                                )}
                                 <img 
                                     src={url} 
                                     alt={`Review image ${idx + 1}`} 
                                     className="w-40 h-40 object-cover rounded-lg border border-gray-200"
                                 />
                                 {idx === 0 && (
-                                    <span className="text-xs text-gray-500 mt-2">{formatLocalDate(props.createdAt)}</span>
+                                    <>
+                                    <span className="text-xs text-gray-500 mt-3">Date: {formatLocalDate(props.createdAt)}</span>
+                                    </>
                                 )}
                             </div>
                         ))}
                     </div>
                 )}
                 {(!props.imageUrls || props.imageUrls.length === 0) && (
-                    <span className="text-xs text-gray-500 mb-3 block">{formatLocalDate(props.createdAt)}</span>
+                    <>
+                    <span className="text-xs text-gray-500 block">Flavor: {props.variant}</span>
+                    <span className="text-xs text-gray-500 mt-1 block">Date: {formatLocalDate(props.createdAt)}</span>
+                    </>
+
                 )}
+
                 <div className="flex items-center gap-4 text-sm">
                     {/*
                     <button className="text-gray-500 hover:text-emerald-600 flex items-center gap-1">

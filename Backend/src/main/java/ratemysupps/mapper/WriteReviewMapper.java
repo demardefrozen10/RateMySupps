@@ -21,6 +21,7 @@ public class WriteReviewMapper {
         review.setPurchaseImageUrl(writeReview. getPurchaseImageUrl());
         review.setVerified(false);
         review.setCreatedAt(LocalDateTime.now());
+        review.setVariant(writeReview.getVariant());
 
         return review;
     }

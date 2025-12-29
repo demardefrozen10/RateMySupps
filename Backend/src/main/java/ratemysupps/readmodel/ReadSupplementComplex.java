@@ -22,8 +22,9 @@ public class ReadSupplementComplex {
 
     public List<String> servingSizes;
 
-    public List<String> flavors;
+    public List<String> variants;
 
     public String category;
+
 
 }

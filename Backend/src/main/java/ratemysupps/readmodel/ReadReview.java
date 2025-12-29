@@ -22,4 +22,6 @@ public class ReadReview {
     private List<String> imageUrls;
 
     private LocalDateTime createdAt;
+
+    private String variant;
 }

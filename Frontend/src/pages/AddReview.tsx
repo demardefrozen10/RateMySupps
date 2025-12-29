@@ -11,6 +11,7 @@ export default function AddReview() {
     const [proofOfPurchase, setProofOfPurchase] = useState<File | null>(null);
     const [anonymous, setAnonymous] = useState(false);
     const [name, setName] = useState("");
+    const [variant, setVariant] = useState<string>("");
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -18,6 +19,7 @@ export default function AddReview() {
     const brandName: string = location.state?.brandName;
     const supplementName: string = location.state?.supplementName;
     const imageUrl: string = location.state?.imageUrl;
+    const variants: string[] = location.state?.variants;
 
     const {post} = useFetch("http://localhost:8080/api/");
 
@@ -100,7 +102,7 @@ const HandleSubmitReview = async () => {
 
     let proofS3Url: string = "";
     if (proofOfPurchase) {
-        const response: any = await post("s3/presigned-url", [{
+        const response: S3Request[] = await post("s3/presigned-url", [{
             fileName: proofOfPurchase.name,
             contentType: proofOfPurchase.type,
             fileSize: proofOfPurchase.size,
@@ -120,7 +122,8 @@ const HandleSubmitReview = async () => {
         rating: rating,
         comment: review,
         imageUrls: uploadedImageUrls,
-        purchaseImageUrl: proofS3Url
+        purchaseImageUrl: proofS3Url,
+        variant: variant
     }).then(() => {
         const supplementId = location.state?.supplementId;
         const brandName = location.state?.brandName;
@@ -204,6 +207,21 @@ const HandleSubmitReview = async () => {
                             />
                             <p className="text-sm text-gray-600 mt-1">Remain anonymous</p>
                         </div>
+                    </div>
+                    <div className="mb-8">
+                        <label className="block text-lg font-bold text-gray-800 mb-3">
+                            Variant <span className="text-red-500">*</span>
+                        </label>
+                        <select
+                            className="w-full px-4 py-3 rounded-lg border-2 border-gray-200"
+                            value={variant}
+                            onChange={e => setVariant(e.target.value)}
+                        >
+                            <option value="">Select One</option>
+                            {variants.map((variant, idx) => (
+                                <option key={idx} value={variant}>{variant}</option>
+                            ))}
+                        </select>
                     </div>
                     {/*}
                     <div className="mb-8">
@@ -376,11 +394,11 @@ const HandleSubmitReview = async () => {
                     </div>
 
                     <div className="flex gap-4">
-                        <button className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-4 rounded-xl transition-colors" onClick={() => navigate(-1)}>
+                        <button className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-4 rounded-xl transition-colors cursor-pointer" onClick={() => navigate(-1)}>
                             Cancel
                         </button>
                         <button 
-                            disabled={!rating || !review.trim() || !proofOfPurchase}
+                            disabled={!rating || !review.trim() || !proofOfPurchase || !variant}
                             className="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-4 rounded-xl transition-colors shadow-lg disabled:bg-gray-300 disabled:cursor-not-allowed"
                             onClick={HandleSubmitReview}
                         >

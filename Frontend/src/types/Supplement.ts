@@ -6,6 +6,7 @@ interface Supplement {
     imageUrl: string;
     brand: string;
     category: string;
+    variants: string[];
 
 
 }
