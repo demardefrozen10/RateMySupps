@@ -1,10 +1,11 @@
-import Powder from '../assets/powder1.jpg';
 import { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Search as SearchIcon, Loader2 } from 'lucide-react';
 import useDebounce from '../hooks/useDebounce';
 import useFetch from '../hooks/useFetch';
 import type { Brand } from '../types/Brand';
 import type { Supplement } from '../types/Supplement';
-import { useNavigate } from 'react-router-dom';
+import Powder from '../assets/powder1.jpg';
 
 export default function Search() {
     const [searchQuery, setSearchQuery] = useState('');
@@ -24,19 +25,19 @@ export default function Search() {
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setSearchQuery(e.target.value);
         setShowDropdown(true);
-    }
+    };
 
     const handleBrandClick = (brand: Brand) => {
-        navigate(`/products/${brand.brandName}`, { state: { brand } });
+        navigate(`/products/${brand.id}`, { state: { brand } });
         setShowDropdown(false);
         setSearchQuery('');
-    }
+    };
 
     const handleProductClick = (supplement: Supplement) => {
-        navigate(`/product/${supplement.id}`, { state: { supplement } });
+        navigate(`/product/${supplement.id}`, { state: { supplementId: supplement.id } });
         setShowDropdown(false);
         setSearchQuery('');
-    }
+    };
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -48,155 +49,123 @@ export default function Search() {
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
-   useEffect(() => {
-    if (!debouncedSearchQuery.trim() || debouncedSearchQuery.trim().length < 2) {
-        setResults({ brands: [], supplements: [] });
-        return;
-    }
-
-    const fetchResults = async () => {
-        setLoading(true);
-        setError(null);
-        try {
-            const [brandsData, supplementsData] = await Promise.all([
-                get(`brand/getBrandByName?name=${debouncedSearchQuery}`),  // Fixed endpoint
-                get(`supplement/searchByName?name=${debouncedSearchQuery}`)
-            ]);
-            setResults({
-                brands: brandsData || [],
-                supplements: supplementsData || []
-            });
-        } catch (err) {
-            setError(err instanceof Error ? err.message : 'An error occurred');
-        } finally {
-            setLoading(false);
+    useEffect(() => {
+        if (!debouncedSearchQuery.trim() || debouncedSearchQuery.trim().length < 2) {
+            setResults({ brands: [], supplements: [] });
+            return;
         }
-    };
-    fetchResults();
-}, [debouncedSearchQuery]);
+
+        const fetchResults = async () => {
+            setLoading(true);
+            setError(null);
+            try {
+                const [brandsData, supplementsData] = await Promise.all([
+                    get(`brand/getBrandByName?name=${debouncedSearchQuery}`), 
+                    get(`supplement/searchByName?name=${debouncedSearchQuery}`)
+                ]);
+                setResults({
+                    brands: brandsData || [],
+                    supplements: supplementsData || []
+                });
+            } catch (err) {
+                setError(err instanceof Error ? err.message : 'An error occurred');
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchResults();
+    }, [debouncedSearchQuery]);
 
     const hasResults = results.brands.length > 0 || results.supplements.length > 0;
 
     return (
         <div 
-            className="relative w-full min-h-[50vh] flex flex-col items-center justify-center px-4 py-20 overflow-hidden"
+            className="relative w-full min-h-[55vh] flex flex-col items-center justify-center px-4 py-20 overflow-hidden font-sans"
             style={{ 
-                backgroundImage: `linear-gradient(rgba(0,0,0,0.55), rgba(0,0,0,0.55)), url(${Powder})`,
+                backgroundImage: `linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.65)), url(${Powder})`,
                 backgroundPosition: 'center 25%',
                 backgroundSize: 'cover'
             }}
         >
-            <div className="max-w-4xl w-full text-center space-y-8 relative z-10">
+            <div className="max-w-4xl w-full text-center space-y-10 relative z-10">
                 <div className="space-y-4">
-                    <h2 className="text-3xl md:text-5xl text-white font-extrabold tracking-tight drop-shadow-md">
+                    <h2 className="text-4xl md:text-5xl text-white font-bold tracking-tight">
                         Real Reviews. <span className="text-emerald-400">Verified Buyers.</span>
                     </h2>
-                    <p className="text-lg text-gray-200 font-medium max-w-2xl mx-auto">
-                        Search over <span className="text-emerald-400 font-bold">1000+</span> supplement brands & products with over <span className="text-emerald-400 font-bold">2000+</span> verified reviews.
+                    <p className="text-lg text-gray-200 font-medium max-w-xl mx-auto opacity-90">
+                        Search thousands of supplement brands and products.
                     </p>
                 </div>
                 
-                <div className="relative max-w-3xl mx-auto w-full" ref={dropdownRef}>
+                <div className="relative max-w-2xl mx-auto w-full" ref={dropdownRef}>
                     <div className="relative flex items-center group">
-                        <div className="absolute left-6 text-gray-400">
-                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                            </svg>
+                        <div className="absolute left-5 text-gray-400">
+                            <SearchIcon size={20} />
                         </div>
                         <input 
                             type="text" 
                             value={searchQuery}
                             placeholder="Search brands or products..." 
-                            className="w-full pl-14  py-4 text-base rounded-xl shadow-xl focus:ring-2 focus:ring-emerald-500/20 focus:outline-none text-gray-900 bg-white border-none"
+                            className="w-full pl-14 pr-32 py-5 text-lg rounded-2xl shadow-2xl focus:outline-none text-gray-900 bg-white border-none transition-all placeholder:text-gray-400 font-medium"
                             onChange={handleChange}
                             onFocus={() => hasResults && setShowDropdown(true)}
                         />
-                        <button className="absolute right-2 bg-emerald-500 hover:bg-emerald-600 text-white px-6 py-2 rounded-lg font-bold transition-all active:scale-95 shadow-md">
+                        <button className="absolute right-2.5 bg-emerald-500 hover:bg-emerald-600 text-white px-7 py-3 rounded-xl font-bold transition-all shadow-lg">
                             Search
                         </button>
                     </div>
 
-                    {showDropdown && (loading || error || hasResults || (debouncedSearchQuery && !loading && !error && !hasResults)) && (
-                        <div className="absolute top-full mt-3 w-full bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200">
-                            <div className="max-h-[420px] overflow-y-auto custom-scrollbar">
+                    {showDropdown && (
+                        <div className="absolute top-full mt-3 w-full bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-50">
+                            <div className="max-h-[420px] overflow-y-auto">
+                                
                                 {loading && (
                                     <div className="p-10 text-center flex flex-col items-center gap-3">
-                                        <div className="w-6 h-6 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
-                                        <span className="text-sm font-medium text-gray-500 uppercase tracking-widest">Searching...</span>
+                                        <Loader2 className="w-6 h-6 text-emerald-500 animate-spin" />
+                                        <span className="text-sm font-medium text-gray-400 tracking-wide uppercase">Searching...</span>
                                     </div>
                                 )}
-                                
-                                {error && (
-                                    <div className="p-6 text-center text-red-500 font-medium bg-red-50">
-                                        {error}
-                                    </div>
-                                )}
-                                
-                                {!loading && !error && !hasResults && debouncedSearchQuery && (
+
+                                {!loading && !hasResults && debouncedSearchQuery && (
                                     <div className="p-10 text-center text-gray-500">
-                                        No matches found for <span className="font-bold text-gray-800">"{debouncedSearchQuery}"</span>
+                                        No results found for "{debouncedSearchQuery}"
                                     </div>
                                 )}
-                                
-                                {!loading && !error && hasResults && (
+
+                                {!loading && hasResults && (
                                     <div className="divide-y divide-gray-50">
+                                        
                                         {results.brands.length > 0 && (
-                                            <div>
-                                                <div className="px-5 py-3 bg-gray-50/80 text-[11px] font-bold text-gray-400 uppercase tracking-[0.2em]">
+                                            <div className="text-left">
+                                                <div className="px-6 py-3 bg-gray-50/80 text-[11px] font-bold text-gray-400 uppercase tracking-widest">
                                                     Brands
                                                 </div>
-                                                <ul>
-                                                    {results.brands.map((brand) => (
-                                                        <li 
-                                                            key={brand.id}
-                                                            onClick={() => handleBrandClick(brand)}
-                                                            className="px-6 py-4 hover:bg-emerald-50 cursor-pointer transition-colors group flex items-center justify-between"
-                                                        >
-                                                            <div className="text-left">
-                                                                <div className="font-bold text-gray-900 group-hover:text-emerald-700 transition-colors">
-                                                                    {brand.brandName}
-                                                                </div>
-                                                                {brand.description && (
-                                                                    <div className="text-sm text-gray-500 line-clamp-1 mt-0.5">
-                                                                        {brand.description}
-                                                                    </div>
-                                                                )}
-                                                            </div>
-                                                            <svg className="w-4 h-4 text-gray-300 group-hover:text-emerald-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
-                                                            </svg>
-                                                        </li>
-                                                    ))}
-                                                </ul>
+                                                {results.brands.map((brand) => (
+                                                    <div 
+                                                        key={brand.id}
+                                                        onClick={() => handleBrandClick(brand)}
+                                                        className="px-6 py-4 hover:bg-emerald-50 cursor-pointer font-semibold text-gray-900 transition-colors"
+                                                    >
+                                                        {brand.brandName}
+                                                    </div>
+                                                ))}
                                             </div>
                                         )}
 
                                         {results.supplements.length > 0 && (
-                                            <div>
-                                                <div className="px-5 py-3 bg-gray-50/80 text-[11px] font-bold text-gray-400 uppercase tracking-[0.2em]">
+                                            <div className="text-left">
+                                                <div className="px-6 py-3 bg-gray-50/80 text-[11px] font-bold text-gray-400 uppercase tracking-widest border-t border-gray-100">
                                                     Products
                                                 </div>
-                                                <ul>
-                                                    {results.supplements.map((supplement) => (
-                                                        <li 
-                                                            key={supplement.id}
-                                                            onClick={() => handleProductClick(supplement)}
-                                                            className="px-6 py-4 hover:bg-emerald-50 cursor-pointer transition-colors group flex items-center justify-between"
-                                                        >
-                                                            <div className="text-left">
-                                                                <div className="font-bold text-gray-900 group-hover:text-emerald-700 transition-colors">
-                                                                    {supplement.supplementName}
-                                                                </div>
-                                                                <div className="text-xs text-emerald-600 font-semibold mt-0.5 uppercase tracking-wide">
-                                                                    Product
-                                                                </div>
-                                                            </div>
-                                                            <svg className="w-4 h-4 text-gray-300 group-hover:text-emerald-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
-                                                            </svg>
-                                                        </li>
-                                                    ))}
-                                                </ul>
+                                                {results.supplements.map((supplement) => (
+                                                    <div 
+                                                        key={supplement.id}
+                                                        onClick={() => handleProductClick(supplement)}
+                                                        className="px-6 py-4 hover:bg-emerald-50 cursor-pointer font-semibold text-gray-900 transition-colors"
+                                                    >
+                                                        {supplement.supplementName}
+                                                    </div>
+                                                ))}
                                             </div>
                                         )}
                                     </div>

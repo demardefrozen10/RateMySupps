@@ -46,9 +46,11 @@ public List<ReadSupplement> getAllSupplementsByBrand(Long brandId) {
 
     @Override
     public List<String> getCategories() {
-        return mapper.fromEntityVariant(categoryRepo.findAll());
+        return categoryRepo.findAll()
+                .stream()
+                .map(category -> category.getName()) 
+                .collect(Collectors.toList());
     }
-
 
 
     public List<ReadSupplement> searchSupplementsByMinRating(Double minRating, Sort sort) {
@@ -90,26 +92,41 @@ public List<ReadSupplement> getAllSupplementsByBrand(Long brandId) {
                 .collect(Collectors.toList());
     }
 
-    @Override
-    public List<ReadSupplement> getSupplementsByBrand(Long brandId, String search, String filter, String sortOption) {
-    
-    Sort sortObj = Sort.by(Sort.Direction.ASC, "supplementName");
+@Override
+public List<ReadSupplement> getSupplementsByBrand(Long brandId, String search, String filter, String sortOption) {
 
+    Sort sortObj = Sort.by(Sort.Direction.ASC, "supplementName");
     if (sortOption != null) {
         if (sortOption.equalsIgnoreCase("highest-rated")) {
             sortObj = Sort.by(Sort.Direction.DESC, "averageRating");
         } else if (sortOption.equalsIgnoreCase("most-reviews")) {
             sortObj = Sort.by(Sort.Direction.DESC, "totalReviews");
+        } else if (sortOption.equalsIgnoreCase("a-z")) {
+            sortObj = Sort.by(Sort.Direction.ASC, "supplementName");
         }
     }
 
-    String searchParam = (search != null && !search.isBlank()) ? "%" + search + "%" : null;
-    String filterParam = (filter != null && !filter.isBlank()) ? filter : null;
+    String searchParam = null;
+    if (search != null && !search.trim().isEmpty()) {
+        // Add wildcards AND convert to lowercase here
+        searchParam = "%" + search.trim().toLowerCase() + "%";
+    }
+
+    String filterParam = null;
+    if (filter != null && !filter.trim().isEmpty()) {
+        // Convert to lowercase here
+        filterParam = filter.trim().toLowerCase();
+    }
 
     return repo.findByBrandWithFilters(brandId, searchParam, filterParam, sortObj)
                .stream()
                .map(mapper::fromEntity)
-               
                .toList();
 }
+
+@Override
+public List<String> findVariantsBySupplementId(Long supplementId) {
+    return repo.findVariantsBySupplementId(supplementId);
+}
+
 }

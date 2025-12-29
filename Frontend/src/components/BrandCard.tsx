@@ -1,11 +1,17 @@
 import type {Supplement} from "../types/Supplement";
 import { useNavigate } from "react-router-dom";
+
 export default function BrandCard(props: Supplement) {
 
     const navigate = useNavigate();
 
     const handleCardClick = () => {
-        navigate(`/product/${props.id}`, { state: { supplementId: props.id, brand: props.brand } });
+        navigate(`/product/${props.id}`, { 
+            state: { 
+                supplementId: props.id, // Ensure ID is passed
+                brandName: (props.brand as any).brandName // FIX: Pass the string name, not the whole object
+            } 
+        });
     }
 
     return (
@@ -40,7 +46,7 @@ export default function BrandCard(props: Supplement) {
                                 ? 'bg-gradient-to-br from-yellow-400 to-yellow-500'
                                 : 'bg-gradient-to-br from-emerald-400 to-emerald-500'
                     }`}>
-                    <span className="text-3xl font-bold text-white">{props.averageRating.toFixed(1)}</span>
+                    <span className="text-3xl font-bold text-white">{(props.averageRating ?? 0).toFixed(1)}</span>
                 </div>
                     <span className="text-xs text-gray-500 mt-2">{props.totalReviews} ratings</span>
                 </div>

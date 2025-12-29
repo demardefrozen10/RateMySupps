@@ -10,8 +10,6 @@ interface Supplement {
     category: string;
     variants: string[];
     servingSizes: string[];
-
-
 }
 
 

@@ -44,6 +44,8 @@ public class BrandController {
 
     }
 
+    
+
     @PostMapping("/createBrand")
     public ResponseEntity<ReadBrand> createBrand(@RequestBody @Valid WriteBrand brand) {
         ReadBrand created = commandRepo.submitBrand(brand);

@@ -21,8 +21,8 @@ public class ReadSupplementMapper {
 
         readSupplement.setAverageRating(supplement.getAverageRating());
 
-        readSupplement.setImageUrl(
-        supplement.getImageUrl().isEmpty() ? null : supplement.getImageUrl().get(0)
+        readSupplement.setImageUrl(supplement.getImageUrl() != null && !supplement.getImageUrl().isEmpty() 
+        ? supplement.getImageUrl().get(0) : null
     );
 
 

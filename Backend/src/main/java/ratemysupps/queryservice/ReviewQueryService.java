@@ -24,29 +24,32 @@ public class ReviewQueryService implements IReviewQueryService {
 
 
     @Override
-    public List<ReadReview> getReviewBySupplementId(Long supplementId, String sortBy, String sortOrder, String variant) {
-        List<ReadReview> reviews;
-
-        if (sortBy == null) {
-            reviews = getUnsortedReviews(supplementId);
-        } else if ("rating".equals(sortBy)) {
-            reviews = "asc".equals(sortOrder)
-                    ? getReviewsBySupplementIdByMinRating(supplementId)
-                    : getReviewsBySupplementIdByMaxRating(supplementId);
-        } else if ("date".equals(sortBy)) {
-            reviews = getReviewsBySupplementIdByMaxDate(supplementId);
-        } else {
-            reviews = getUnsortedReviews(supplementId);
-        }
-
-        if (!variant.isEmpty()) {
-            reviews = reviews.stream()
-                    .filter(review -> variant.equals(review.getVariant()))
-                    .collect(Collectors.toList());
-        }
-
-        return reviews;
+public List<ReadReview> getReviewBySupplementId(Long supplementId, String sortBy, String sortOrder, String variant, int limit) {
+    List<ReadReview> reviews;
+    
+    if (sortBy == null) {
+        reviews = getUnsortedReviews(supplementId);
+    } else if ("rating".equals(sortBy)) {
+        reviews = "asc".equals(sortOrder)
+                ? getReviewsBySupplementIdByMinRating(supplementId)
+                : getReviewsBySupplementIdByMaxRating(supplementId);
+    } else if ("date".equals(sortBy)) {
+        reviews = getReviewsBySupplementIdByMaxDate(supplementId);
+    } else {
+        reviews = getUnsortedReviews(supplementId);
     }
+
+    if (variant != null && !variant.isEmpty()) {
+        reviews = reviews.stream()
+                .filter(review -> variant.equals(review.getVariant()))
+                .collect(Collectors.toList());
+    }
+
+        return reviews.stream()
+            .limit(limit)
+            .collect(Collectors.toList());
+}
+
 
     private List<ReadReview> getUnsortedReviews(Long supplementId) {
         return reviewRepo.findBySupplementId(supplementId).stream()
@@ -87,6 +90,9 @@ public class ReviewQueryService implements IReviewQueryService {
 
         return readReviews;
     }
+
+    
+
 
 
 }
