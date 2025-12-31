@@ -49,26 +49,27 @@ export default function Carousel({ title }: { title: string }) {
         className="flex gap-4 overflow-x-auto scrollbar-hide snap-x snap-mandatory"
         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
       >
-        {supplements.map((item) => {
+        {supplements.map((supplement) => {
           const handleCardClick = () => {
-            navigate(`/product/${item.id}`, { state: { supplementId: item.id, brandName: item.brand } });
+            navigate(`/product/${supplement.brandName}/${supplement.supplementName}/${supplement.id}`, { state: { supplement: supplement } });
           };
           return (
             <div 
-              key={item.id}
+              key={supplement.id}
               className="min-w-[200px] md:min-w-[240px] flex-shrink-0 bg-white rounded-lg border border-slate-200 overflow-hidden cursor-pointer hover:shadow-md transition-shadow snap-start"
               onClick={handleCardClick}
             >
               <div className="h-40 bg-slate-100">
                 <img 
-                  src={item.imageUrl} 
-                  alt={item.supplementName} 
+                  src={supplement.imageUrl} 
+                  alt={supplement.supplementName} 
                   className="w-full h-full object-cover"
                 />
               </div>
               <div className="p-3">
-                <h3 className="font-bold text-sm text-slate-800 truncate">{item.supplementName}</h3>
-                <p className="text-xs text-slate-500 mt-1">{item.totalReviews} Reviews</p>
+                <h3 className="font-bold text-sm text-slate-800 truncate">{supplement.supplementName}</h3>
+                <p className="text-xs text-emerald-400">{supplement.brandName}</p>
+                <p className="text-xs text-slate-500 mt-1">{supplement.totalReviews} Reviews</p>
               </div>
             </div>
           );

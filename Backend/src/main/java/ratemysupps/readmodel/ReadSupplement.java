@@ -18,7 +18,15 @@ public class ReadSupplement {
 
     public int totalReviews;
 
-    public String imageUrl;
+    public List<String> imageUrl;
+
+    public List<String> servingSizes;
 
     public List<String> variants;
+
+    public String category;
+
+    public String brandName;
+
+
 }

@@ -1,34 +1,41 @@
 import { useState, useEffect } from "react"
-import { useLocation, useNavigate, useParams } from "react-router-dom"
+import { useNavigate, useParams, useLocation } from "react-router-dom"
 import useFetch from "../hooks/useFetch";
 import type { Supplement } from "../types/Supplement";
 import type { Review } from "../types/Review";
 import ReviewStrip from "../components/ReviewStrip";
 import type { Brand } from "../types/Brand";
+import Load from "../components/Load";
 
 export default function ProductPage() {
     const [supplement, setSupplement] = useState<Supplement>();
     const [reviews, setReviews] = useState<Review[]>([]);
-    const [showNotification, setShowNotification] = useState(false);
+    const [showNotification] = useState(false);
     const [sortOption, setSortOption] = useState<"recent" | "highest" | "lowest">("recent");
     const [variant, setVariant] = useState<string>("");
+    const [brand, setBrand] = useState<Brand>();
 
     const navigate = useNavigate();
+    const { supplementId } = useParams<{ brandName: string, supplementId: string }>();
+    
     const location = useLocation();
-    const { supplementId } = useParams<{ supplementId: string }>();
-
-    const brand: Brand = location.state?.brand;
-
+    const locationSupplement: Supplement = location.state?.supplement;
 
     const {get} = useFetch("http://localhost:8080/api/");
 
 
+
+
     useEffect(() => {
-        if (!supplementId) return;
+        if (locationSupplement) {
+            setSupplement(locationSupplement);
+        } else {
+
         get(`supplement/getSupplement?supplementId=${supplementId}`).then((data) => {
             setSupplement(data);
         });
-    }, [supplementId]);
+        }
+    }, []);
     
     useEffect(() => {
         if (!supplementId) return;
@@ -46,21 +53,11 @@ export default function ProductPage() {
             sort = "date";
         }
 
-
         get(`review/getReviews?supplementId=${supplementId}&sortBy=${sort}&sortOrder=${orderBy}&variant=${variant}`).then((data: Review[]) => {
             setReviews(data)
         });
-    }, [sortOption, variant, supplementId]);
+    }, [sortOption, variant]);
 
-
-
-    useEffect(() => {
-        if (location.state?.reviewSubmitted) {
-            setShowNotification(true);
-            navigate(location.pathname, { replace: true, state: { ...location.state, reviewSubmitted: undefined } });
-            setTimeout(() => setShowNotification(false), 3000);
-        }
-    }, [location.state, navigate, location.pathname]);
 
 
 
@@ -102,6 +99,10 @@ export default function ProductPage() {
     const ratingDistribution = getRatingDistribution();
     const totalReviewCount = reviews.length;
 
+    if (!supplement) return (
+        <Load/>
+    );
+
 
     return (
         <div className="min-h-screen to-white">
@@ -129,8 +130,8 @@ export default function ProductPage() {
                     </div>
                     <div>
                         <div className="mb-4">
-                            <a onClick={() =>    navigate(`/products/${brand.brandName}`, { state: { brand } })} className="text-emerald-600 hover:text-emerald-700 font-semibold mb-2 inline-block cursor-pointer">
-                                {brand.brandName}
+                            <a onClick={() => navigate(`/products/${supplement.brandName}`, { state: { brand } })} className="text-emerald-600 hover:text-emerald-700 font-semibold mb-2 inline-block cursor-pointer">
+                                {supplement.brandName}
                             </a>
                             <h1 className="text-4xl font-bold text-gray-800 mb-4">
                                 {supplement?.supplementName}

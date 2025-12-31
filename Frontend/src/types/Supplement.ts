@@ -1,4 +1,3 @@
-import type { Brand } from "./Brand";
 
 interface Supplement {
     id: number;
@@ -10,6 +9,7 @@ interface Supplement {
     category: string;
     variants: string[];
     servingSizes: string[];
+    brandName: string;
 
 
 }

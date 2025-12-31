@@ -18,4 +18,5 @@ public interface ISupplementRepository extends JpaRepository<Supplement, Long> {
     List<Supplement> findByOrderByTotalReviewsDesc();
     List<Supplement> findByAverageRating(Double rating);
     List<Supplement> findBySupplementNameContainingIgnoreCase(String name);
+
 }

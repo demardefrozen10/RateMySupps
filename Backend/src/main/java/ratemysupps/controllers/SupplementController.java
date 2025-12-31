@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.*;
 import ratemysupps.icommandservice.ISupplementCommandService;
 import ratemysupps.iqueryservice.ISupplementQueryService;
 import ratemysupps.readmodel.ReadSupplement;
-import ratemysupps.readmodel.ReadSupplementComplex;
 import ratemysupps.writemodel.WriteSupplement;
 import org.springframework.data.domain.Sort;
 
@@ -37,8 +36,8 @@ public class SupplementController {
     }
 
     @GetMapping("/getSupplement")
-    public ResponseEntity<ReadSupplementComplex> getSupplementById(@RequestParam Long supplementId) {
-        ReadSupplementComplex supplement = queryRepo.getSupplementById(supplementId);
+    public ResponseEntity<ReadSupplement> getSupplementById(@RequestParam Long supplementId) {
+        ReadSupplement supplement = queryRepo.getSupplementById(supplementId);
         return ResponseEntity.ok(supplement);
     }
 

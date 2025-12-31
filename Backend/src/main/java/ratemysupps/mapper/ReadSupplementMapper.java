@@ -4,7 +4,7 @@ import org.springframework.stereotype.Component;
 import ratemysupps.entity.Category;
 import ratemysupps.entity.Supplement;
 import ratemysupps.readmodel.ReadSupplement;
-import ratemysupps.readmodel.ReadSupplementComplex;
+import ratemysupps.repository.IBrandRepository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,35 +15,19 @@ public class ReadSupplementMapper {
     public ReadSupplement fromEntity(Supplement supplement) {
         ReadSupplement readSupplement = new ReadSupplement();
 
-        readSupplement.setSupplementName(supplement.getSupplementName());
-
-        readSupplement.setTotalReviews(supplement.getTotalReviews());
-
-        readSupplement.setAverageRating(supplement.getAverageRating());
-
-        readSupplement.setImageUrl(supplement.getImageUrl().getFirst());
 
         readSupplement.setId(supplement.getId());
-
+        readSupplement.setSupplementName(supplement.getSupplementName());
+        readSupplement.setAverageRating(supplement.getAverageRating());
+        readSupplement.setImageUrl(supplement.getImageUrl());
+        readSupplement.setServingSizes(supplement.getServingSizes());
+        readSupplement.setTotalReviews(supplement.getTotalReviews());
+        readSupplement.setCategory(supplement.getCategory().getName());
         readSupplement.setVariants(supplement.getVariants());
 
+        readSupplement.setBrandName(supplement.getBrand().getBrandName());
+
         return readSupplement;
-    }
-
-
-    public ReadSupplementComplex fromEntityComplex(Supplement supplement) {
-        ReadSupplementComplex readSupplementComplex = new ReadSupplementComplex();
-
-        readSupplementComplex.setId(supplement.getId());
-        readSupplementComplex.setSupplementName(supplement.getSupplementName());
-        readSupplementComplex.setAverageRating(supplement.getAverageRating());
-        readSupplementComplex.setImageUrl(supplement.getImageUrl());
-        readSupplementComplex.setServingSizes(supplement.getServingSizes());
-        readSupplementComplex.setTotalReviews(supplement.getTotalReviews());
-        readSupplementComplex.setCategory(supplement.getCategory().getName());
-        readSupplementComplex.setVariants(supplement.getVariants());
-
-        return readSupplementComplex;
     }
 
     public List<String> fromEntityVariant(List<Category> variants) {

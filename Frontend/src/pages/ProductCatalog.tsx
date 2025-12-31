@@ -1,31 +1,41 @@
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import BrandCard from "../components/BrandCard"
 import { useState, useEffect } from "react"
 import type { Brand } from "../types/Brand";
 import useFetch from "../hooks/useFetch";
 import type {Supplement} from "../types/Supplement";
+import Load from "../components/Load";
 
 
 export default function ProductCatalog() {
     const [currentImage, setCurrentImage] = useState(0);
     const [supplements, setSupplements] = useState<Supplement[]>([]);
     const [showNotification, setShowNotification] = useState(false);
+    const [brand, setBrand] = useState<Brand>();
 
-    const { get } = useFetch("http://localhost:8080/api/supplement/");
+    const { get } = useFetch("http://localhost:8080/api/");
     const navigate = useNavigate();
 
 
     const location = useLocation();
-    const brand: Brand = location.state?.brand;
+    const locationBrand: Brand = location.state?.brand;
+    const { brandName } = useParams<{ brandName: string }>();
 
 
-    useEffect(() => {
-        get(`getSupplements?brandId=${brand.id}`).then((data: Supplement[]) => {
-            setSupplements(data);
-        }).catch((error) => {
-            console.error("Error fetching supplements:", error);
-        });
-    }, []); 
+
+      useEffect(() => {
+        if (locationBrand) {
+            setBrand(locationBrand);
+        } else {
+            const formattedBrandName = brandName ? brandName.replace(/-/g, " ") : "";
+            get(`brand/getBrand?name=${encodeURIComponent(formattedBrandName)}`).then((data: Brand[]) => {
+                console.log(data);
+                setBrand(data[0]);
+            }).catch((error) => {
+                console.error("Error fetching brand:", error);
+            });
+        }
+    }, []);
 
     
     useEffect(() => {
@@ -36,9 +46,15 @@ export default function ProductCatalog() {
         }
     }, [location.state, navigate, location.pathname]);
 
-
-
-    const images = [brand.imageUrl];
+    
+    useEffect(() => {
+        if (!brand) return;
+        get(`supplement/getSupplements?brandId=${brand!.id}`).then((data: Supplement[]) => {
+            setSupplements(data);
+        }).catch((error) => {
+            console.error("Error fetching supplements:", error);
+        });
+    }, [brand]);
 
     const nextImage = () => setCurrentImage((prev) => (prev + 1) % images.length)
     const prevImage = () => setCurrentImage((prev) => (prev - 1 + images.length) % images.length)
@@ -66,6 +82,12 @@ export default function ProductCatalog() {
         });
     };
 
+    if (!brand) return (
+        <Load/>
+    );
+
+    const images = [brand!.imageUrl];
+    
     return (   
         <div className="min-h-screen to-white">
         {showNotification && (
@@ -87,7 +109,7 @@ export default function ProductCatalog() {
                             <h1 className="text-4xl sm:text-6xl font-bold text-white drop-shadow-lg text-center w-full break-words">{brand.brandName}</h1>
                             <div className="mt-2 flex items-center justify-center">
                                 <span className="flex text-5xl sm:text-4xl">
-                                    {renderStars(brand.averageRating)}
+                                    {renderStars(brand!.averageRating)}
                                 </span>
                             </div>
                             <p className="mt-1 font-bold text-white drop-shadow-lg text-center w-full break-words">Based on {brand.totalReviews} reviews</p>
@@ -161,10 +183,11 @@ export default function ProductCatalog() {
                         imageUrl={supplement.imageUrl}
                         averageRating={supplement.averageRating}
                         totalReviews={supplement.totalReviews}
-                        brand={brand}
+                        brandId={supplement.brandId}
                         category={supplement.category}
                         variants={supplement.variants}
                         servingSizes={supplement.servingSizes}
+                        brandName={brand!.brandName}
                     />
                     ))}
                 </div>

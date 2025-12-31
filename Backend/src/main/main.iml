@@ -61,5 +61,6 @@
     </orderEntry>
     <orderEntry type="library" name="Maven: jakarta.validation:jakarta.validation-api:3.1.1" level="project" />
     <orderEntry type="library" name="Maven: org.springframework.data:spring-data-jpa:4.0.0" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework.data:spring-data-commons:4.0.0" level="project" />
   </component>
 </module>
