@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { Star } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { ChevronLeft, ChevronRight, Star } from 'lucide-react';
 import useFetch from '../hooks/useFetch';
 import type { Supplement } from '../types/Supplement';
 import { useNavigate } from 'react-router-dom';
@@ -12,11 +12,18 @@ type CarouselProps = {
 export default function Carousel({ title, supplements }: CarouselProps) {
   const { get } = useFetch("http://localhost:8080/api/supplement/");
   const navigate = useNavigate();
-
+  const scrollRef = useRef<HTMLDivElement | null>(null);
 
   if(supplements.length === 0) {
     return null;
   }
+
+    const scroll = (direction: 'left' | 'right') => {
+    if (!scrollRef.current) return;
+    const scrollAmount = direction === 'left' ? -350 : 350;
+    scrollRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+  };
+
 
   return (
     <div className="w-full max-w-7xl mx-auto px-6 py-20">
@@ -27,14 +34,31 @@ export default function Carousel({ title, supplements }: CarouselProps) {
         <div className="w-12 h-1.5 bg-emerald-500 mt-4 rounded-full"></div>
       </div>
 
-      <div 
+        {/* Carousel with Arrows */}
+      <div className="relative">
+        {/* Left Arrow */}
+        <button
+          onClick={() => scroll('left')}
+          className="hidden md:block absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white shadow-lg rounded-full p-3 hover:bg-gray-50"
+        >
+          <ChevronLeft size={24} />
+        </button>
+
+        <button
+          onClick={() => scroll('right')}
+          className="hidden md:block absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white shadow-lg rounded-full p-3 hover:bg-gray-50"
+        >
+          <ChevronRight size={24} />
+        </button>
+
+      <div ref={scrollRef}
         className="flex gap-8 overflow-x-auto scrollbar-hide snap-x snap-mandatory pb-10 px-4 -mx-4"
         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
       >
         {supplements.map((item) => {
           const handleCardClick = () => {
             navigate(`/product/${item.id}`, { 
-                state: { supplementId: item.id, brandName: item.brand } 
+                state: { supplementId: item.id, brandName: item.brand, supplement: item } 
             });
           };
           
@@ -78,6 +102,7 @@ export default function Carousel({ title, supplements }: CarouselProps) {
           );
         })}
       </div>
+    </div>
     </div>
   );
 }

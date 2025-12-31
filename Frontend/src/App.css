@@ -4,12 +4,57 @@ h1 {
   font-family: 'Inter', sans-serif;
 }
 
+
 * {
   -webkit-overflow-scrolling: touch;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.scrollbar-hide::-webkit-scrollbar {
-  display: none;
+html {
+  scroll-behavior: smooth;
+}
+
+body, html {
+  overflow-x: hidden;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+}
+
+@media (max-width: 640px) {
+  html {
+    font-size: 14px; 
+  }
+}
+
+
+@media (min-width: 640px) {
+  .container {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .container {
+    max-width: 768px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .container {
+    max-width: 1024px;
+  }
+}
+
+@media (min-width: 1280px) {
+  .container {
+    max-width: 1280px;
+  }
 }
 
 .scrollbar-hide {
@@ -17,10 +62,67 @@ h1 {
   scrollbar-width: none;
 }
 
-body {
-  overflow-x: hidden;
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
 }
 
-* {
+button, a, input, select, textarea {
+  touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
+}
+
+button, a[role="button"], input[type="button"], input[type="submit"] {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+.responsive-padding {
+  padding: 1rem;
+}
+
+@media (min-width: 640px) {
+  .responsive-padding {
+    padding: 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .responsive-padding {
+    padding: 2rem;
+  }
+}
+
+.responsive-margin {
+  margin: 1rem;
+}
+
+@media (min-width: 640px) {
+  .responsive-margin {
+    margin: 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .responsive-margin {
+    margin: 2rem;
+  }
+}
+
+@supports (padding: env(safe-area-inset-top)) {
+  body {
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
 }

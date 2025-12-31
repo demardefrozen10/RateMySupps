@@ -315,7 +315,7 @@ export default function ProductPage() {
                 </div>
         {recommendations.length > 0 && (
     <Carousel 
-        title="You May Also Like" 
+    title={`${brandName} Users Have Also Enjoyed`}
         supplements={recommendations} />
         )}
             </div>
