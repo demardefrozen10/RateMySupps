@@ -49,5 +49,6 @@ Application inspired by RateMyProfessor, this app allows you to rate & view supp
    Frontend runs on `http://localhost:5173`
 
 ## Contributors
-Jason Deng
+Jason Deng  
+
 Farzana Sattar 
