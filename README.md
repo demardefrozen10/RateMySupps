@@ -1,5 +1,6 @@
 # RateMySupplements
-![Collaborative](https://img.shields.io/badge/Collaboration-Jason%20Deng%20%26%20Farzana%20Sattar-blue?style=for-the-badge)
+**Collaborative Project** • Built by Jason Deng & Farzana Sattar
+
 Application inspired by RateMyProfessor, this app allows you to rate & view supplements in one centralized platform.
 
 
@@ -49,7 +50,3 @@ Application inspired by RateMyProfessor, this app allows you to rate & view supp
    npm run dev
 ```
    Frontend runs on `http://localhost:5173`
-
-## Contributors
-Jason Deng  
-Farzana Sattar 
