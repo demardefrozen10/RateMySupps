@@ -35,5 +35,5 @@ List<Supplement> findByBrandWithFilters(
 );
 
 @Query("SELECT v FROM supplement s JOIN s.variants v WHERE s.id = :id")
-List<String> findVariantsBySupplementId(@Param("id") Long id);
+List<String> getVariantsBySupplementId(@Param("id") Long id);
 }

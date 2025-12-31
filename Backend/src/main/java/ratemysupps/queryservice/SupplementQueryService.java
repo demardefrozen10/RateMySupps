@@ -108,13 +108,11 @@ public List<ReadSupplement> getSupplementsByBrand(Long brandId, String search, S
 
     String searchParam = null;
     if (search != null && !search.trim().isEmpty()) {
-        // Add wildcards AND convert to lowercase here
         searchParam = "%" + search.trim().toLowerCase() + "%";
     }
 
     String filterParam = null;
     if (filter != null && !filter.trim().isEmpty()) {
-        // Convert to lowercase here
         filterParam = filter.trim().toLowerCase();
     }
 
@@ -125,8 +123,8 @@ public List<ReadSupplement> getSupplementsByBrand(Long brandId, String search, S
 }
 
 @Override
-public List<String> findVariantsBySupplementId(Long supplementId) {
-    return repo.findVariantsBySupplementId(supplementId);
+public List<String> getVariantsBySupplementId(Long supplementId) {
+    return repo.getVariantsBySupplementId(supplementId);
 }
 
 }

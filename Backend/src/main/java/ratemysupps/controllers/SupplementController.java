@@ -53,7 +53,7 @@ public class SupplementController {
 
     @GetMapping("/getVariants")
     public List<String> getVariantsBySupplementId(@RequestParam Long supplementId) {
-        return queryRepo.findVariantsBySupplementId(supplementId);
+        return queryRepo.getVariantsBySupplementId(supplementId);
     }
 
     @PostMapping("/createSupplement")
@@ -94,6 +94,7 @@ public class SupplementController {
     public List<ReadSupplement> searchByName(@RequestParam String name) {
         return queryRepo.searchSupplementsByName(name);
     }
+
 
 
 }

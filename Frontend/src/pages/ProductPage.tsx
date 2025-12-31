@@ -4,6 +4,7 @@ import useFetch from "../hooks/useFetch";
 import type { Supplement } from "../types/Supplement";
 import type { Review } from "../types/Review";
 import ReviewStrip from "../components/ReviewStrip";
+import type { Tag } from "../types/Tag";
 
 export default function ProductPage() {
     const [supplement, setSupplement] = useState<Supplement>();
@@ -12,6 +13,7 @@ export default function ProductPage() {
     const [showNotification, setShowNotification] = useState(false);
     const [sortOption, setSortOption] = useState<"recent" | "highest" | "lowest">("recent");
     const [variant, setVariant] = useState<string>("");
+    const [tags, setTag] = useState<Tag[]>([]);
     const [limit, setLimit] = useState<number>(5); 
     
     const navigate = useNavigate();
@@ -38,6 +40,14 @@ export default function ProductPage() {
 
         get(`supplement/getVariants?supplementId=${supplementId}`).then((data) => {
             setVariants(data || []);
+        });
+    }, [supplementId]);
+
+    useEffect(() => {
+        if (!supplementId) return;
+
+        get(`tag/bySupplement?supplementId=${supplementId}`).then((data) => {
+            setTag(data || []);
         });
     }, [supplementId]);
     
@@ -194,17 +204,25 @@ export default function ProductPage() {
                                             : "No variants listed"}
                                     </span>
                                 </div>
+
+                             <div className="flex justify-between">
+                                    <span className="text-gray-600">Tags :</span>
+                                <div className="flex gap-2">
+                                    {tags.map((tag) => (
+                                        <span key={tag.id} className="bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full text-sm font-medium">
+                                            {tag.name}
+                                        </span>
+                                    ))}
+                                </div>
                             </div>
                         </div>
+                        </div>
+                    
 
                         <button className="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-4 rounded-xl transition-colors shadow-lg mb-4 cursor-pointer" onClick={HandleReviewClick}>
                             Leave a Review
                         </button>
                         
-                        <div className="flex gap-2">
-                            <span className="bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full text-sm font-medium">Gluten Free</span>
-                            <span className="bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full text-sm font-medium">Non-GMO</span>
-                        </div>
                     </div>
                 </div>
 

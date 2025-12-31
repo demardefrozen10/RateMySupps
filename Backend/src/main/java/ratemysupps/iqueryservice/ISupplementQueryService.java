@@ -18,6 +18,6 @@ public interface ISupplementQueryService {
     List<ReadSupplement>searchSupplementsByExactRating(Double rating);
     List<ReadSupplement> searchSupplementsByName(String name);
     List<ReadSupplement> getSupplementsByBrand(Long brandId, String search, String filter, String sortOption);
-    List<String> findVariantsBySupplementId(Long supplementId);
+    List<String> getVariantsBySupplementId(Long supplementId);
 
 }
