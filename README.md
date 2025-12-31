@@ -1,5 +1,5 @@
 # RateMySupplements
-**Collaborative Project** • Built by Jason Deng & Farzana Sattar
+> Built by Jason Deng & Farzana Sattar
 
 Application inspired by RateMyProfessor, this app allows you to rate & view supplements in one centralized platform.
 
@@ -50,3 +50,5 @@ Application inspired by RateMyProfessor, this app allows you to rate & view supp
    npm run dev
 ```
    Frontend runs on `http://localhost:5173`
+
+   
