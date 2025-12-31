@@ -7,6 +7,8 @@ import org.springframework.data.repository.query.Param;
 
 import ratemysupps.entity.Category;
 import ratemysupps.entity.Supplement;
+import ratemysupps.entity.Tag;
+
 import java.util.List;
 
 public interface ISupplementRepository extends JpaRepository<Supplement, Long> {
@@ -36,4 +38,8 @@ List<Supplement> findByBrandWithFilters(
 
 @Query("SELECT v FROM supplement s JOIN s.variants v WHERE s.id = :id")
 List<String> getVariantsBySupplementId(@Param("id") Long id);
+
+
+List<Supplement> findTop6ByBrand_IdAndIdNotOrderByAverageRating_Desc(Long brandId, Long supplementId);
+List<Supplement> findByTagsInAndIdNotInOrderByAverageRating_Desc(List<Tag> tags, List<Long> excludeIds);
 }

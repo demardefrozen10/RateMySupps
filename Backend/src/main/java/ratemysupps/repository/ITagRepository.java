@@ -13,4 +13,5 @@ public interface ITagRepository extends JpaRepository<Tag, Long> {
     List<Tag> findByNameContainingIgnoreCase(String keyword);
     List<Tag> findBySupplements_Id(Long supplementId);
 
+
 }

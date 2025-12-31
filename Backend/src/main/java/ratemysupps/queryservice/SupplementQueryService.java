@@ -11,6 +11,7 @@ import ratemysupps.readmodel.ReadSupplementComplex;
 import ratemysupps.repository.ISupplementRepository;
 import ratemysupps.repository.ICategoryRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -125,6 +126,39 @@ public List<ReadSupplement> getSupplementsByBrand(Long brandId, String search, S
 @Override
 public List<String> getVariantsBySupplementId(Long supplementId) {
     return repo.getVariantsBySupplementId(supplementId);
+}
+
+@Override
+public List<ReadSupplement> getRecommendations(Long supplementId) {
+    Supplement supplement = repo.findById(supplementId)
+            .orElseThrow(() -> new RuntimeException("Supplement not found with ID: " + supplementId));
+
+    Long brandId = supplement.getBrand().getId();
+    List<Supplement> recommendedSupplements = new ArrayList<>();
+
+    List<Supplement> brandRecommendations = repo.findTop6ByBrand_IdAndIdNotOrderByAverageRating_Desc(brandId, supplementId);
+    recommendedSupplements.addAll(brandRecommendations);
+
+     if (supplement.getTags().isEmpty() || recommendedSupplements.size() >= 6) {
+        return brandRecommendations.stream()
+                .map(mapper::fromEntity)
+                .collect(Collectors.toList());
+    }
+
+    List<Long> excludeIds = brandRecommendations.stream()
+            .map(Supplement::getId)
+            .toList();
+    excludeIds = new ArrayList<>(excludeIds);
+    excludeIds.add(supplementId);
+
+        List<Supplement> tagRecommendations = repo.findByTagsInAndIdNotInOrderByAverageRating_Desc(supplement.getTags().stream().toList(), excludeIds);
+
+    recommendedSupplements.addAll(tagRecommendations);
+    return recommendedSupplements.stream()
+            .distinct()
+            .limit(6)
+            .map(mapper::fromEntity)
+            .collect(Collectors.toList());
 }
 
 }

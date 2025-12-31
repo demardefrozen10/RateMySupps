@@ -95,6 +95,10 @@ public class SupplementController {
         return queryRepo.searchSupplementsByName(name);
     }
 
+    @GetMapping("/recommendations")
+    public List<ReadSupplement> getRecommendations(@RequestParam Long supplementId) {
+    return queryRepo.getRecommendations(supplementId);
+}
 
 
 }

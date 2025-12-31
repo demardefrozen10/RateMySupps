@@ -5,6 +5,7 @@ import type { Supplement } from "../types/Supplement";
 import type { Review } from "../types/Review";
 import ReviewStrip from "../components/ReviewStrip";
 import type { Tag } from "../types/Tag";
+import Carousel from "../components/Carousel";
 
 export default function ProductPage() {
     const [supplement, setSupplement] = useState<Supplement>();
@@ -15,6 +16,7 @@ export default function ProductPage() {
     const [variant, setVariant] = useState<string>("");
     const [tags, setTag] = useState<Tag[]>([]);
     const [limit, setLimit] = useState<number>(5); 
+    const [recommendations, setRecommendations] = useState<Supplement[]>([]);
     
     const navigate = useNavigate();
     const location = useLocation();
@@ -48,6 +50,14 @@ export default function ProductPage() {
 
         get(`tag/bySupplement?supplementId=${supplementId}`).then((data) => {
             setTag(data || []);
+        });
+    }, [supplementId]);
+
+    useEffect(() => {
+        if (!supplementId) return;
+
+        get(`supplement/recommendations?supplementId=${supplementId}`).then((data) => {
+            setRecommendations(data || []);
         });
     }, [supplementId]);
     
@@ -299,9 +309,15 @@ export default function ProductPage() {
                                     Back to Top
                                 </button>
                             </div>
+                            
                         </>
                     )}
                 </div>
+        {recommendations.length > 0 && (
+    <Carousel 
+        title="You May Also Like" 
+        supplements={recommendations} />
+        )}
             </div>
         </div>
     )

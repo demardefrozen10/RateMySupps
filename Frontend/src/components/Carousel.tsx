@@ -4,21 +4,19 @@ import useFetch from '../hooks/useFetch';
 import type { Supplement } from '../types/Supplement';
 import { useNavigate } from 'react-router-dom';
 
-export default function Carousel({ title }: { title: string }) {
+type CarouselProps = {
+  title: string;
+  supplements: Supplement[];
+};
+
+export default function Carousel({ title, supplements }: CarouselProps) {
   const { get } = useFetch("http://localhost:8080/api/supplement/");
-  const [supplements, setSupplements] = useState<Supplement[]>([]);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    get('top-rated')
-      .then((data: Supplement[]) => {
-        setSupplements(Array.isArray(data) ? data : []);
-      })
-      .catch((err) => {
-        console.error("Failed to fetch supplements:", err);
-        setSupplements([]);
-      });
-  }, []);
+
+  if(supplements.length === 0) {
+    return null;
+  }
 
   return (
     <div className="w-full max-w-7xl mx-auto px-6 py-20">
