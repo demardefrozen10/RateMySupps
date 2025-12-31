@@ -105,7 +105,7 @@ const HandleSubmitReview = async () => {
 
     let proofS3Url: string = "";
     if (proofOfPurchase) {
-        const response: any = await post("s3/presigned-url", [{
+        const response = await post("s3/presigned-url", [{
             fileName: proofOfPurchase.name,
             contentType: proofOfPurchase.type,
             fileSize: proofOfPurchase.size,
@@ -377,7 +377,7 @@ const HandleSubmitReview = async () => {
                     </div>
 
                     <div className="flex gap-4">
-                        <button className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-4 rounded-xl transition-colors" onClick={() => navigate(-1)}>
+                        <button className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-4 rounded-xl cursor-pointer transition-colors" onClick={() => navigate(-1)}>
                             Cancel
                         </button>
                         <button 

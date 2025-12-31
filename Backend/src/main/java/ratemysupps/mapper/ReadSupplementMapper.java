@@ -42,6 +42,8 @@ public class ReadSupplementMapper {
         readSupplementComplex.setServingSizes(supplement.getServingSizes());
         readSupplementComplex.setTotalReviews(supplement.getTotalReviews());
         readSupplementComplex.setCategory(supplement.getCategory().getName());
+        readSupplementComplex.setVariants(supplement.getVariants());
+        
 
         return readSupplementComplex;
     }
@@ -53,4 +55,6 @@ public class ReadSupplementMapper {
         }
         return list;
     }
+
+    
 }

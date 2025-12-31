@@ -34,7 +34,7 @@ export default function Search() {
     };
 
     const handleProductClick = (supplement: Supplement) => {
-        navigate(`/product/${supplement.id}`, { state: { supplementId: supplement.id } });
+        navigate(`/product/${supplement.id}`, { state: { supplementId: supplement.id, brandName: supplement.brand?.brandName} });
         setShowDropdown(false);
         setSearchQuery('');
     };

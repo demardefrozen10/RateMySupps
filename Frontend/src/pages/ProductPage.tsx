@@ -21,9 +21,11 @@ export default function ProductPage() {
     const navigate = useNavigate();
     const location = useLocation();
     
-    const brandName = typeof location.state?.brandName === 'string' 
-        ? location.state.brandName 
-        : location.state?.brand?.brandName || supplement?.brand?.brandName || "Product";
+    const brandName = location.state?.brandName 
+    || (typeof location.state?.brand === 'string' ? location.state.brand : location.state?.brand?.brandName)
+    || supplement?.brand?.brandName 
+    || (typeof supplement?.brand === 'string' ? supplement.brand : '')
+    || "Product";
     
     const supplementId: number = location.state?.supplementId; 
   

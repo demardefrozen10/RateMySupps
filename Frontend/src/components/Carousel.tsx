@@ -34,9 +34,7 @@ export default function Carousel({ title, supplements }: CarouselProps) {
         <div className="w-12 h-1.5 bg-emerald-500 mt-4 rounded-full"></div>
       </div>
 
-        {/* Carousel with Arrows */}
       <div className="relative">
-        {/* Left Arrow */}
         <button
           onClick={() => scroll('left')}
           className="hidden md:block absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white shadow-lg rounded-full p-3 hover:bg-gray-50"
