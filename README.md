@@ -1,5 +1,7 @@
 # RateMySupplements
+![Collaborative](https://img.shields.io/badge/Collaboration-Jason%20Deng%20%26%20Farzana%20Sattar-blue?style=for-the-badge)
 Application inspired by RateMyProfessor, this app allows you to rate & view supplements in one centralized platform.
+
 
 # Built With
 ![React Badge](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB) 
