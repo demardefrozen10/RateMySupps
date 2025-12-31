@@ -80,14 +80,14 @@ export default function Search() {
 
     return (
         <div 
-            className="relative w-full min-h-[55vh] flex flex-col items-center justify-center px-4 py-20 overflow-hidden font-sans"
+        className="relative w-full min-h-[55vh] flex flex-col items-center justify-center px-4 py-20 overflow-visible font-sans"
             style={{ 
                 backgroundImage: `linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.65)), url(${Powder})`,
                 backgroundPosition: 'center 25%',
                 backgroundSize: 'cover'
             }}
         >
-            <div className="max-w-4xl w-full text-center space-y-10 relative z-10">
+            <div className="max-w-4xl w-full text-center space-y-10 relative z-50">
                 <div className="space-y-4">
                     <h2 className="text-4xl md:text-5xl text-white font-bold tracking-tight">
                         Real Reviews. <span className="text-emerald-400">Verified Buyers.</span>
@@ -116,7 +116,7 @@ export default function Search() {
                     </div>
 
                     {showDropdown && (
-                        <div className="absolute top-full mt-3 w-full bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-50">
+                        <div className="absolute top-full mt-3 w-full bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-100">
                             <div className="max-h-[420px] overflow-y-auto">
                                 
                                 {loading && (
