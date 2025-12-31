@@ -50,5 +50,4 @@ Application inspired by RateMyProfessor, this app allows you to rate & view supp
 
 ## Contributors
 Jason Deng  
-
 Farzana Sattar 
