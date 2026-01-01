@@ -1,8 +1,10 @@
 package ratemysupps.queryservice;
 
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import org.springframework.web.server.ResponseStatusException;
 import ratemysupps.entity.Supplement;
 import ratemysupps.iqueryservice.ISupplementQueryService;
 import ratemysupps.mapper.ReadSupplementMapper;
@@ -38,10 +40,13 @@ public List<ReadSupplement> getAllSupplementsByBrand(Long brandId) {
 
     @Override
     public ReadSupplement getSupplementById(Long supplementId) {
-        Supplement supplement = repo.findById(supplementId).orElseThrow(() -> new RuntimeException("Supplement not found with ID: " + supplementId));
+        Supplement supplement = repo.findById(supplementId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Supplement not found with ID: " + supplementId
+                ));
 
         return mapper.fromEntity(supplement);
-
     }
 
     @Override
