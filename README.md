@@ -1,5 +1,8 @@
 # RateMySupplements
+> Built by Jason Deng & Farzana Sattar
+
 Application inspired by RateMyProfessor, this app allows you to rate & view supplements in one centralized platform.
+
 
 # Built With
 ![React Badge](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB) 
@@ -47,3 +50,5 @@ Application inspired by RateMyProfessor, this app allows you to rate & view supp
    npm run dev
 ```
    Frontend runs on `http://localhost:5173`
+
+   

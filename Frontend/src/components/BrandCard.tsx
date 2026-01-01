@@ -5,13 +5,9 @@ export default function BrandCard(props: Supplement) {
 
     const navigate = useNavigate();
 
+
     const handleCardClick = () => {
-        navigate(`/product/${props.id}`, { 
-            state: { 
-                supplementId: props.id, // Ensure ID is passed
-                brandName: (props.brand as any).brandName // FIX: Pass the string name, not the whole object
-            } 
-        });
+        navigate(`/product/${props.brandName}/${props.supplementName}/${props.id}`, { state: { supplement: props } });
     }
 
     return (

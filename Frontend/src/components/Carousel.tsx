@@ -53,24 +53,22 @@ export default function Carousel({ title, supplements }: CarouselProps) {
         className="flex gap-8 overflow-x-auto scrollbar-hide snap-x snap-mandatory pb-10 px-4 -mx-4"
         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
       >
-        {supplements.map((item) => {
+        {supplements.map((supplement) => {
           const handleCardClick = () => {
-            navigate(`/product/${item.id}`, { 
-                state: { supplementId: item.id, brandName: item.brand, supplement: item } 
-            });
+            navigate(`/product/${supplement.brandName}/${supplement.supplementName}/${supplement.id}`, { state: { supplement: supplement } });
           };
           
           return (
             <div 
-              key={item.id}
-              className="min-w-[280px] md:min-w-[320px] group flex-shrink-0 bg-white rounded-3xl border border-gray-100 overflow-hidden cursor-pointer hover:shadow-[0_30px_60px_rgba(0,0,0,0.06)] transition-all duration-500 hover:-translate-y-2 snap-start"
+              key={supplement.id}
+              className="min-w-[200px] md:min-w-[240px] flex-shrink-0 bg-white rounded-lg border border-slate-200 overflow-hidden cursor-pointer hover:shadow-md transition-shadow snap-start"
               onClick={handleCardClick}
             >
               <div className="h-64 overflow-hidden bg-slate-50/50 relative">
                 <img 
-                  src={item.imageUrl} 
-                  alt={item.supplementName} 
-                  className="w-full h-full object-contain p-8 group-hover:scale-105 transition-transform duration-700"
+                  src={supplement.imageUrl} 
+                  alt={supplement.supplementName} 
+                  className="w-full h-full object-cover"
                 />
                 <div className="absolute top-4 left-4">
                    <span className="bg-white/95 backdrop-blur-md text-[11px] font-bold text-slate-600 px-3 py-1.5 rounded-full shadow-sm border border-white">
@@ -78,23 +76,10 @@ export default function Carousel({ title, supplements }: CarouselProps) {
                    </span>
                 </div>
               </div>
-
-              <div className="p-6 text-center">
-                <h3 className="font-bold text-lg text-slate-900 leading-tight group-hover:text-emerald-600 transition-colors line-clamp-1 tracking-tight">
-                    {item.supplementName}
-                </h3>
-                
-                <div className="mt-4 flex flex-col items-center gap-2">
-                  <div className="flex items-center gap-1.5 text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full">
-                    <Star size={14} fill="currentColor" />
-                    <span className="text-sm font-bold">
-                        {(item.averageRating || 0).toFixed(1)}
-                    </span>
-                  </div>
-                  <span className="text-sm font-medium text-gray-400">
-                    {item.totalReviews} verified reviews
-                  </span>
-                </div>
+              <div className="p-3">
+                <h3 className="font-bold text-sm text-slate-800 truncate">{supplement.supplementName}</h3>
+                <p className="text-xs text-emerald-400">{supplement.brandName}</p>
+                <p className="text-xs text-slate-500 mt-1">{supplement.totalReviews} Reviews</p>
               </div>
             </div>
           );

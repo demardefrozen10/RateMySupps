@@ -7,7 +7,6 @@ import ratemysupps.entity.Supplement;
 import ratemysupps.iqueryservice.ISupplementQueryService;
 import ratemysupps.mapper.ReadSupplementMapper;
 import ratemysupps.readmodel.ReadSupplement;
-import ratemysupps.readmodel.ReadSupplementComplex;
 import ratemysupps.repository.ISupplementRepository;
 import ratemysupps.repository.ICategoryRepository;
 
@@ -38,10 +37,10 @@ public List<ReadSupplement> getAllSupplementsByBrand(Long brandId) {
 
 
     @Override
-    public ReadSupplementComplex getSupplementById(Long supplementId) {
+    public ReadSupplement getSupplementById(Long supplementId) {
         Supplement supplement = repo.findById(supplementId).orElseThrow(() -> new RuntimeException("Supplement not found with ID: " + supplementId));
 
-        return mapper.fromEntityComplex(supplement);
+        return mapper.fromEntity(supplement);
 
     }
 

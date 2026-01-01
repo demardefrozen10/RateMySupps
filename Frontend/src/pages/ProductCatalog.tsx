@@ -1,56 +1,69 @@
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 import BrandCard from "../components/BrandCard";
-import useFetch from "../hooks/useFetch";
 import useDebounce from '../hooks/useDebounce';
 import type { Brand } from "../types/Brand";
-import type { Supplement } from "../types/Supplement";
+import useFetch from "../hooks/useFetch";
+import type {Supplement} from "../types/Supplement";
+import Load from "../components/Load";
+
 
 export default function ProductCatalog() {
     const [currentImage, setCurrentImage] = useState(0);
     const [supplements, setSupplements] = useState<Supplement[]>([]);
-    const [showNotification, setShowNotification] = useState(false);
+    const [showNotification] = useState(false);
+    const [brand, setBrand] = useState<Brand>();
 
     const [searchQuery, setSearchQuery] = useState("");
     const [sortOption, setSortOption] = useState("");
     const [filterOption, setFilterOption] = useState("");
+    const [categories, setCategories] = useState<string[]>([]);
 
-    const { get: getSupplementsApi } = useFetch("http://localhost:8080/api/supplement/");
-    const { get: getBrandApi } = useFetch("http://localhost:8080/api/brand/");
+
+    const { get } = useFetch("http://localhost:8080/api/");
     
     const debouncedSearchQuery = useDebounce(searchQuery, 500);
     const navigate = useNavigate();
-
-    const { brandId } = useParams();
-    const [brand, setBrand] = useState<Brand | null>(null);
     const location = useLocation();
 
-    const [categories, setCategories] = useState<string[]>([]);
+    const locationBrand: Brand = location.state?.brand;
+    const { brandName } = useParams<{ brandName: string }>();
+
+
+  
+
+    
+      useEffect(() => {
+        if (locationBrand) {
+            setBrand(locationBrand);
+        } else {
+            const formattedBrandName = brandName ? brandName.replace(/-/g, " ") : "";
+            get(`brand/getBrand?name=${encodeURIComponent(formattedBrandName)}`).then((data: Brand[]) => {
+                console.log(data);
+                setBrand(data[0]);
+            }).catch((error) => {
+                console.error("Error fetching brand:", error);
+            });
+        }
+    }, []);
+
 
     useEffect(() => {
-        if (!brandId) return;
+        if (!brand) return;
 
-        getBrandApi(`getBrand?brandId=${brandId}`)
-            .then((data: Brand) => setBrand(data))
-            .catch((error) => console.error("Error fetching brand:", error));
-    }, [brandId]);
-
-    useEffect(() => {
-        if (!brandId) return;
-
-        let url = `getSupplements?brandId=${brandId}`;
+        let url = `getSupplements?brandId=${brand.id}`;
 
         if (debouncedSearchQuery.trim()) url += `&search=${debouncedSearchQuery.trim()}`;
         if (filterOption) url += `&filter=${filterOption}`;
         if (sortOption) url += `&sortOption=${sortOption}`;
 
-        getSupplementsApi(url)
+        get(url)
             .then((data: Supplement[]) => setSupplements(data))
             .catch((error) => console.error("Error fetching supplements:", error));
-    }, [brandId, debouncedSearchQuery, filterOption, sortOption]);
+    }, [debouncedSearchQuery, filterOption, sortOption]);
 
-    useEffect(() => {
-        getSupplementsApi("getCategories")
+        useEffect(() => {
+        get("getCategories")
             .then((data: string[]) => {
                 setCategories(Array.isArray(data) ? data : []);
             })
@@ -60,13 +73,6 @@ export default function ProductCatalog() {
             });
     }, []);
 
-    useEffect(() => {
-        if (location.state?.supplementSubmitted) {
-            setShowNotification(true);
-            navigate(location.pathname, { replace: true, state: { ...location.state, supplementSubmitted: undefined } });
-            setTimeout(() => setShowNotification(false), 3000);
-        }
-    }, [location.state, navigate, location.pathname]);
 
     const HandleAddSupplementClick = () => {
         if (!brand) return;
@@ -82,7 +88,6 @@ export default function ProductCatalog() {
         return <div className="p-8 text-gray-500">Loading brand…</div>;
     }
 
-    const images = [brand.imageUrl];
 
     const nextImage = () => setCurrentImage((prev) => (prev + 1) % images.length);
     const prevImage = () => setCurrentImage((prev) => (prev - 1 + images.length) % images.length);
@@ -106,7 +111,13 @@ export default function ProductCatalog() {
         });
     };
 
-    return (
+    if (!brand) return (
+        <Load/>
+    );
+
+    const images = [brand!.imageUrl];
+    
+    return (   
         <div className="min-h-screen to-white">
             {showNotification && (
                 <div className="fixed top-6 left-1/2 transform -translate-x-1/2 z-50">
@@ -127,7 +138,7 @@ export default function ProductCatalog() {
                             <h1 className="text-4xl sm:text-6xl font-bold text-white drop-shadow-lg text-center w-full break-words">{brand.brandName}</h1>
                             <div className="mt-2 flex items-center justify-center">
                                 <span className="flex text-5xl sm:text-4xl">
-                                    {renderStars(brand.averageRating)}
+                                    {renderStars(brand!.averageRating)}
                                 </span>
                             </div>
                             <p className="mt-1 font-bold text-white drop-shadow-lg text-center w-full break-words">Based on {brand.totalReviews} reviews</p>
@@ -224,10 +235,11 @@ export default function ProductCatalog() {
                                 imageUrl={supplement.imageUrl}
                                 averageRating={supplement.averageRating}
                                 totalReviews={supplement.totalReviews}
-                                brand={brand}
+                                brandId={supplement.brandId}
                                 category={supplement.category}
                                 variants={supplement.variants}
                                 servingSizes={supplement.servingSizes}
+                                brandName={brand!.brandName}
                             />
                         ))
                     )}

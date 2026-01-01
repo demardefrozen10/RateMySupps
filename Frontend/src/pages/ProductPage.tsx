@@ -1,11 +1,13 @@
 import { useState, useEffect } from "react"
-import { useLocation, useNavigate } from "react-router-dom"
+import { useNavigate, useParams, useLocation } from "react-router-dom"
 import useFetch from "../hooks/useFetch";
 import type { Supplement } from "../types/Supplement";
 import type { Review } from "../types/Review";
 import ReviewStrip from "../components/ReviewStrip";
 import type { Tag } from "../types/Tag";
 import Carousel from "../components/Carousel";
+
+import Load from "../components/Load";
 
 export default function ProductPage() {
     const [supplement, setSupplement] = useState<Supplement>();
@@ -16,28 +18,29 @@ export default function ProductPage() {
     const [variant, setVariant] = useState<string>("");
     const [tags, setTag] = useState<Tag[]>([]);
     const [limit, setLimit] = useState<number>(5); 
-    const [recommendations, setRecommendations] = useState<Supplement[]>([]);
-    
+    const [recommendations, setRecommendations] = useState<Supplement[]>([]); 
+
     const navigate = useNavigate();
+    const { supplementId } = useParams<{ brandName: string, supplementId: string }>();
+    
     const location = useLocation();
-    
-    const brandName = location.state?.brandName 
-    || (typeof location.state?.brand === 'string' ? location.state.brand : location.state?.brand?.brandName)
-    || supplement?.brand?.brandName 
-    || (typeof supplement?.brand === 'string' ? supplement.brand : '')
-    || "Product";
-    
-    const supplementId: number = location.state?.supplementId; 
-  
+    const locationSupplement: Supplement = location.state?.supplement;
+
     const {get} = useFetch("http://localhost:8080/api/");
 
+
+
+
     useEffect(() => {
-        if (!supplementId) return;
+        if (locationSupplement) {
+            setSupplement(locationSupplement);
+        } else {
 
         get(`supplement/getSupplement?supplementId=${supplementId}`).then((data) => {
             setSupplement(data);
         });
-    }, [supplementId]);
+        }
+    }, []);
 
     useEffect(() => {
         if (!supplementId) return;
@@ -65,7 +68,6 @@ export default function ProductPage() {
     
     useEffect(() => {
         if (!supplementId) return;
-
         let orderBy: string = "";
         let sort: string = "";
         
@@ -100,7 +102,7 @@ export default function ProductPage() {
         navigate('/add-review', { 
             state: { 
                 supplementId, 
-                brandName: brandName, 
+                brandName: supplement?.brandName, 
                 supplementName: supplement?.supplementName, 
                 imageUrl: supplement?.imageUrl, 
                 variants: variants  
@@ -143,6 +145,11 @@ export default function ProductPage() {
     const ratingDistribution = getRatingDistribution();
     const totalReviewCount = reviews.length;
 
+    if (!supplement) return (
+        <Load/>
+    );
+
+
     return (
         <div className="min-h-screen to-white">
             <div className="max-w-7xl mx-auto px-4 py-12">
@@ -169,8 +176,8 @@ export default function ProductPage() {
                     </div>
                     <div>
                         <div className="mb-4">
-                            <a onClick={() => navigate(`/products/${brandName}`, { state: { brandName } })} className="text-emerald-600 hover:text-emerald-700 font-semibold mb-2 inline-block cursor-pointer">
-                                {brandName}
+                            <a onClick={() => navigate(`/products/${supplement.brandName}`, { state: { brand } })} className="text-emerald-600 hover:text-emerald-700 font-semibold mb-2 inline-block cursor-pointer">
+                                {supplement.brandName}
                             </a>
                             <h1 className="text-4xl font-bold text-gray-800 mb-4">
                                 {supplement?.supplementName}
@@ -317,7 +324,7 @@ export default function ProductPage() {
                 </div>
         {recommendations.length > 0 && (
     <Carousel 
-    title={`${brandName} Users Have Also Enjoyed`}
+    title={`${supplement.brandName} Users Have Also Enjoyed`}
         supplements={recommendations} />
         )}
             </div>
