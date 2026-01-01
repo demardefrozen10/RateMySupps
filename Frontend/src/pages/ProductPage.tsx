@@ -214,11 +214,11 @@ export default function ProductPage() {
                         <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
                             <h3 className="font-bold text-lg mb-4">Product Details</h3>
                             <div className="space-y-3 text-sm">
-                                <div className="flex justify-between">
+                                <div className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-0">
                                     <span className="text-gray-600">Category:</span>
                                     <span className="font-semibold">{supplement?.category || "N/A"}</span>
                                 </div>
-                                <div className="flex justify-between">
+                                <div className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-0">
                                     <span className="text-gray-600">Serving Sizes:</span>
                                     <span className="font-semibold">
                                         {(() => {
@@ -229,7 +229,7 @@ export default function ProductPage() {
                                         })()}
                                     </span>
                                 </div>
-                                <div className="flex justify-between">
+                                <div className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-0">
                                     <span className="text-gray-600">Flavors:</span>
                                     <span className="font-semibold">
                                         {variants.length > 0 
@@ -237,18 +237,17 @@ export default function ProductPage() {
                                             : "No variants listed"}
                                     </span>
                                 </div>
-
-                             <div className="flex justify-between">
+                                <div className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-0">
                                     <span className="text-gray-600">Tags:</span>
-                                <div className="flex gap-2">
-                                    {tags.map((tag) => (
-                                        <span key={tag.id} className="bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full text-sm font-medium">
-                                            {tag.name}
-                                        </span>
-                                    ))}
+                                    <div className="flex flex-wrap gap-2">
+                                        {tags.map((tag) => (
+                                            <span key={tag.id} className="bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full text-sm font-medium">
+                                                {tag.name}
+                                            </span>
+                                        ))}
+                                    </div>
                                 </div>
                             </div>
-                        </div>
                         </div>
                     
 

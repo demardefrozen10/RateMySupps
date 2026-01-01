@@ -17,7 +17,7 @@ function Router() {
       <Route path="/brands" element={<BrandCatalog />} />
       <Route path="/products/:brandName" element={<ProductCatalog />} />
       <Route path="/product/:brandName/:supplementName/:supplementId" element={<ProductPage />} />
-      <Route path="/product/add-supplement/:brandId" element={<AddSupplement />} />
+      <Route path="/product/add-supplement" element={<AddSupplement />} />
       <Route path="/add-review" element={<AddReview />} />
       <Route path="*" element={<NotFound />} /> 
 

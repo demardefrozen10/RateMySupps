@@ -86,7 +86,7 @@ export default function ProductCatalog() {
 
     const HandleAddSupplementClick = () => {
         if (!brand) return;
-        navigate(`/product/add-supplement/${brand.id}`, { state: { brand } });
+        navigate(`/product/add-supplement`, { state: { brand } });
     };
 
     const handleClearFilters = () => {

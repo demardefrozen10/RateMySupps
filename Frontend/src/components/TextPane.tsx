@@ -2,7 +2,7 @@ export default function TextPane() {
   const features = [
     {
       title: "Real & Authentic Reviews",
-      description: "Read verified customer experiences to make informed decisions about your health.",
+      description: "Read verified customer experiences, we NEVER allow fake or paid reviews!",
       iconColor: "from-emerald-400 to-emerald-600",
       iconPath: "M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
     },
@@ -21,7 +21,7 @@ export default function TextPane() {
   ];
 
   return (
-    <section className="py-20 bg-white">
+    <section className="pb-20 pt-5 bg-white">
       <div className="max-w-7xl mx-auto px-6">
         
         <div className="flex flex-col items-center mb-16 text-center">

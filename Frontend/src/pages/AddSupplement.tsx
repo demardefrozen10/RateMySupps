@@ -1,10 +1,9 @@
 import { useState, useEffect } from "react";
 import {useLocation, useNavigate} from "react-router-dom";
 import type { Brand } from "../types/Brand";
-import type { Supplement } from "../types/Supplement";
 import useFetch from "../hooks/useFetch";
-import { useParams } from "react-router-dom";
 import Load from "../components/Load";
+import NotFound from "./NotFound";
 
 export default function AddSupplement() {
     const [supplementName, setSupplementName] = useState("");
@@ -13,41 +12,33 @@ export default function AddSupplement() {
     const [images, setImages] = useState<File[]>([]);
     const [categories, setCategories] = useState<string[]>([]);
     const [brand, setBrand] = useState<Brand | null>(null);
+    const [loading, setLoading] = useState(true);
 
 
     const {post, get} = useFetch("http://localhost:8080/api/");
-    const { get: getBrandApi } = useFetch("http://localhost:8080/api/brand/");
     const location = useLocation();
     const navigate = useNavigate();
-    const { brandId } = useParams<{ brandId: string }>();
-
-useEffect(() => {
-    if (!brandId) return;
-
-    getBrandApi(`getBrand?brandId=${brandId}`)
-        .then((data: Brand) => {
-            if (data && data.id) {
-                setBrand(data);  
-            } else {
-                console.error("No brand found for brandId:", brandId);
-            }
-        })
-        .catch(() => console.error("Failed to load brand"));
-}, [brandId]);
-
-
 
 
     useEffect(() => {
-  get("supplement/getCategories")
-    .then((data: string[]) => setCategories(data))
-    .catch((err) => console.error("Failed to load categories:", err));
-}, []);
+        setBrand(location.state?.brand as Brand | null);
+        setLoading(false);
+    }, []);
+
+    useEffect(() => {
+    if (!brand) return;
+    get("supplement/getCategories")
+        .then((data: string[]) => setCategories(data))
+        .catch((err) => console.error("Failed to load categories:", err));
+    }, [brand]);
 
 
+    if (loading) {
+        return <Load />;
+    }
 
     if (!brand) {
-        return <Load/>;
+        return <NotFound />;
     }
 
 

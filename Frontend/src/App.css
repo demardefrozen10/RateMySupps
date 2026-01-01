@@ -1,9 +1,5 @@
 @import "tailwindcss";
 
-h1 {
-  font-family: 'Inter', sans-serif;
-}
-
 
 * {
   -webkit-overflow-scrolling: touch;
@@ -71,10 +67,7 @@ button, a, input, select, textarea {
   -webkit-tap-highlight-color: transparent;
 }
 
-button, a[role="button"], input[type="button"], input[type="submit"] {
-  min-height: 44px;
-  min-width: 44px;
-}
+
 
 
 
