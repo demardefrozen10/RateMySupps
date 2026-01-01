@@ -4,6 +4,7 @@ import type { Brand } from "../types/Brand";
 import type { Supplement } from "../types/Supplement";
 import useFetch from "../hooks/useFetch";
 import { useParams } from "react-router-dom";
+import Load from "../components/Load";
 
 export default function AddSupplement() {
     const [supplementName, setSupplementName] = useState("");
@@ -46,7 +47,7 @@ useEffect(() => {
 
 
     if (!brand) {
-        return <div className="p-8 text-gray-500">Loading brand…</div>;
+        return <Load/>;
     }
 
 
@@ -69,8 +70,6 @@ useEffect(() => {
             fileSize: image.size,
             imageType: "ProductImages"
         }));
-
-        console.log(batchPayload);
 
         let uploadedImageUrls: string[] = [];
         if (images.length > 0) {

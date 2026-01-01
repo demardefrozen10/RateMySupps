@@ -6,20 +6,23 @@ import BrandCatalog from '../pages/BrandCatalog';
 import AddReview from '../pages/AddReview';
 import AddSupplement from '../pages/AddSupplement';
 import NotFound from '../pages/NotFound';
+import ScrollToTop from '../components/ScrollToTop';
+
 
 function Router() {
-  return (
+  return <>
+    <ScrollToTop />
     <Routes>
       <Route path="/" element={<Home />} />
       <Route path="/brands" element={<BrandCatalog />} />
-      <Route path="/products/:brandId" element={<ProductCatalog />} />
+      <Route path="/products/:brandName" element={<ProductCatalog />} />
       <Route path="/product/:brandName/:supplementName/:supplementId" element={<ProductPage />} />
-      <Route path="/product/add-supplement" element={<AddSupplement />} />
+      <Route path="/product/add-supplement/:brandId" element={<AddSupplement />} />
       <Route path="/add-review" element={<AddReview />} />
       <Route path="*" element={<NotFound />} /> 
 
     </Routes>
-  )
+  </>
 }
 
 export default Router;

@@ -76,11 +76,7 @@ button, a[role="button"], input[type="button"], input[type="submit"] {
   min-width: 44px;
 }
 
-img {
-  max-width: 100%;
-  height: auto;
-  display: block;
-}
+
 
 body {
   -webkit-font-smoothing: antialiased;

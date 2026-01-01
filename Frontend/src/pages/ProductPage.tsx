@@ -6,11 +6,11 @@ import type { Review } from "../types/Review";
 import ReviewStrip from "../components/ReviewStrip";
 import type { Tag } from "../types/Tag";
 import Carousel from "../components/Carousel";
-
 import Load from "../components/Load";
+import NotFound from "../pages/NotFound";
 
 export default function ProductPage() {
-    const [supplement, setSupplement] = useState<Supplement>();
+    const [supplement, setSupplement] = useState<Supplement | null>(null);
     const [reviews, setReviews] = useState<Review[]>([]);
     const [variants, setVariants] = useState<string[]>([]);  
     const [showNotification, setShowNotification] = useState(false);
@@ -19,6 +19,7 @@ export default function ProductPage() {
     const [tags, setTag] = useState<Tag[]>([]);
     const [limit, setLimit] = useState<number>(5); 
     const [recommendations, setRecommendations] = useState<Supplement[]>([]); 
+    const [loading, setLoading] = useState(true);
 
     const navigate = useNavigate();
     const { supplementId } = useParams<{ brandName: string, supplementId: string }>();
@@ -34,40 +35,53 @@ export default function ProductPage() {
     useEffect(() => {
         if (locationSupplement) {
             setSupplement(locationSupplement);
+            setLoading(false);
         } else {
-
-        get(`supplement/getSupplement?supplementId=${supplementId}`).then((data) => {
-            setSupplement(data);
-        });
+            get(`supplement/getSupplement?supplementId=${supplementId}`)
+            .then((data) => {
+                if (data && data.supplementId) {
+                setSupplement(data);
+                } else {
+                console.log("Invalid supplement data");
+                setSupplement(null);
+                }
+            })
+            .catch((error) => {
+                console.log("Network error:", error);
+                setSupplement(null);
+            })
+            .finally(() => {
+                setLoading(false);
+            });
         }
-    }, []);
+    }, [locationSupplement, supplementId]);
 
     useEffect(() => {
-        if (!supplementId) return;
+        if (!supplement) return;
 
         get(`supplement/getVariants?supplementId=${supplementId}`).then((data) => {
             setVariants(data || []);
         });
-    }, [supplementId]);
+    }, [supplement]);
 
     useEffect(() => {
-        if (!supplementId) return;
+        if (!supplement) return;
 
         get(`tag/bySupplement?supplementId=${supplementId}`).then((data) => {
             setTag(data || []);
         });
-    }, [supplementId]);
+    }, [supplement]);
 
     useEffect(() => {
-        if (!supplementId) return;
+        if (!supplement) return;
 
         get(`supplement/recommendations?supplementId=${supplementId}`).then((data) => {
             setRecommendations(data || []);
         });
-    }, [supplementId]);
+    }, [supplement]);
     
     useEffect(() => {
-        if (!supplementId) return;
+        if (!supplement) return;
         let orderBy: string = "";
         let sort: string = "";
         
@@ -87,7 +101,7 @@ export default function ProductPage() {
         get(`review/getReviews?supplementId=${supplementId}&sortBy=${sort}&sortOrder=${orderBy}&variant=${variant}&limit=${limit}`).then((data: Review[]) => {
             setReviews(data || []);
         });
-    }, [supplementId, sortOption, variant, limit]);
+    }, [supplement, sortOption, variant, limit]);
 
     useEffect(() => {
         if (location.state?.reviewSubmitted) {
@@ -145,10 +159,10 @@ export default function ProductPage() {
     const ratingDistribution = getRatingDistribution();
     const totalReviewCount = reviews.length;
 
-    if (!supplement) return (
-        <Load/>
-    );
 
+    if (loading) return <Load />;
+
+    if (!supplement) return <NotFound />;
 
     return (
         <div className="min-h-screen to-white">
@@ -176,7 +190,7 @@ export default function ProductPage() {
                     </div>
                     <div>
                         <div className="mb-4">
-                            <a onClick={() => navigate(`/products/${supplement.brandName}`, { state: { brand } })} className="text-emerald-600 hover:text-emerald-700 font-semibold mb-2 inline-block cursor-pointer">
+                            <a onClick={() => navigate(`/products/${supplement.brandName}`)} className="text-emerald-600 hover:text-emerald-700 font-semibold mb-2 inline-block cursor-pointer">
                                 {supplement.brandName}
                             </a>
                             <h1 className="text-4xl font-bold text-gray-800 mb-4">
@@ -225,7 +239,7 @@ export default function ProductPage() {
                                 </div>
 
                              <div className="flex justify-between">
-                                    <span className="text-gray-600">Tags :</span>
+                                    <span className="text-gray-600">Tags:</span>
                                 <div className="flex gap-2">
                                     {tags.map((tag) => (
                                         <span key={tag.id} className="bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full text-sm font-medium">
@@ -322,11 +336,13 @@ export default function ProductPage() {
                         </>
                     )}
                 </div>
-        {recommendations.length > 0 && (
+        {
+        recommendations.length > 0 && (
     <Carousel 
     title={`${supplement.brandName} Users Have Also Enjoyed`}
         supplements={recommendations} />
-        )}
+        )
+                }
             </div>
         </div>
     )

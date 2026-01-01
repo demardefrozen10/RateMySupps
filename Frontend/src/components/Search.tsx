@@ -28,13 +28,13 @@ export default function Search() {
     };
 
     const handleBrandClick = (brand: Brand) => {
-        navigate(`/products/${brand.id}`, { state: { brand } });
+        navigate(`/products/${brand.brandName}`, { state: { brand } });
         setShowDropdown(false);
         setSearchQuery('');
     };
 
     const handleProductClick = (supplement: Supplement) => {
-        navigate(`/product/${supplement.id}`, { state: { supplementId: supplement.id, brandName: supplement.brand?.brandName} });
+        navigate(`/product/${supplement?.brandName}/${supplement.supplementName}/${supplement.id}`, { state: { supplement} });
         setShowDropdown(false);
         setSearchQuery('');
     };

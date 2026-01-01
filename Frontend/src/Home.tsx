@@ -4,14 +4,11 @@ import Search from './components/Search'
 import TextPane from './components/TextPane'
 import { useEffect, useState } from 'react';
 import useFetch from './hooks/useFetch';
-import { useNavigate } from 'react-router-dom';
 import type { Supplement } from './types/Supplement';
 
 function Home() {
-
-   const { get } = useFetch("http://localhost:8080/api/supplement/");
+  const { get } = useFetch("http://localhost:8080/api/supplement/");
   const [supplements, setSupplements] = useState<Supplement[]>([]);
-  const navigate = useNavigate();
 
 
   useEffect(() => {
@@ -31,7 +28,7 @@ function Home() {
       <Search/>
       <Carousel 
         title="Top Rated Supplements" 
-        supplements={supplements} 
+        supplements={supplements}
       />
       <TextPane/>
 

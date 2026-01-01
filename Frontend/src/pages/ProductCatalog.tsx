@@ -6,18 +6,20 @@ import type { Brand } from "../types/Brand";
 import useFetch from "../hooks/useFetch";
 import type {Supplement} from "../types/Supplement";
 import Load from "../components/Load";
+import NotFound from "./NotFound";
 
 
 export default function ProductCatalog() {
     const [currentImage, setCurrentImage] = useState(0);
     const [supplements, setSupplements] = useState<Supplement[]>([]);
     const [showNotification] = useState(false);
-    const [brand, setBrand] = useState<Brand>();
+    const [brand, setBrand] = useState<Brand | null>(null);
 
     const [searchQuery, setSearchQuery] = useState("");
     const [sortOption, setSortOption] = useState("");
     const [filterOption, setFilterOption] = useState("");
     const [categories, setCategories] = useState<string[]>([]);
+    const [loading, setLoading] = useState(true);
 
 
     const { get } = useFetch("http://localhost:8080/api/");
@@ -38,20 +40,27 @@ export default function ProductCatalog() {
             setBrand(locationBrand);
         } else {
             const formattedBrandName = brandName ? brandName.replace(/-/g, " ") : "";
-            get(`brand/getBrand?name=${encodeURIComponent(formattedBrandName)}`).then((data: Brand[]) => {
-                console.log(data);
-                setBrand(data[0]);
+            get(`brand/getBrandByName?name=${encodeURIComponent(formattedBrandName)}`).then((data: Brand[]) => {
+                if (data.length > 0) {
+                    setBrand(data[0]);
+
+                }
+                else {
+                    setBrand(null);
+                }
             }).catch((error) => {
                 console.error("Error fetching brand:", error);
             });
         }
+        setLoading(false);
+
     }, []);
 
 
     useEffect(() => {
         if (!brand) return;
 
-        let url = `getSupplements?brandId=${brand.id}`;
+        let url = `supplement/getSupplements?brandId=${brand.id}`;
 
         if (debouncedSearchQuery.trim()) url += `&search=${debouncedSearchQuery.trim()}`;
         if (filterOption) url += `&filter=${filterOption}`;
@@ -60,10 +69,11 @@ export default function ProductCatalog() {
         get(url)
             .then((data: Supplement[]) => setSupplements(data))
             .catch((error) => console.error("Error fetching supplements:", error));
-    }, [debouncedSearchQuery, filterOption, sortOption]);
+    }, [debouncedSearchQuery, filterOption, sortOption, brand]);
 
         useEffect(() => {
-        get("getCategories")
+        if (!brand) return;
+        get("supplement/getCategories")
             .then((data: string[]) => {
                 setCategories(Array.isArray(data) ? data : []);
             })
@@ -71,7 +81,7 @@ export default function ProductCatalog() {
                 console.error("Error fetching categories:", err);
                 setCategories([]);
             });
-    }, []);
+    }, [brand?.id]);
 
 
     const HandleAddSupplementClick = () => {
@@ -84,8 +94,12 @@ export default function ProductCatalog() {
         setFilterOption("");
     };
 
+    if (loading) {
+        return <Load/>;
+    }
+
     if (!brand) {
-        return <div className="p-8 text-gray-500">Loading brand…</div>;
+        return <NotFound />;
     }
 
 
@@ -111,9 +125,6 @@ export default function ProductCatalog() {
         });
     };
 
-    if (!brand) return (
-        <Load/>
-    );
 
     const images = [brand!.imageUrl];
     
@@ -161,16 +172,7 @@ export default function ProductCatalog() {
                             </svg>
                         </button>
 
-                        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
-                            {images.map((_, idx) => (
-                                <button
-                                    key={idx}
-                                    onClick={() => setCurrentImage(idx)}
-                                    className={`w-3 h-3 rounded-full transition-colors ${idx === currentImage ? 'bg-white' : 'bg-white/50'
-                                        }`}
-                                />
-                            ))}
-                        </div>
+        
                     </div>
                 </div>
 

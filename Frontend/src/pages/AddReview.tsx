@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { useNavigate, useLocation } from "react-router-dom"
 import useFetch from "../hooks/useFetch";
-import type { S3Request } from "../types/S3Request";
+import NotFound from "./NotFound";
 export default function AddReview() {
     const [rating, setRating] = useState(0);
     const [hoverRating, setHoverRating] = useState(0);
@@ -21,7 +21,9 @@ export default function AddReview() {
 
     const {post} = useFetch("http://localhost:8080/api/");
 
-
+    if (!supplementId || !brandName || !supplementName || !imageUrl) {
+        return <NotFound />;
+    }
 
 
     const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
