@@ -14,9 +14,8 @@ public class ReadSupplement {
 
     public String supplementName;
 
-    public double averageRating;
-
-    public int totalReviews;
+    private Integer totalReviews;
+    private Double averageRating;
 
     public List<String> imageUrl;
 

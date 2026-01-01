@@ -1,13 +1,10 @@
-import { useRef, useEffect, useState } from 'react';
+import { useRef } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import useFetch from '../hooks/useFetch';
 import type { Supplement } from '../types/Supplement';
 import { useNavigate } from 'react-router-dom';
 
-export default function Carousel({ title }: { title: string }) {
+export default function Carousel({ title, supplements }: { title: string, supplements: Supplement[] }) {
   const scrollRef = useRef<HTMLDivElement>(null);
-  const {get} = useFetch("http://localhost:8080/api/supplement/");
-  const [supplements, setSupplements] = useState<Supplement[]>([]);
   const navigate = useNavigate();
 
   const scroll = (direction: string) => {
@@ -18,14 +15,8 @@ export default function Carousel({ title }: { title: string }) {
     }
   };
 
-  useEffect(() => {
-    get('top-rated').then((data: Supplement[]) => {
-      setSupplements(data);
-    })
-  }, [])
-
   return (
-    <div className="w-full max-w-7xl mx-auto px-4 py-8 font-sans">
+    <div className="w-full max-w-7xl mx-auto px-4 pt-8 font-sans">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-xl font-bold text-slate-800">{title}</h2>
         <div className="flex gap-2">
@@ -78,4 +69,3 @@ export default function Carousel({ title }: { title: string }) {
     </div>
   );
 };
-

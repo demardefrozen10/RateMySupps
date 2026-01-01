@@ -22,9 +22,17 @@ public class BrandQueryService implements IBrandQueryService {
         this.mapper = mapper;
     }
 
+    public ReadBrand getBrandById(Long brandId) {
+        Brand brand = brandRepo.findById(brandId).orElse(null);
+        if (brand == null) {
+            return null;
+        }
+        return mapper.fromEntity(brand);
+    }
+
     public List<ReadBrand> getBrandByName(String name) {
 
-        return brandRepo.findBybrandNameContainingIgnoreCase(name).stream().map(mapper::fromEntity).collect(Collectors.toList());
+        return brandRepo.findByBrandNameContainingIgnoreCase(name).stream().map(mapper::fromEntity).collect(Collectors.toList());
     }
 
     @Override

@@ -29,10 +29,14 @@ public class SupplementController {
         this.commandRepo = commandRepo;
     }
 
-
-    @GetMapping("/getSupplements")
-    public List<ReadSupplement> getSupplementsByBrandId(@RequestParam Long brandId) {
-        return queryRepo.getAllSupplementsByBrand(brandId);
+   @GetMapping("/getSupplements")
+    public List<ReadSupplement> getSupplementsByBrandId(
+            @RequestParam Long brandId,
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) String filter,
+            @RequestParam(required = false) String sortOption
+    ) {
+        return queryRepo.getSupplementsByBrand(brandId, search, filter, sortOption);
     }
 
     @GetMapping("/getSupplement")
@@ -44,6 +48,11 @@ public class SupplementController {
     @GetMapping("/getCategories")
     public List<String> getAllCategories() {
         return queryRepo.getCategories();
+    }
+
+    @GetMapping("/getVariants")
+    public List<String> getVariantsBySupplementId(@RequestParam Long supplementId) {
+        return queryRepo.getVariantsBySupplementId(supplementId);
     }
 
     @PostMapping("/createSupplement")
@@ -84,5 +93,11 @@ public class SupplementController {
     public List<ReadSupplement> searchByName(@RequestParam String name) {
         return queryRepo.searchSupplementsByName(name);
     }
+
+    @GetMapping("/recommendations")
+    public List<ReadSupplement> getRecommendations(@RequestParam Long supplementId) {
+    return queryRepo.getRecommendations(supplementId);
+}
+
 
 }

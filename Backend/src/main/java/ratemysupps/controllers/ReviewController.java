@@ -25,9 +25,15 @@ public class ReviewController {
     }
 
     @GetMapping("/getReviews")
-    public List<ReadReview> getReviewBySupplementId(@RequestParam Long supplementId, @RequestParam(required = false) String sortBy, @RequestParam(required = false) String sortOrder, @RequestParam(required = false) String variant) {
-        return queryRepo.getReviewBySupplementId(supplementId, sortBy, sortOrder, variant);
-    }
+public List<ReadReview> getReviewBySupplementId(
+    @RequestParam Long supplementId, 
+    @RequestParam(required = false) String sortBy, 
+    @RequestParam(required = false) String sortOrder, 
+    @RequestParam(required = false) String variant,
+    @RequestParam(defaultValue = "5") int limit 
+) {
+    return queryRepo.getReviewBySupplementId(supplementId, sortBy, sortOrder, variant, limit);
+}
 
     @PostMapping("/createReview")
     public ResponseEntity<ReadReview> createReview(@RequestBody @Valid WriteReview review) {

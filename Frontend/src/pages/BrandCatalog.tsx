@@ -29,9 +29,7 @@ export default function Catalog() {
                 </div>
 
                 <div className="flex flex-col gap-4">
-                    <BrandCard/>
-                    <BrandCard/>
-                    <BrandCard/>
+                   
                 </div>
             </div>
         </div>

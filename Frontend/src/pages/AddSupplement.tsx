@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import {useLocation, useNavigate} from "react-router-dom";
 import type { Brand } from "../types/Brand";
 import useFetch from "../hooks/useFetch";
+import Load from "../components/Load";
+import NotFound from "./NotFound";
 
 export default function AddSupplement() {
     const [supplementName, setSupplementName] = useState("");
@@ -9,13 +11,41 @@ export default function AddSupplement() {
     const [category, setCategory] = useState("Protein");
     const [images, setImages] = useState<File[]>([]);
     const [categories, setCategories] = useState<string[]>([]);
+    const [brand, setBrand] = useState<Brand | null>(null);
+    const [loading, setLoading] = useState(true);
+
+
     const {post, get} = useFetch("http://localhost:8080/api/");
+    const location = useLocation();
+    const navigate = useNavigate();
+
+
+    useEffect(() => {
+        setBrand(location.state?.brand as Brand | null);
+        setLoading(false);
+    }, []);
+
+    useEffect(() => {
+    if (!brand) return;
+    get("supplement/getCategories")
+        .then((data: string[]) => setCategories(data))
+        .catch((err) => console.error("Failed to load categories:", err));
+    }, [brand]);
+
+
+    if (loading) {
+        return <Load />;
+    }
+
+    if (!brand) {
+        return <NotFound />;
+    }
 
 
     const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files) {
             const selectedFiles = Array.from(e.target.files);
-            setImages((prevImages) => [...prevImages, ...selectedFiles].slice(0, 5));
+            setImages((prevImages) => [...prevImages, ...selectedFiles].slice(0, 3));
         }
     };
 
@@ -24,11 +54,6 @@ export default function AddSupplement() {
         setImages(images.filter((_, i) => i !== index));
     }
 
-
-    const location = useLocation();
-    const navigate = useNavigate();
-    const brand: Brand = location.state?.brand;
-
     const HandleProductSubmit = async () => {
         const batchPayload = images.map((image) => ({
             fileName: image.name,
@@ -36,8 +61,6 @@ export default function AddSupplement() {
             fileSize: image.size,
             imageType: "ProductImages"
         }));
-
-        console.log(batchPayload);
 
         let uploadedImageUrls: string[] = [];
         if (images.length > 0) {
@@ -60,16 +83,12 @@ export default function AddSupplement() {
             category: category,
             websiteUrl: websiteUrl,
             imageUrl: uploadedImageUrls
-        }).then(() => {
-            navigate(`/products/${brand.id}`, { state: {brand: brand, supplementSubmitted: true} });
-        });
-    };
+          });
 
-    useEffect(() => {
-        get("supplement/getCategories").then((data) => {
-            setCategories(data);
-        })
-    }, []);
+    navigate(`/products/${brand.id}`, {
+      state: { brand, supplementSubmitted: true },
+    });
+  };
 
 
 
@@ -116,15 +135,24 @@ export default function AddSupplement() {
                         <label className="block text-lg font-bold text-gray-800 mb-3">
                             Variant <span className="text-red-500">*</span>
                         </label>
+
+                    
+
+
+
                         <select
-                            className="w-full px-4 py-3 rounded-lg border-2 border-gray-200"
-                            value={category}
-                            onChange={e => setCategory(e.target.value)}
+                        className="w-full px-4 py-3 rounded-lg border-2 border-gray-200"
+                        value={category}
+                        onChange={e => setCategory(e.target.value)}
                         >
-                            {categories.map((cat, idx) => (
-                                <option key={idx} value={cat}>{cat}</option>
-                            ))}
+                        {categories.length > 0
+                            ? categories.map((cat, idx) => <option key={idx} value={cat}>{cat}</option>)
+                            : <option value="Protein">Protein</option> // fallback
+                        }
                         </select>
+
+
+
                     </div>
                     <div className="mb-8">
                         <label className="block text-lg font-bold text-gray-800 mb-3">

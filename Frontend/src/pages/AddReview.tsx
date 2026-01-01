@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { useNavigate, useLocation } from "react-router-dom"
 import useFetch from "../hooks/useFetch";
-import type { S3Request } from "../types/S3Request";
+import NotFound from "./NotFound";
 export default function AddReview() {
     const [rating, setRating] = useState(0);
     const [hoverRating, setHoverRating] = useState(0);
@@ -11,7 +11,6 @@ export default function AddReview() {
     const [proofOfPurchase, setProofOfPurchase] = useState<File | null>(null);
     const [anonymous, setAnonymous] = useState(false);
     const [name, setName] = useState("");
-    const [variant, setVariant] = useState<string>("");
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -19,11 +18,12 @@ export default function AddReview() {
     const brandName: string = location.state?.brandName;
     const supplementName: string = location.state?.supplementName;
     const imageUrl: string = location.state?.imageUrl;
-    const variants: string[] = location.state?.variants;
 
     const {post} = useFetch("http://localhost:8080/api/");
 
-
+    if (!supplementId || !brandName || !supplementName || !imageUrl) {
+        return <NotFound />;
+    }
 
 
     const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -88,6 +88,11 @@ const HandleSubmitReview = async () => {
     let uploadedImageUrls: string[] = [];
     if (images.length > 0) {
         const data = await post("s3/presigned-url", batchPayload);
+
+        if (!data || !Array.isArray(data)) {
+            console.error("Failed to get presigned URLs from server");
+            return; 
+        }
         await Promise.all(
             images.map((image, idx) =>
                 fetch(data[idx].uploadUrl, {
@@ -102,7 +107,7 @@ const HandleSubmitReview = async () => {
 
     let proofS3Url: string = "";
     if (proofOfPurchase) {
-        const response: S3Request[] = await post("s3/presigned-url", [{
+        const response = await post("s3/presigned-url", [{
             fileName: proofOfPurchase.name,
             contentType: proofOfPurchase.type,
             fileSize: proofOfPurchase.size,
@@ -122,8 +127,7 @@ const HandleSubmitReview = async () => {
         rating: rating,
         comment: review,
         imageUrls: uploadedImageUrls,
-        purchaseImageUrl: proofS3Url,
-        variant: variant
+        purchaseImageUrl: proofS3Url
     }).then(() => {
         const supplementId = location.state?.supplementId;
         const brandName = location.state?.brandName;
@@ -131,10 +135,6 @@ const HandleSubmitReview = async () => {
     })
 }
 
-
-    
-
-  
 
     return (
         <div className="min-h-screen">
@@ -207,21 +207,6 @@ const HandleSubmitReview = async () => {
                             />
                             <p className="text-sm text-gray-600 mt-1">Remain anonymous</p>
                         </div>
-                    </div>
-                    <div className="mb-8">
-                        <label className="block text-lg font-bold text-gray-800 mb-3">
-                            Variant <span className="text-red-500">*</span>
-                        </label>
-                        <select
-                            className="w-full px-4 py-3 rounded-lg border-2 border-gray-200"
-                            value={variant}
-                            onChange={e => setVariant(e.target.value)}
-                        >
-                            <option value="">Select One</option>
-                            {variants.map((variant, idx) => (
-                                <option key={idx} value={variant}>{variant}</option>
-                            ))}
-                        </select>
                     </div>
                     {/*}
                     <div className="mb-8">
@@ -394,11 +379,11 @@ const HandleSubmitReview = async () => {
                     </div>
 
                     <div className="flex gap-4">
-                        <button className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-4 rounded-xl transition-colors cursor-pointer" onClick={() => navigate(-1)}>
+                        <button className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-4 rounded-xl cursor-pointer transition-colors" onClick={() => navigate(-1)}>
                             Cancel
                         </button>
                         <button 
-                            disabled={!rating || !review.trim() || !proofOfPurchase || !variant}
+                            disabled={!rating || !review.trim() || !proofOfPurchase}
                             className="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-4 rounded-xl transition-colors shadow-lg disabled:bg-gray-300 disabled:cursor-not-allowed"
                             onClick={HandleSubmitReview}
                         >

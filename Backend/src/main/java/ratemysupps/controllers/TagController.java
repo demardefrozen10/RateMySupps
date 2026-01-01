@@ -42,7 +42,7 @@ public class TagController {
         return queryService.findByNameContainingIgnoreCase(keyword);
     }
 
-    @GetMapping("/by-supplement")
+    @GetMapping("/bySupplement")
     public List<ReadTag> getTagsBySupplement(@RequestParam Long supplementId) {
         return queryService.findBySupplements_Id(supplementId);
     }

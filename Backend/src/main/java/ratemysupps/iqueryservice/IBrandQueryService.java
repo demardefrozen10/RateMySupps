@@ -5,7 +5,10 @@ import ratemysupps.readmodel.ReadBrand;
 
 import java.util.List;
 
+
 public interface IBrandQueryService {
+
+    public ReadBrand getBrandById(Long brandId);
 
     public List<ReadBrand> getBrandByName(String name);
 
