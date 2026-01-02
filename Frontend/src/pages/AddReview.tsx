@@ -144,7 +144,11 @@ const HandleSubmitReview = async () => {
     }).then(() => {
         const supplementId = location.state?.supplementId;
         const brandName = location.state?.brandName;
-        navigate(`/product/${brandName}/:${supplementName}/:${supplementId}`, { state: { supplementId, brandName, reviewSubmitted: true } });
+        navigate(
+  `/product/${brandName}/${supplementName}/${supplementId}`,
+  { state: { supplementId, brandName, reviewSubmitted: true } }
+);
+
     })
 }
 
