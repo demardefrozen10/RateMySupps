@@ -313,27 +313,27 @@ export default function ProductPage() {
                             </div>
 
                         <div className="flex w-full gap-4 mt-8">
-                                    {reviews.length > 0 && (
+                                    {reviews.length > 0 && reviews.length === limit && (
                                     <button 
                                         onClick={handleLoadMore}
-      className="flex-1 px-8 py-3 border-2 border-emerald-300 text-emerald-600 hover:bg-emerald-50 font-semibold rounded-lg transition-colors cursor-pointer"
+                                        className="flex-1 px-8 py-3 border-2 border-emerald-300 text-emerald-600 hover:bg-emerald-50 font-semibold rounded-lg transition-colors cursor-pointer"
                                     >
                                         Load More Reviews
                                     </button>
-                                            )}  
+                                        )}  
                                             
 
-                                        {reviews.length === 0 ? (
-                                                        <div className="w-full py-10 px-45 bg-gray-100 text-gray-600 hover:bg-gray-200 font-semibold rounded-lg transition-colors flex flex-col items-center justify-center gap-4 cursor-pointer">
-                                                            <h3 className="text-xl font-semibold text-gray-800">No reviews found</h3>
-                                                            <p className="text-gray-500 mt-1 mb-6">Try adjusting your filters.</p>
-                                                        </div>
-                                                            ) : <button 
-                                                                onClick={scrollToTop}
-                                                                className="w-full sm:w-auto px-8 py-3 border-2 border-gray-300 text-gray-600 hover:bg-gray-200 font-semibold rounded-lg transition-colors cursor-pointer flex items-center gap-2"
-                                                                >
-                                                                Back to Top
-                                                            </button>}
+                                    {reviews.length === 0 ? (
+                                            <div className="w-full py-10 px-45 bg-gray-100 text-gray-600 hover:bg-gray-200 font-semibold rounded-lg transition-colors flex flex-col items-center justify-center gap-4 cursor-pointer">
+                                            <h3 className="text-xl font-semibold text-gray-800">No reviews found</h3>
+                                            <p className="text-gray-500 mt-1 mb-6">Try adjusting your filters.</p>
+                                            </div>
+                                                ) : <button 
+                                                    onClick={scrollToTop}
+                                                    className="w-full sm:w-auto px-8 py-3 border-2 border-gray-300 text-gray-600 hover:bg-gray-200 font-semibold rounded-lg transition-colors cursor-pointer flex items-center gap-2"
+                                                    >
+                                                    Back to Top
+                                            </button>}
                                     </div>
                                                 
                                 
