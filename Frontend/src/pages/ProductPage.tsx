@@ -36,10 +36,10 @@ export default function ProductPage() {
         if (locationSupplement) {
             setSupplement(locationSupplement);
             setLoading(false);
-        } else {
+        } else if (supplementId) {
             get(`supplement/getSupplement?supplementId=${supplementId}`)
             .then((data) => {
-                if (data && data.supplementId) {
+                if (data && data.id) {
                 setSupplement(data);
                 } else {
                 console.log("Invalid supplement data");

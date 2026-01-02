@@ -133,7 +133,7 @@ const HandleSubmitReview = async () => {
         proofS3Url = response[0].publicUrl;
     }
 
-    await post("review/createReview", {
+await post("review/createReview", {
     username: name,
     supplementId: supplementId,
     rating: rating,
@@ -142,18 +142,8 @@ const HandleSubmitReview = async () => {
     purchaseImageUrl: proofS3Url,
     variant: variant
 }).then(() => {
-    // 1. Prepare the variables
-    const bName = brandName;
-    const sName = supplementName;
-    const sId = supplementId;
-
-    // 2. Build the path WITHOUT colons
-    // We use encodeURIComponent to turn spaces into %20
-    const path = `/product/${encodeURIComponent(bName)}/${encodeURIComponent(sName)}/${sId}`;
-
-    // 3. Navigate
-    navigate(path, { 
-        state: { supplementId: sId, brandName: bName, reviewSubmitted: true } 
+    navigate(`/product/${encodeURIComponent(brandName)}/${encodeURIComponent(supplementName)}/${supplementId}`, { 
+        state: { reviewSubmitted: true } 
     });
 });
 }
