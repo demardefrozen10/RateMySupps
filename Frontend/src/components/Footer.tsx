@@ -13,9 +13,19 @@ export default function Footer() {
                 RateMy<span className="text-emerald-500">Supplements</span>
             </h1>
             <div className="flex items-center gap-1 text-sm">
-                <p>Terms & Conditions</p>
+                <p
+                    className="cursor-pointer hover:underline"
+                    onClick={() => navigate('/terms-and-conditions')}
+                >
+                    Terms & Conditions
+                </p>
                 <p>•</p>
-                <p>Privacy Policy</p>
+                <p
+                    className="cursor-pointer hover:underline"
+                    onClick={() => navigate('/privacy-policy')}
+                >
+                    Privacy Policy
+                </p>
                 <p>•</p>
                 <p>All Rights Reserved</p>
             </div>

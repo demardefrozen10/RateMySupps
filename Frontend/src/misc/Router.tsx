@@ -7,6 +7,8 @@ import AddReview from '../pages/AddReview';
 import AddSupplement from '../pages/AddSupplement';
 import NotFound from '../pages/NotFound';
 import ScrollToTop from '../components/ScrollToTop';
+import TermsAndConditions from '../pages/TermsAndConditions';
+import PrivacyPolicy from '../pages/PrivacyPolicy';
 
 
 function Router() {
@@ -20,6 +22,8 @@ function Router() {
       <Route path="/product/add-supplement" element={<AddSupplement />} />
       <Route path="/add-review" element={<AddReview />} />
       <Route path="*" element={<NotFound />} /> 
+      <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
+      <Route path="/privacy-policy" element={<PrivacyPolicy />} />
 
     </Routes>
   </>

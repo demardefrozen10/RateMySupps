@@ -21,12 +21,12 @@ export default function TextPane() {
   ];
 
   return (
-    <section className="pb-20 pt-5 bg-white">
+    <section className="pb-20 pt-10 bg-white">
       <div className="max-w-7xl mx-auto px-6">
         
         <div className="flex flex-col items-center mb-16 text-center">
           <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight">
-            Why Trust Us?
+            Why use RateMySupplement?
           </h2>
           <div className="w-12 h-1.5 bg-emerald-500 mt-4 rounded-full"></div>
         </div>
@@ -35,7 +35,7 @@ export default function TextPane() {
           {features.map((feature, idx) => (
             <div 
               key={idx} 
-              className="group flex flex-col items-center text-center p-8 rounded-3xl transition-all duration-300 border border-transparent hover:border-gray-50 hover:bg-slate-50/50"
+              className="group flex flex-col items-center text-center  rounded-3xl transition-all duration-300 border border-transparent hover:border-gray-50 hover:bg-slate-50/50"
             >
               <div className={`
                 w-14 h-14 rounded-2xl mb-6 

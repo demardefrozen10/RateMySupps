@@ -6,6 +6,7 @@ export default function AddReview() {
     const [rating, setRating] = useState(0);
     const [hoverRating, setHoverRating] = useState(0);
     //const [wouldPurchaseAgain, setWouldPurchaseAgain] = useState<boolean | null>(null);
+    const [variant, setVariant] = useState<string>("");
     const [review, setReview] = useState("");
     const [images, setImages] = useState<File[]>([]);
     const [proofOfPurchase, setProofOfPurchase] = useState<File | null>(null);
@@ -18,6 +19,7 @@ export default function AddReview() {
     const brandName: string = location.state?.brandName;
     const supplementName: string = location.state?.supplementName;
     const imageUrl: string = location.state?.imageUrl;
+    const variants: string[] = location.state?.variants || [];
 
     const {post} = useFetch("http://localhost:8080/api/");
 
@@ -27,15 +29,25 @@ export default function AddReview() {
 
 
     const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const allowedTypes = ["image/png", "image/jpeg", "image/jpg", "image/gif"];
         const files = Array.from(e.target.files || []);
+        const validFiles = files.filter(file => allowedTypes.includes(file.type));
+        if (validFiles.length < files.length) {
+            alert("Only PNG, JPG, and GIF images are allowed.");
+        }
         const remainingSlots = 5 - images.length;
-        const newImages = files.slice(0, remainingSlots);
+        const newImages = validFiles.slice(0, remainingSlots);
         setImages([...images, ...newImages]);
     }
 
     const handleProofUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0]
+        const allowedTypes = ["application/pdf", "image/png", "image/jpeg", "image/jpg"];
+        const file = e.target.files?.[0];
         if (file) {
+            if (!allowedTypes.includes(file.type)) {
+                alert("Only PDF, PNG, or JPG files are allowed for proof of purchase.");
+                return;
+            }
             setProofOfPurchase(file);
         }
     }
@@ -127,11 +139,12 @@ const HandleSubmitReview = async () => {
         rating: rating,
         comment: review,
         imageUrls: uploadedImageUrls,
-        purchaseImageUrl: proofS3Url
+        purchaseImageUrl: proofS3Url,
+        variant: variant
     }).then(() => {
         const supplementId = location.state?.supplementId;
         const brandName = location.state?.brandName;
-        navigate(`/product/${supplementId}`, { state: { supplementId, brandName, reviewSubmitted: true } });
+        navigate(`/product/${brandName}/:${supplementName}/:${supplementId}`, { state: { supplementId, brandName, reviewSubmitted: true } });
     })
 }
 
@@ -208,6 +221,21 @@ const HandleSubmitReview = async () => {
                             <p className="text-sm text-gray-600 mt-1">Remain anonymous</p>
                         </div>
                     </div>
+                    <div className="mb-8">
+                    <label className="block text-lg font-bold text-gray-800 mb-3">
+                    Variant <span className="text-red-500">*</span>
+                        </label>
+                        <select
+                            className="w-full px-4 py-3 rounded-lg border-2 border-gray-200"
+                            value={variant}
+                            onChange={e => setVariant(e.target.value)}
+                        >
+                            <option value="">Select One</option>
+                            {variants.map((variant, idx) => (
+                                <option key={idx} value={variant}>{variant}</option>
+                            ))}
+                        </select>
+                    </div>
                     {/*}
                     <div className="mb-8">
                         <label className="block text-lg font-bold text-gray-800 mb-3">
@@ -250,10 +278,14 @@ const HandleSubmitReview = async () => {
                             maxLength={200}
                         />
                         <div className="flex justify-between items-center mt-2">
-                            
                             <p className="text-sm text-gray-500">
                                 {review.length}/200 characters
                             </p>
+                            {review.length > 0 && review.length < 50 && (
+                                <span className="text-xs text-red-500 ml-2">
+                                    Minimum 50 characters required.
+                                </span>
+                            )}
                         </div>
                     </div>
 
@@ -383,7 +415,7 @@ const HandleSubmitReview = async () => {
                             Cancel
                         </button>
                         <button 
-                            disabled={!rating || !review.trim() || !proofOfPurchase}
+                            disabled={!rating || !review.trim() || review.length < 50 || !proofOfPurchase}
                             className="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-4 rounded-xl transition-colors shadow-lg disabled:bg-gray-300 disabled:cursor-not-allowed"
                             onClick={HandleSubmitReview}
                         >

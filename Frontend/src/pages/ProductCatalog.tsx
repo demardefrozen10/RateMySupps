@@ -12,7 +12,7 @@ import NotFound from "./NotFound";
 export default function ProductCatalog() {
     const [currentImage, setCurrentImage] = useState(0);
     const [supplements, setSupplements] = useState<Supplement[]>([]);
-    const [showNotification] = useState(false);
+    const [showNotification, setShowNotification] = useState(false);
     const [brand, setBrand] = useState<Brand | null>(null);
 
     const [searchQuery, setSearchQuery] = useState("");
@@ -82,6 +82,15 @@ export default function ProductCatalog() {
                 setCategories([]);
             });
     }, [brand?.id]);
+
+
+    useEffect(() => {
+        if (location.state?.supplementSubmitted) {
+            setShowNotification(true);
+            navigate(location.pathname, { replace: true, state: { ...location.state, supplementSubmitted: undefined } });
+            setTimeout(() => setShowNotification(false), 3000);
+        }
+    }, [location.state, navigate, location.pathname]);
 
 
     const HandleAddSupplementClick = () => {
