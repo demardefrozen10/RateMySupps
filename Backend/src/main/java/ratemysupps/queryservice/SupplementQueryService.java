@@ -30,17 +30,18 @@ public class SupplementQueryService implements ISupplementQueryService {
     }
 
     @Override
-public List<ReadSupplement> getAllSupplementsByBrand(Long brandId) {
-    return repo.findAllWithReviewsByBrandId(brandId) 
-            .stream()
-            .map(mapper::fromEntity)
-            .collect(Collectors.toList());
-}
+    public List<ReadSupplement> getAllSupplementsByBrand(Long brandId) {
+        return repo.findAllWithReviewsByBrandId(brandId)
+                .stream()
+                .filter(Supplement::isVerified)
+                .map(mapper::fromEntity)
+                .collect(Collectors.toList());
+    }
 
 
     @Override
     public ReadSupplement getSupplementById(Long supplementId) {
-        Supplement supplement = repo.findById(supplementId)
+        Supplement supplement = repo.findById(supplementId).filter(Supplement::isVerified)
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND,
                         "Supplement not found with ID: " + supplementId
@@ -61,6 +62,7 @@ public List<ReadSupplement> getAllSupplementsByBrand(Long brandId) {
     public List<ReadSupplement> searchSupplementsByMinRating(Double minRating, Sort sort) {
         return repo.findByAverageRatingGreaterThanEqual(minRating, sort)
                 .stream()
+                .filter(Supplement::isVerified)
                 .map(mapper::fromEntity)
                 .collect(Collectors.toList());
     }
@@ -69,6 +71,7 @@ public List<ReadSupplement> getAllSupplementsByBrand(Long brandId) {
     public List<ReadSupplement> getTopRatedSupplements() {
         return repo.findByOrderByAverageRatingDesc()
                 .stream()
+                .filter(Supplement::isVerified)
                 .map(mapper::fromEntity)
                 .collect(Collectors.toList());
     }
@@ -77,6 +80,7 @@ public List<ReadSupplement> getAllSupplementsByBrand(Long brandId) {
     public List<ReadSupplement> getMostReviewedSupplements() {
         return repo.findByOrderByTotalReviewsDesc()
                 .stream()
+                .filter(Supplement::isVerified)
                 .map(mapper::fromEntity)
                 .collect(Collectors.toList());
     }
@@ -85,6 +89,7 @@ public List<ReadSupplement> getAllSupplementsByBrand(Long brandId) {
     public List<ReadSupplement> searchSupplementsByExactRating(Double rating) {
         return repo.findByAverageRating(rating)
                 .stream()
+                .filter(Supplement::isVerified)
                 .map(mapper::fromEntity)
                 .collect(Collectors.toList());
     }
@@ -93,6 +98,7 @@ public List<ReadSupplement> getAllSupplementsByBrand(Long brandId) {
     public List<ReadSupplement> searchSupplementsByName(String name) {
         return repo.findBySupplementNameContainingIgnoreCase(name)
                 .stream()
+                .filter(Supplement::isVerified)
                 .map(mapper::fromEntity)
                 .collect(Collectors.toList());
     }
@@ -123,6 +129,7 @@ public List<ReadSupplement> getSupplementsByBrand(Long brandId, String search, S
 
     return repo.findByBrandWithFilters(brandId, searchParam, filterParam, sortObj)
                .stream()
+                .filter(Supplement::isVerified)
                .map(mapper::fromEntity)
                .toList();
 }
@@ -145,20 +152,23 @@ public List<ReadSupplement> getRecommendations(Long supplementId) {
 
      if (supplement.getTags().isEmpty() || recommendedSupplements.size() >= 6) {
         return brandRecommendations.stream()
+                .filter(Supplement::isVerified)
                 .map(mapper::fromEntity)
                 .collect(Collectors.toList());
     }
 
     List<Long> excludeIds = brandRecommendations.stream()
+            .filter(Supplement::isVerified)
             .map(Supplement::getId)
             .toList();
     excludeIds = new ArrayList<>(excludeIds);
     excludeIds.add(supplementId);
 
-        List<Supplement> tagRecommendations = repo.findByTagsInAndIdNotInOrderByAverageRating_Desc(supplement.getTags().stream().toList(), excludeIds);
+    List<Supplement> tagRecommendations = repo.findByTagsInAndIdNotInOrderByAverageRating_Desc(supplement.getTags().stream().toList(), excludeIds);
 
     recommendedSupplements.addAll(tagRecommendations);
     return recommendedSupplements.stream()
+            .filter(Supplement::isVerified)
             .distinct()
             .limit(6)
             .map(mapper::fromEntity)

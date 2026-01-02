@@ -8,7 +8,7 @@ import NotFound from "./NotFound";
 export default function AddSupplement() {
     const [supplementName, setSupplementName] = useState("");
     const [websiteUrl, setWebsiteUrl] = useState("");
-    const [category, setCategory] = useState("Protein");
+    const [category, setCategory] = useState("Protein Powder");
     const [images, setImages] = useState<File[]>([]);
     const [categories, setCategories] = useState<string[]>([]);
     const [brand, setBrand] = useState<Brand | null>(null);
@@ -44,8 +44,13 @@ export default function AddSupplement() {
 
     const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files) {
+            const allowedTypes = ["image/png", "image/jpeg", "image/jpg", "image/gif"];
             const selectedFiles = Array.from(e.target.files);
-            setImages((prevImages) => [...prevImages, ...selectedFiles].slice(0, 3));
+            const validFiles = selectedFiles.filter(file => allowedTypes.includes(file.type));
+            if (validFiles.length < selectedFiles.length) {
+                alert("Only PNG, JPG, and GIF images are allowed.");
+            }
+            setImages((prevImages) => [...prevImages, ...validFiles].slice(0, 3));
         }
     };
 
@@ -85,12 +90,10 @@ export default function AddSupplement() {
             imageUrl: uploadedImageUrls
           });
 
-    navigate(`/products/${brand.id}`, {
+    navigate(`/products/${brand.brandName}`, {
       state: { brand, supplementSubmitted: true },
     });
   };
-
-
 
     return (
         <div className="min-h-screen">
@@ -147,7 +150,7 @@ export default function AddSupplement() {
                         >
                         {categories.length > 0
                             ? categories.map((cat, idx) => <option key={idx} value={cat}>{cat}</option>)
-                            : <option value="Protein">Protein</option> // fallback
+                            : <option value="Protein Powder">Protein Powder</option>
                         }
                         </select>
 
