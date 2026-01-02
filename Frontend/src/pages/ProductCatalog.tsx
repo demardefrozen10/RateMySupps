@@ -12,7 +12,7 @@ import NotFound from "./NotFound";
 export default function ProductCatalog() {
     const [currentImage, setCurrentImage] = useState(0);
     const [supplements, setSupplements] = useState<Supplement[]>([]);
-    const [showNotification, setShowNotification] = useState(false);
+    const [showNotification] = useState(false);
     const [brand, setBrand] = useState<Brand | null>(null);
 
     const [searchQuery, setSearchQuery] = useState("");
@@ -84,15 +84,6 @@ export default function ProductCatalog() {
     }, [brand?.id]);
 
 
-    useEffect(() => {
-        if (location.state?.supplementSubmitted) {
-            setShowNotification(true);
-            navigate(location.pathname, { replace: true, state: { ...location.state, supplementSubmitted: undefined } });
-            setTimeout(() => setShowNotification(false), 3000);
-        }
-    }, [location.state, navigate, location.pathname]);
-
-
     const HandleAddSupplementClick = () => {
         if (!brand) return;
         navigate(`/product/add-supplement`, { state: { brand } });
@@ -138,6 +129,7 @@ export default function ProductCatalog() {
     const images = [brand!.imageUrl];
     
     return (   
+
         <div className="min-h-screen to-white">
             {showNotification && (
                 <div className="fixed top-6 left-1/2 transform -translate-x-1/2 z-50">
@@ -185,6 +177,8 @@ export default function ProductCatalog() {
                     </div>
                 </div>
 
+
+
                 <div className="mb-6 flex flex-col gap-3 items-center sm:flex-row sm:gap-3">
                     <input
                         type="text"
@@ -218,7 +212,7 @@ export default function ProductCatalog() {
                     </select>
                 </div>
 
-           <div className="mb-6 bg-white border-2 border-gray-200 rounded-xl p-5 flex items-center justify-between shadow-sm">
+                  <div className="mb-6 bg-white border-2 border-gray-200 rounded-xl p-5 flex items-center justify-between shadow-sm">
     <div className="text-sm text-gray-700">
         <span className="font-semibold">Can't find your supplement?</span>
         <p className="text-xs text-gray-500 mt-1">Add it to this brand's page</p>

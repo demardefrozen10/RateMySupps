@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import ratemysupps.entity.Category;
 import ratemysupps.entity.Supplement;
 import ratemysupps.entity.Tag;
 
@@ -41,11 +42,4 @@ List<String> getVariantsBySupplementId(@Param("id") Long id);
 
 List<Supplement> findTop6ByBrand_IdAndIdNotOrderByAverageRating_Desc(Long brandId, Long supplementId);
 List<Supplement> findByTagsInAndIdNotInOrderByAverageRating_Desc(List<Tag> tags, List<Long> excludeIds);
-
-@Query("SELECT COUNT(r) FROM review r WHERE r.supplement.id = :supplementId")
-int countReviewsBySupplementId(Long supplementId);
-
-@Query("SELECT COALESCE(AVG(r.rating), 0) FROM review r WHERE r.supplement.id = :supplementId")
-double averageRatingBySupplementId(Long supplementId);
-
 }

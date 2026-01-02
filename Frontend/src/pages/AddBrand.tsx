@@ -107,7 +107,7 @@ export default function AddBrand() {
                         <label className="block text-lg font-bold text-gray-800 mb-3">
                             Brand Name <span className="text-red-500">*</span>
                         </label>
-                        <p className="text-sm text-gray-600 mb-3">Enter the official name of the supplement as seen on their official page.</p>
+                        <p className="text-sm text-gray-600 mb-3">Enter the official name of the brand as seen on their official page.</p>
                         <input
                             className="w-full px-4 py-3 rounded-lg border-2 border-gray-200"
                             value={brandName}
