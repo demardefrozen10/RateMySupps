@@ -313,7 +313,7 @@ export default function ProductPage() {
                             </div>
 
                             <div className="flex flex-col sm:flex-row gap-4 mt-8">
-                                {reviews.length < (supplement?.totalReviews || 0) && (
+                                {reviews.length > 0 && reviews.length === limit &&(
                                     <button 
                                         onClick={handleLoadMore}
                                         className="flex-1 py-3 border-2 border-emerald-300 text-emerald-600 hover:bg-emerald-50 font-semibold rounded-lg transition-colors cursor-pointer"

@@ -77,13 +77,18 @@ export default function AddBrand() {
           
         console.log("Created brand:", newBrand);
 
-        navigate(`/products/${brandName}`, {
-        state: { brand: newBrand }
-        });
+        // ONLY navigate if the response doesn't contain a server error
+if (newBrand && !newBrand.error && newBrand.status !== 500) {
+    navigate("/");
+} else {
+    // Alert the user so they know it didn't save
+    alert("Server Error: Could not save brand. Please check the logs.");
+}  
         } catch (error) {
-            console.error(error);
+            console.error("Error creating brand:", error);
+            alert("An error occurred while creating the brand. Please try again.");
         } finally {
-            setLoading(false); 
+            setLoading(false);
         }
 
   };
