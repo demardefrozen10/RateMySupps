@@ -218,9 +218,18 @@ export default function ProductCatalog() {
                     </select>
                 </div>
 
-                <div className="mb-6 text-sm text-gray-600">
-                    Can't find what you're looking for? <button className="text-emerald-600 hover:text-emerald-700 font-semibold underline cursor-pointer" onClick={HandleAddSupplementClick}>Add a supplement here</button>
-                </div>
+           <div className="mb-6 bg-white border-2 border-gray-200 rounded-xl p-5 flex items-center justify-between shadow-sm">
+    <div className="text-sm text-gray-700">
+        <span className="font-semibold">Can't find your supplement?</span>
+        <p className="text-xs text-gray-500 mt-1">Add it to this brand's page</p>
+    </div>
+    <button 
+        onClick={HandleAddSupplementClick}
+        className="px-6 py-3 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 font-semibold transition-colors whitespace-nowrap ml-4"
+    >
+        Add Supplement
+    </button>
+</div>
 
                 <div className="flex flex-col gap-4">
                     {supplements.length === 0 ? (

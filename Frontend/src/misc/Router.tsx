@@ -9,6 +9,7 @@ import NotFound from '../pages/NotFound';
 import ScrollToTop from '../components/ScrollToTop';
 import TermsAndConditions from '../pages/TermsAndConditions';
 import PrivacyPolicy from '../pages/PrivacyPolicy';
+import AddBrand from '../pages/AddBrand';
 
 
 function Router() {
@@ -17,6 +18,7 @@ function Router() {
     <Routes>
       <Route path="/" element={<Home />} />
       <Route path="/brands" element={<BrandCatalog />} />
+      <Route path="/add-brand" element={<AddBrand />} />
       <Route path="/products/:brandName" element={<ProductCatalog />} />
       <Route path="/product/:brandName/:supplementName/:supplementId" element={<ProductPage />} />
       <Route path="/product/add-supplement" element={<AddSupplement />} />

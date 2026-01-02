@@ -1,0 +1,218 @@
+import { useState } from "react";
+import {useLocation, useNavigate} from "react-router-dom";
+import useFetch from "../hooks/useFetch";
+import Load from "../components/Load";
+
+export default function AddBrand() {
+    const [brandName, setBrandName] = useState("");
+    const [country, setCountry] = useState("");
+    const [websiteUrl, setWebsiteUrl] = useState("");
+    const [description, setDescription] = useState("");
+    const [images, setImage] = useState<File[]>([]);
+    const [loading, setLoading] = useState(false);
+
+
+    const {post, get} = useFetch("http://localhost:8080/api/");
+    const location = useLocation();
+    const navigate = useNavigate();
+
+
+    if (loading) {
+        return <Load />;
+    }
+
+
+    const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files) {
+            const allowedTypes = ["image/png", "image/jpeg", "image/jpg", "image/gif"];
+            const selectedFiles = Array.from(e.target.files);
+            const validFiles = selectedFiles.filter(file => allowedTypes.includes(file.type));
+            if (validFiles.length < selectedFiles.length) {
+                alert("Only PNG, JPG, and GIF images are allowed.");
+            }
+            setImage((prevImages) => [...prevImages, ...validFiles].slice(0, 1));
+        }
+    };
+
+    
+    const removeImage = (index: number) => {
+        setImage(images.filter((_, i) => i !== index));
+    }
+
+    const HandleBrandSubmit = async () => {
+         setLoading(true); 
+        try {
+            const batchPayload = images.map((image) => ({
+            fileName: image.name,
+            contentType: image.type,
+            fileSize: image.size,
+            imageType: "BrandImage"
+        }));
+
+            
+
+        let uploadedImageUrl: string[] = [];
+        if (images.length > 0) {
+            const data = await post("s3/presigned-url", batchPayload); 
+            await Promise.all(
+                images.map((image, idx) =>
+                    fetch(data[idx].uploadUrl, {
+                        method: "PUT",
+                        headers: { "Content-Type": image.type },
+                        body: image
+                    })
+                )
+            );
+            uploadedImageUrl = data.map((item: { publicUrl: string }) => item.publicUrl);
+        }
+
+        const newBrand = await post("brand/createBrand", {
+            brandName: brandName,
+            country: country,
+            websiteUrl: websiteUrl,
+            imageUrl: uploadedImageUrl[0] || null,
+            description: description
+            
+        });
+          
+        console.log("Created brand:", newBrand);
+
+        navigate(`/products/${brandName}`, {
+        state: { brand: newBrand }
+        });
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setLoading(false); 
+        }
+
+  };
+
+    return (
+        <div className="min-h-screen">
+            <div className="max-w-3xl mx-auto px-4 py-12">
+                <div className="mb-8">
+                    <h1 className="text-4xl font-bold text-gray-800 mb-2">Add A Brand</h1>
+                    <p className="text-gray-600">If you don't see a brand on our page you can make a request to add it.</p>
+                </div>
+
+                <div className="bg-white rounded-xl shadow-lg p-8">
+                    <div className="mb-8 pb-6 border-b">
+                        <div className="flex items-center gap-4">
+                            <h2 className="text-2xl font-bold text-gray-800">Brand Information</h2>
+                        </div>
+                    </div>
+
+                    <div className="mb-8">
+                        <label className="block text-lg font-bold text-gray-800 mb-3">
+                            Brand Name <span className="text-red-500">*</span>
+                        </label>
+                        <p className="text-sm text-gray-600 mb-3">Enter the official name of the supplement as seen on their official page.</p>
+                        <input
+                            className="w-full px-4 py-3 rounded-lg border-2 border-gray-200"
+                            value={brandName}
+                            onChange={e => setBrandName(e.target.value)}
+                        />
+                    </div>
+
+                    <div className="mb-8">
+                        <label className="block text-lg font-bold text-gray-800 mb-3">
+                            Country <span className="text-red-500">*</span>
+                        </label>
+                        <p className="text-sm text-gray-600 mb-3">Enter the country of origin for the brand.</p>
+                        <input
+                            className="w-full px-4 py-3 rounded-lg border-2 border-gray-200"
+                            value={country}
+                            onChange={e => setCountry(e.target.value)}
+                        />
+                    </div>
+
+                    <div className="mb-8">
+                        <label className="block text-lg font-bold text-gray-800 mb-3">
+                            Description <span className="text-red-500">*</span>
+                        </label>
+                        <p className="text-sm text-gray-600 mb-3">Enter a description of the brand.</p>
+                        <input
+                            className="w-full px-4 py-3 rounded-lg border-2 border-gray-200"
+                            value={description}
+                            onChange={e => setDescription(e.target.value)}
+                        />
+                    </div>
+                    <div className="mb-8">
+                        <label className="block text-lg font-bold text-gray-800 mb-3">
+                            Brand Link <span className="text-red-500">*</span>
+                        </label>
+                        <p className="text-sm text-gray-600 mb-3">Enter the link to the brand's official site.</p>
+                        <input
+                            className="w-full px-4 py-3 rounded-lg border-2 border-gray-200"
+                            value={websiteUrl}
+                            onChange={e => setWebsiteUrl(e.target.value)}
+                        />
+                    </div>
+                
+                    
+                    <div className="mb-8">
+                        <label className="block text-lg font-bold text-gray-800 mb-3">
+                            Add A Photo (Optional)
+                        </label>
+                        
+                        {images.length < 2 && (
+                            <label className="cursor-pointer">
+                                <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-emerald-500 hover:bg-emerald-50 transition-all">
+                                    <svg className="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                                        <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                    </svg>
+                                    <p className="mt-2 text-sm text-gray-600">
+                                        <span className="font-semibold text-emerald-600">Click to upload</span>
+                                    </p>
+                                    <p className="text-xs text-gray-500 mt-1">PNG, JPG, GIF up to 10MB</p>
+                                </div>
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    multiple
+                                    onChange={handleImageUpload}
+                                    className="hidden"
+                                />
+                            </label>
+                        )}
+
+                        {images.length > 0 && (
+                            <div className="grid grid-cols-5 gap-3 mt-4">
+                                {images.map((image, index) => (
+                                    <div key={index} className="relative group">
+                                        <img
+                                            src={URL.createObjectURL(image)}
+                                            alt={`Upload ${index + 1}`}
+                                            className="w-full h-24 object-cover rounded-lg border-2 border-gray-200"
+                                        />
+                                        <button
+                                            onClick={() => removeImage(index)}
+                                            className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg hover:bg-red-600"
+                                        >
+                                            ×
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+
+
+                    <div className="flex gap-4">
+                        <button className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-4 rounded-xl transition-colors cursor-pointer" onClick={() => navigate(-1)}>
+                        Cancel
+                        </button>
+                        <button 
+                            className="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-4 rounded-xl transition-colors shadow-lg disabled:bg-gray-300 disabled:cursor-not-allowed cursor-pointer"
+                            disabled={!websiteUrl.trim() || !brandName.trim()}
+                            onClick={HandleBrandSubmit}
+                        >
+                            Submit Brand
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    )
+}

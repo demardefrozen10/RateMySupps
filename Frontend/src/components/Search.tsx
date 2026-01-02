@@ -127,9 +127,29 @@ export default function Search() {
                                 )}
 
                                 {!loading && !hasResults && debouncedSearchQuery && (
-                                    <div className="p-10 text-center text-gray-500">
-                                        No results found for "{debouncedSearchQuery}"
-                                    </div>
+                                    <div className="text-center py-12">
+       <h3 className="text-xl font-semibold text-gray-800 mb-2">
+    No results found for "{searchQuery}"
+</h3>
+<p className="text-gray-600 mb-6">
+    Can't find what you're looking for?
+</p>
+<div className="flex flex-col gap-3 items-center">
+    <button 
+        onClick={() => {
+            navigate('/add-brand');
+            setShowDropdown(false);
+            setSearchQuery('');
+        }}
+        className="px-6 py-3 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 font-semibold"
+    >
+        Request to Add This Brand
+    </button>
+    <p className="text-sm text-gray-500">
+        Looking for a specific product? Try searching for the brand first.
+    </p>
+</div>
+    </div>
                                 )}
 
                                 {!loading && hasResults && (
