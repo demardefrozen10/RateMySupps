@@ -214,13 +214,13 @@ export default function ProductPage() {
                         <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
                             <h3 className="font-bold text-lg mb-4">Product Details</h3>
                             <div className="space-y-3 text-sm">
-                                <div className="flex flex-row items-center gap-2">
+                                <div className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-0">
                                     <span className="text-gray-600">Category:</span>
-                                    <span>{supplement?.category || "N/A"}</span>
+                                    <span className="font-semibold">{supplement?.category || "N/A"}</span>
                                 </div>
-                                <div className="flex flex-row items-center gap-2">
+                                <div className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-0">
                                     <span className="text-gray-600">Serving Sizes:</span>
-                                    <span>
+                                    <span className="font-semibold">
                                         {(() => {
                                             const data = supplement as any;
                                             const val = data?.servingSizes || data?.serving_sizes || data?.serving_size;
@@ -229,26 +229,15 @@ export default function ProductPage() {
                                         })()}
                                     </span>
                                 </div>
-                                <div className="flex flex-row items-center gap-2">
-                                    <span className="text-gray-600">Variants:</span>
+                                <div className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-0">
+                                    <span className="text-gray-600">Flavors:</span>
                                     <span className="font-semibold">
-                                        {variants.length > 0 ? (
-                                            <select
-                                                className="px-3 py-2 rounded-lg border-2 border-gray-200 bg-white text-gray-700 font-medium"
-                                                value={variant}
-                                                onChange={e => setVariant(e.target.value)}
-                                            >
-                                                <option value="">All Flavors</option>
-                                                {variants.map((v, i) => (
-                                                    <option key={i} value={v}>{v}</option>
-                                                ))}
-                                            </select>
-                                        ) : (
-                                            "No variants listed"
-                                        )}
+                                        {variants.length > 0 
+                                            ? variants.join(", ") 
+                                            : "No variants listed"}
                                     </span>
                                 </div>
-                                <div className="flex flex-row items-center gap-2">
+                                <div className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-0">
                                     <span className="text-gray-600">Tags:</span>
                                     <div className="flex flex-wrap gap-2">
                                         {tags.map((tag) => (
@@ -287,7 +276,7 @@ export default function ProductPage() {
                                 value={variant}
                                 onChange={e => { setVariant(e.target.value); setLimit(5); }}
                             >
-                                <option value="">Filter by Variant</option>
+                                <option value="">Filter by Flavor</option>
                                 {variants.map((v, idx) => (
                                     <option key={idx} value={v}>{v}</option>
                                 ))}
@@ -324,27 +313,27 @@ export default function ProductPage() {
                             </div>
 
                         <div className="flex w-full gap-4 mt-8">
-                                    {reviews.length > 0 && reviews.length === limit && (
+                                    {reviews.length > 0 && reviews.length === limit &&(
                                     <button 
                                         onClick={handleLoadMore}
-                                        className="flex-1 px-8 py-3 border-2 border-emerald-300 text-emerald-600 hover:bg-emerald-50 font-semibold rounded-lg transition-colors cursor-pointer"
+      className="flex-1 px-8 py-3 border-2 border-emerald-300 text-emerald-600 hover:bg-emerald-50 font-semibold rounded-lg transition-colors cursor-pointer"
                                     >
                                         Load More Reviews
                                     </button>
-                                        )}  
+                                            )}  
                                             
 
-                                    {reviews.length === 0 ? (
-                                            <div className="w-full py-10 px-45 bg-gray-100 text-gray-600 hover:bg-gray-200 font-semibold rounded-lg transition-colors flex flex-col items-center justify-center gap-4 cursor-pointer">
-                                            <h3 className="text-xl font-semibold text-gray-800">No reviews found</h3>
-                                            <p className="text-gray-500 mt-1 mb-6">Try adjusting your filters.</p>
-                                            </div>
-                                                ) : <button 
-                                                    onClick={scrollToTop}
-                                                    className="w-full sm:w-auto px-8 py-3 border-2 border-gray-300 text-gray-600 hover:bg-gray-200 font-semibold rounded-lg transition-colors cursor-pointer flex items-center gap-2"
-                                                    >
-                                                    Back to Top
-                                            </button>}
+                                        {reviews.length === 0 ? (
+                                                        <div className="w-full py-10 px-45 bg-gray-100 text-gray-600 hover:bg-gray-200 font-semibold rounded-lg transition-colors flex flex-col items-center justify-center gap-4 cursor-pointer">
+                                                            <h3 className="text-xl font-semibold text-gray-800">No reviews found</h3>
+                                                            <p className="text-gray-500 mt-1 mb-6">Try adjusting your filters.</p>
+                                                        </div>
+                                                            ) : <button 
+                                                                onClick={scrollToTop}
+                                                                className="w-full sm:w-auto px-8 py-3 border-2 border-gray-300 text-gray-600 hover:bg-gray-200 font-semibold rounded-lg transition-colors cursor-pointer flex items-center gap-2"
+                                                                >
+                                                                Back to Top
+                                                            </button>}
                                     </div>
                                                 
                                 
