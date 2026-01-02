@@ -2,7 +2,6 @@ package ratemysupps.queryservice;
 
 import org.springframework.stereotype.Service;
 import ratemysupps.entity.Review;
-import ratemysupps.entity.Supplement;
 import ratemysupps.iqueryservice.IReviewQueryService;
 import ratemysupps.mapper.ReadReviewMapper;
 import ratemysupps.readmodel.ReadReview;
@@ -25,7 +24,7 @@ public class ReviewQueryService implements IReviewQueryService {
 
 
     @Override
-    public List<ReadReview> getReviewBySupplementId(Long supplementId, String sortBy, String sortOrder, String variant, int limit) {
+public List<ReadReview> getReviewBySupplementId(Long supplementId, String sortBy, String sortOrder, String variant, int limit) {
     List<ReadReview> reviews;
     
     if (sortBy == null) {
@@ -40,21 +39,20 @@ public class ReviewQueryService implements IReviewQueryService {
         reviews = getUnsortedReviews(supplementId);
     }
 
-    if (variant != null && !variant.isEmpty()) {
-        reviews = reviews.stream()
-                .filter(review -> variant.equals(review.getVariant()))
-                .collect(Collectors.toList());
-    }
-
-        return reviews.stream()
-            .limit(limit)
+   if (variant != null && !variant.isEmpty()) {
+    reviews = reviews.stream()
+            .filter(r -> r.getVariant() != null && r.getVariant().equals(variant))
             .collect(Collectors.toList());
     }
 
 
+        return reviews.stream()
+            .limit(limit)
+            .collect(Collectors.toList());
+}
+
     private List<ReadReview> getUnsortedReviews(Long supplementId) {
         return reviewRepo.findBySupplementId(supplementId).stream()
-                .filter(Review::isVerified)
                 .map(mapper::fromEntity)
                 .collect(Collectors.toList());
     }
@@ -62,7 +60,7 @@ public class ReviewQueryService implements IReviewQueryService {
 
     private List<ReadReview> getReviewsBySupplementIdByMinRating(Long supplementId) {
         List<ReadReview> readReviews = new ArrayList<>();
-        List<Review> reviews = reviewRepo.findBySupplementIdOrderByRatingAsc(supplementId).stream().filter(Review::isVerified).toList();
+        List<Review> reviews = reviewRepo.findBySupplementIdOrderByRatingAsc(supplementId);
 
         for (Review review : reviews) {
             readReviews.add(mapper.fromEntity(review));
@@ -73,7 +71,7 @@ public class ReviewQueryService implements IReviewQueryService {
 
     private List<ReadReview> getReviewsBySupplementIdByMaxRating(Long supplementId) {
         List<ReadReview> readReviews = new ArrayList<>();
-        List<Review> reviews = reviewRepo.findBySupplementIdOrderByRatingDesc(supplementId).stream().filter(Review::isVerified).toList();
+        List<Review> reviews = reviewRepo.findBySupplementIdOrderByRatingDesc(supplementId);
 
         for (Review review : reviews) {
             readReviews.add(mapper.fromEntity(review));
@@ -84,7 +82,7 @@ public class ReviewQueryService implements IReviewQueryService {
 
     private List<ReadReview> getReviewsBySupplementIdByMaxDate(Long supplementId) {
         List<ReadReview> readReviews = new ArrayList<>();
-        List<Review> reviews = reviewRepo.findBySupplementIdOrderByCreatedAtDesc(supplementId).stream().filter(Review::isVerified).toList();
+        List<Review> reviews = reviewRepo.findBySupplementIdOrderByCreatedAtDesc(supplementId);
 
         for (Review review : reviews) {
             readReviews.add(mapper.fromEntity(review));

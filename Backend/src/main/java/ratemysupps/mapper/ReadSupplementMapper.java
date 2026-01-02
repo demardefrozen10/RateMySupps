@@ -30,9 +30,6 @@ public class ReadSupplementMapper {
         return readSupplement;
     }
 
-
-
-
     public List<String> fromEntityVariant(List<Category> variants) {
         List<String> list = new ArrayList<>();
         for (Category category : variants) {

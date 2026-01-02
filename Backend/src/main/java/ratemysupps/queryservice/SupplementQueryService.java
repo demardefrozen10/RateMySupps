@@ -175,4 +175,11 @@ public List<ReadSupplement> getRecommendations(Long supplementId) {
             .collect(Collectors.toList());
 }
 
+    public double averageRatingBySupplementId(Long supplementId) {
+        return repo.averageRatingBySupplementId(supplementId);
+    }
+    public int countReviewsBySupplementId(Long supplementId) {
+        return repo.countReviewsBySupplementId(supplementId);
+    }
+
 }

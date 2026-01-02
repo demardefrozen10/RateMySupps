@@ -31,18 +31,34 @@ public class SupplementController {
 
    @GetMapping("/getSupplements")
     public List<ReadSupplement> getSupplementsByBrandId(
-            @RequestParam Long brandId,
-            @RequestParam(required = false) String search,
-            @RequestParam(required = false) String filter,
-            @RequestParam(required = false) String sortOption
+        @RequestParam Long brandId,
+        @RequestParam(required = false) String search,
+        @RequestParam(required = false) String filter,
+        @RequestParam(required = false) String sortOption
     ) {
-        return queryRepo.getSupplementsByBrand(brandId, search, filter, sortOption);
+    List<ReadSupplement> supplements = queryRepo.getSupplementsByBrand(brandId, search, filter, sortOption);
+
+    for (ReadSupplement supplement : supplements) {
+        int totalReviews = queryRepo.countReviewsBySupplementId(supplement.getId());
+        double averageRating = queryRepo.averageRatingBySupplementId(supplement.getId());
+        supplement.setTotalReviews(totalReviews);
+        supplement.setAverageRating(averageRating);
     }
+
+    return supplements;
+}
+
 
     @GetMapping("/getSupplement")
     public ResponseEntity<ReadSupplement> getSupplementById(@RequestParam Long supplementId) {
         ReadSupplement supplement = queryRepo.getSupplementById(supplementId);
+        int totalReviews = queryRepo.countReviewsBySupplementId(supplement.getId());
+        double averageRating = queryRepo.averageRatingBySupplementId(supplement.getId());
+
+        supplement.setTotalReviews(totalReviews);
+        supplement.setAverageRating(averageRating);
         return ResponseEntity.ok(supplement);
+        
     }
 
     @GetMapping("/getCategories")
@@ -76,7 +92,15 @@ public class SupplementController {
 
     @GetMapping("/top-rated")
     public List<ReadSupplement> getTopRated() {
-        return queryRepo.getTopRatedSupplements();
+        List<ReadSupplement> supplements = queryRepo.getTopRatedSupplements();
+         for (ReadSupplement supplement : supplements) {
+            int totalReviews = queryRepo.countReviewsBySupplementId(supplement.getId());
+            double averageRating = queryRepo.averageRatingBySupplementId(supplement.getId());
+            supplement.setTotalReviews(totalReviews);
+            supplement.setAverageRating(averageRating);
+        }
+
+    return supplements;
     }
 
     @GetMapping("/most-reviewed")

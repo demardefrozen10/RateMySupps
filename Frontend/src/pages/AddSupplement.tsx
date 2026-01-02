@@ -8,7 +8,7 @@ import NotFound from "./NotFound";
 export default function AddSupplement() {
     const [supplementName, setSupplementName] = useState("");
     const [websiteUrl, setWebsiteUrl] = useState("");
-    const [category, setCategory] = useState("Protein Powder");
+    const [category, setCategory] = useState("");
     const [images, setImages] = useState<File[]>([]);
     const [categories, setCategories] = useState<string[]>([]);
     const [brand, setBrand] = useState<Brand | null>(null);

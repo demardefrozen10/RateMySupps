@@ -19,5 +19,7 @@ public interface ISupplementQueryService {
     List<ReadSupplement> getSupplementsByBrand(Long brandId, String search, String filter, String sortOption);
     List<String> getVariantsBySupplementId(Long supplementId);
     List<ReadSupplement> getRecommendations(Long supplementId);
+    double averageRatingBySupplementId(Long supplementId);
+    int countReviewsBySupplementId(Long supplementId);
 
 }
