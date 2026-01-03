@@ -4,15 +4,17 @@ import type { Brand } from "../types/Brand";
 import useFetch from "../hooks/useFetch";
 import Load from "../components/Load";
 import NotFound from "./NotFound";
+import Error from "../components/Error";
 
 export default function AddSupplement() {
     const [supplementName, setSupplementName] = useState("");
     const [websiteUrl, setWebsiteUrl] = useState("");
-    const [category, setCategory] = useState("Protein");
+    const [category, setCategory] = useState("Protein Powder");
     const [images, setImages] = useState<File[]>([]);
     const [categories, setCategories] = useState<string[]>([]);
     const [brand, setBrand] = useState<Brand | null>(null);
     const [loading, setLoading] = useState(true);
+    const[error, setError] = useState(false);
 
 
     const {post, get} = useFetch("http://localhost:8080/api/");
@@ -29,7 +31,10 @@ export default function AddSupplement() {
     if (!brand) return;
     get("supplement/getCategories")
         .then((data: string[]) => setCategories(data))
-        .catch((err) => console.error("Failed to load categories:", err));
+        .catch(() =>{
+            setError(true);
+            setTimeout(() => setError(false), 3000);
+        })
     }, [brand]);
 
 
@@ -71,6 +76,9 @@ export default function AddSupplement() {
                         method: "PUT",
                         headers: { "Content-Type": image.type },
                         body: image
+                    }).catch(() =>{
+                        setError(true);
+                        setTimeout(() => setError(false), 3000);
                     })
                 )
             );
@@ -83,9 +91,12 @@ export default function AddSupplement() {
             category: category,
             websiteUrl: websiteUrl,
             imageUrl: uploadedImageUrls
+          }).catch(() => {
+                setError(true);
+                setTimeout(() => setError(false), 3000);
           });
 
-    navigate(`/products/${brand.id}`, {
+    navigate(`/products/${brand.brandName}`, {
       state: { brand, supplementSubmitted: true },
     });
   };
@@ -93,6 +104,8 @@ export default function AddSupplement() {
 
 
     return (
+        <>
+        {error && <Error />}
         <div className="min-h-screen">
             <div className="max-w-3xl mx-auto px-4 py-12">
                 <div className="mb-8">
@@ -147,7 +160,7 @@ export default function AddSupplement() {
                         >
                         {categories.length > 0
                             ? categories.map((cat, idx) => <option key={idx} value={cat}>{cat}</option>)
-                            : <option value="Protein">Protein</option> // fallback
+                            : <option value="Protein Powder">Protein Powder</option> // fallback
                         }
                         </select>
 
@@ -220,5 +233,6 @@ export default function AddSupplement() {
                 </div>
             </div>
         </div>
+        </>
     )
 }

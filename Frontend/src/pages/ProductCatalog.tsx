@@ -12,7 +12,8 @@ import NotFound from "./NotFound";
 export default function ProductCatalog() {
     const [currentImage, setCurrentImage] = useState(0);
     const [supplements, setSupplements] = useState<Supplement[]>([]);
-    const [showNotification] = useState(false);
+    const [showNotification, setShowNotification] = useState(false);
+    const [notificationType, setNotificationType] = useState<'brand' | 'supplement' | null>(null);
     const [brand, setBrand] = useState<Brand | null>(null);
 
     const [searchQuery, setSearchQuery] = useState("");
@@ -20,7 +21,7 @@ export default function ProductCatalog() {
     const [filterOption, setFilterOption] = useState("");
     const [categories, setCategories] = useState<string[]>([]);
     const [loading, setLoading] = useState(true);
-
+    const [supplementsLoading, setSupplementsLoading] = useState(false);
 
     const { get } = useFetch("http://localhost:8080/api/");
     
@@ -35,26 +36,45 @@ export default function ProductCatalog() {
   
 
     
-      useEffect(() => {
+    useEffect(() => {
         if (locationBrand) {
             setBrand(locationBrand);
+            setLoading(false);
         } else {
             const formattedBrandName = brandName ? brandName.replace(/-/g, " ") : "";
-            get(`brand/getBrandByName?name=${encodeURIComponent(formattedBrandName)}`).then((data: Brand[]) => {
-                if (data.length > 0) {
-                    setBrand(data[0]);
-
-                }
-                else {
+            get(`brand/getBrandByName?name=${encodeURIComponent(formattedBrandName)}`)
+                .then((data: Brand[]) => {
+                    if (data.length > 0) {
+                        setBrand(data[0]);
+                    } else {
+                        setBrand(null);
+                    }
+                })
+                .catch((error) => {
+                    console.error("Error fetching brand:", error);
                     setBrand(null);
-                }
-            }).catch((error) => {
-                console.error("Error fetching brand:", error);
-            });
+                })
+                .finally(() => {
+                    setLoading(false);
+                });
         }
-        setLoading(false);
+    }, [brandName, locationBrand]);
 
-    }, []);
+    useEffect(() => {
+        if (location.state?.brandSubmitted) {
+            setNotificationType('brand');
+            setShowNotification(true);
+            navigate(location.pathname, { replace: true, state: { ...location.state, brandSubmitted: undefined } });
+            const timer = setTimeout(() => setShowNotification(false), 3000);
+            return () => clearTimeout(timer);
+        } else if (location.state?.supplementSubmitted) {
+            setNotificationType('supplement');
+            setShowNotification(true);
+            navigate(location.pathname, { replace: true, state: { ...location.state, supplementSubmitted: undefined } });
+            const timer = setTimeout(() => setShowNotification(false), 3000);
+            return () => clearTimeout(timer);
+        }
+    }, [location.state, navigate, location.pathname]);
 
 
     useEffect(() => {
@@ -66,9 +86,11 @@ export default function ProductCatalog() {
         if (filterOption) url += `&filter=${filterOption}`;
         if (sortOption) url += `&sortOption=${sortOption}`;
 
+        setSupplementsLoading(true);
         get(url)
             .then((data: Supplement[]) => setSupplements(data))
-            .catch((error) => console.error("Error fetching supplements:", error));
+            .catch((error) => console.error("Error fetching supplements:", error))
+            .finally(() => setSupplementsLoading(false));
     }, [debouncedSearchQuery, filterOption, sortOption, brand]);
 
         useEffect(() => {
@@ -129,6 +151,7 @@ export default function ProductCatalog() {
     const images = [brand!.imageUrl];
     
     return (   
+
         <div className="min-h-screen to-white">
             {showNotification && (
                 <div className="fixed top-6 left-1/2 transform -translate-x-1/2 z-50">
@@ -136,7 +159,9 @@ export default function ProductCatalog() {
                         <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                         </svg>
-                        <span className="font-semibold">Supplement Submitted</span>
+                        <span className="font-semibold">
+                            {notificationType === 'brand' ? 'Brand Submitted' : 'Supplement Submitted'}
+                        </span>
                     </div>
                 </div>
             )}
@@ -176,6 +201,8 @@ export default function ProductCatalog() {
                     </div>
                 </div>
 
+
+
                 <div className="mb-6 flex flex-col gap-3 items-center sm:flex-row sm:gap-3">
                     <input
                         type="text"
@@ -209,12 +236,23 @@ export default function ProductCatalog() {
                     </select>
                 </div>
 
-                <div className="mb-6 text-sm text-gray-600">
-                    Can't find what you're looking for? <button className="text-emerald-600 hover:text-emerald-700 font-semibold underline cursor-pointer" onClick={HandleAddSupplementClick}>Add a supplement here</button>
-                </div>
+                  <div className="mb-6 bg-white border-2 border-gray-200 rounded-xl p-5 flex items-center justify-between shadow-sm">
+    <div className="text-sm text-gray-700">
+        <span className="font-semibold">Can't find your supplement?</span>
+        <p className="text-xs text-gray-500 mt-1">Add it to this brand's page</p>
+    </div>
+    <button 
+        onClick={HandleAddSupplementClick}
+        className="px-6 py-3 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 font-semibold transition-colors whitespace-nowrap ml-4 cursor-pointer"
+    >
+        Add Supplement
+    </button>
+</div>
 
                 <div className="flex flex-col gap-4">
-                    {supplements.length === 0 ? (
+                    {supplementsLoading ? (
+                        <Load />
+                    ) : supplements.length === 0 ? (
                         <div className="flex flex-col items-center justify-center py-20 bg-gray-50 rounded-xl border-2 border-dashed border-gray-200">
                             <svg className="w-16 h-16 text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -242,6 +280,7 @@ export default function ProductCatalog() {
                                 variants={supplement.variants}
                                 servingSizes={supplement.servingSizes}
                                 brandName={brand!.brandName}
+                                tags={supplement.tags}
                             />
                         ))
                     )}

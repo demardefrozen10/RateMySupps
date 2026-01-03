@@ -7,5 +7,7 @@ public interface ISupplementCommandService {
 
     public ReadSupplement submitSupplement(WriteSupplement supplement);
 
+    public ReadSupplement approveSupplement(Long supplementId);
+
 
 }

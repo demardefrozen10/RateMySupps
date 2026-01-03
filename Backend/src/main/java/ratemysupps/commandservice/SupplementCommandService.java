@@ -1,5 +1,8 @@
 package ratemysupps.commandservice;
+import jakarta.transaction.Transactional;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 import ratemysupps.entity.Brand;
 import ratemysupps.entity.Category;
 import ratemysupps.entity.Supplement;
@@ -21,34 +24,40 @@ public class SupplementCommandService implements ISupplementCommandService {
     private final WriteSupplementMapper writeMapper;
     private final ReadSupplementMapper readMapper;
     private final ISupplementRepository suppRepo;
-    private final ICategoryRepository categoryRepo;
     private final IBrandRepository brandRepo;
 
-    public SupplementCommandService(WriteSupplementMapper writeMapper, ISupplementRepository suppRepo, ICategoryRepository categoryRepo, IBrandRepository brandRepo, ReadSupplementMapper readMapper) {
+    public SupplementCommandService(WriteSupplementMapper writeMapper, ISupplementRepository suppRepo, ReadSupplementMapper readMapper, IBrandRepository brandRepo) {
         this.writeMapper = writeMapper;
         this.suppRepo = suppRepo;
-        this.categoryRepo = categoryRepo;
-        this.brandRepo = brandRepo;
         this.readMapper = readMapper;
+        this.brandRepo = brandRepo;
     }
 
     @Override
     public ReadSupplement submitSupplement(WriteSupplement supplement) {
 
         Brand brand = brandRepo.findById(supplement.getBrandId())
-                .orElseThrow(() -> new IllegalArgumentException("Brand not found: " + supplement.getBrandId()));
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Brand not found"
+                ));
 
-        Category category = categoryRepo.findByName(supplement.getCategory())
-                .orElseThrow(() -> new IllegalArgumentException("Category not found: " + supplement.getCategory()));
+        Category category = supplement.getCategory();
+        Supplement entitySupplement = writeMapper.toEntity(supplement, category, brand);
 
-        Supplement entitySupplement = writeMapper.toEntity(supplement);
-
-        entitySupplement.setBrand(brand);
-        entitySupplement.setCategory(category);
-        entitySupplement.setCreatedAt(LocalDateTime.now()); 
-        entitySupplement.setAverageRating(0.0);           
-        entitySupplement.setTotalReviews(0);       
         suppRepo.save(entitySupplement);
         return readMapper.fromEntity(entitySupplement);
+    }
+
+    @Override
+    @Transactional
+    public ReadSupplement approveSupplement(Long supplementId) {
+        Supplement supplement = suppRepo.findById(supplementId).orElseThrow(() -> new ResponseStatusException(
+                HttpStatus.NOT_FOUND,
+                "Supplement not found"
+        ));
+
+        supplement.setVerified(true);
+        return readMapper.fromEntity(supplement);
     }
 }

@@ -14,4 +14,8 @@ public interface IBrandQueryService {
 
     public List<Brand> getAllBrands();
 
+    public double averageRatingByBrandId(Long id);
+
+    public int countReviewsByBrandId(Long id);
+
 }

@@ -39,4 +39,14 @@ public class BrandQueryService implements IBrandQueryService {
     public List<Brand> getAllBrands() {
         return brandRepo.findAll();
     }
+
+    @Override
+    public double averageRatingByBrandId(Long id) {
+        return brandRepo.averageRatingByBrandId(id);
+    }
+
+    @Override
+    public int countReviewsByBrandId(Long id) {
+        return brandRepo.countReviewsByBrandId(id);
+    }
 }

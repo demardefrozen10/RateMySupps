@@ -8,6 +8,7 @@ import type { Tag } from "../types/Tag";
 import Carousel from "../components/Carousel";
 import Load from "../components/Load";
 import NotFound from "../pages/NotFound";
+import Error from "../components/Error";
 
 export default function ProductPage() {
     const [supplement, setSupplement] = useState<Supplement | null>(null);
@@ -20,6 +21,7 @@ export default function ProductPage() {
     const [limit, setLimit] = useState<number>(5); 
     const [recommendations, setRecommendations] = useState<Supplement[]>([]); 
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(false);
 
     const navigate = useNavigate();
     const { supplementId } = useParams<{ brandName: string, supplementId: string }>();
@@ -36,18 +38,18 @@ export default function ProductPage() {
         if (locationSupplement) {
             setSupplement(locationSupplement);
             setLoading(false);
-        } else {
+        } else if (supplementId) {
             get(`supplement/getSupplement?supplementId=${supplementId}`)
             .then((data) => {
-                if (data && data.supplementId) {
+                if (data && data.id) {
                 setSupplement(data);
                 } else {
-                console.log("Invalid supplement data");
                 setSupplement(null);
                 }
             })
-            .catch((error) => {
-                console.log("Network error:", error);
+            .catch(() => {
+                setError(true);
+                setTimeout(() => setError(false), 3000);
                 setSupplement(null);
             })
             .finally(() => {
@@ -69,6 +71,9 @@ export default function ProductPage() {
 
         get(`tag/bySupplement?supplementId=${supplementId}`).then((data) => {
             setTag(data || []);
+        }).catch(() => {
+            setError(true);
+            setTimeout(() => setError(false), 3000);
         });
     }, [supplement]);
 
@@ -77,6 +82,9 @@ export default function ProductPage() {
 
         get(`supplement/recommendations?supplementId=${supplementId}`).then((data) => {
             setRecommendations(data || []);
+        }).catch(() => {
+            setError(true);
+            setTimeout(() => setError(false), 3000);
         });
     }, [supplement]);
     
@@ -100,6 +108,9 @@ export default function ProductPage() {
 
         get(`review/getReviews?supplementId=${supplementId}&sortBy=${sort}&sortOrder=${orderBy}&variant=${variant}&limit=${limit}`).then((data: Review[]) => {
             setReviews(data || []);
+        }).catch(() => {
+            setError(true);
+            setTimeout(() => setError(false), 3000);
         });
     }, [supplement, sortOption, variant, limit]);
 
@@ -165,6 +176,8 @@ export default function ProductPage() {
     if (!supplement) return <NotFound />;
 
     return (
+        <>
+        {error && <Error />}
         <div className="min-h-screen to-white">
             <div className="max-w-7xl mx-auto px-4 py-12">
                 {showNotification && (
@@ -180,11 +193,11 @@ export default function ProductPage() {
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-12">
                     <div>
-                        <div className="bg-white rounded-xl shadow-lg overflow-hidden mb-4">
+                        <div className="bg-gray-50 rounded-xl shadow-lg overflow-visible mb-4 flex justify-center items-center p-6">
                             <img 
                                 src={supplement?.imageUrl} 
                                 alt="Product" 
-                                className="w-full h-[500px] object-cover"
+                                className="w-auto h-auto max-w-[400px] max-h-[400px] object-contain rounded-lg"
                             />
                         </div>
                     </div>
@@ -213,14 +226,14 @@ export default function ProductPage() {
 
                         <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
                             <h3 className="font-bold text-lg mb-4">Product Details</h3>
-                            <div className="space-y-3 text-sm">
-                                <div className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-0">
+                            <div className="space-y-2 text-sm">
+                                <div className="flex items-center gap-2">
                                     <span className="text-gray-600">Category:</span>
-                                    <span className="font-semibold">{supplement?.category || "N/A"}</span>
+                                    <span>{supplement?.category || "N/A"}</span>
                                 </div>
-                                <div className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-0">
+                                <div className="flex items-center gap-2">
                                     <span className="text-gray-600">Serving Sizes:</span>
-                                    <span className="font-semibold">
+                                    <span>
                                         {(() => {
                                             const data = supplement as any;
                                             const val = data?.servingSizes || data?.serving_sizes || data?.serving_size;
@@ -229,23 +242,36 @@ export default function ProductPage() {
                                         })()}
                                     </span>
                                 </div>
-                                <div className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-0">
+                                <div className="flex items-center gap-2">
                                     <span className="text-gray-600">Flavors:</span>
-                                    <span className="font-semibold">
-                                        {variants.length > 0 
-                                            ? variants.join(", ") 
-                                            : "No variants listed"}
+                                    <span>
+                                        {variants.length > 0 ? (
+                                            <select
+                                                className="px-3 py-2 rounded-lg border-2 border-gray-200 bg-white text-gray-700 font-medium"
+                                                // value and onChange are omitted so it acts as a static dropdown
+                                            >
+                                                {variants.map((v, i) => (
+                                                    <option key={i} value={v}>{v}</option>
+                                                ))}
+                                            </select>
+                                        ) : (
+                                            "No variants listed"
+                                        )}
                                     </span>
                                 </div>
-                                <div className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-0">
+                                <div className="flex items-center gap-2">
                                     <span className="text-gray-600">Tags:</span>
-                                    <div className="flex flex-wrap gap-2">
-                                        {tags.map((tag) => (
-                                            <span key={tag.id} className="bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full text-sm font-medium">
-                                                {tag.name}
+                                    <span>
+                                        {tags.length > 0 ? (
+                                            <span className="flex flex-wrap gap-2">
+                                                {tags.map((tag) => (
+                                                    <span key={tag.id} className="bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full text-sm font-medium">
+                                                        {tag.name}
+                                                    </span>
+                                                ))}
                                             </span>
-                                        ))}
-                                    </div>
+                                        ) : "No tags"}
+                                    </span>
                                 </div>
                             </div>
                         </div>
@@ -313,7 +339,7 @@ export default function ProductPage() {
                             </div>
 
                             <div className="flex flex-col sm:flex-row gap-4 mt-8">
-                                {reviews.length < (supplement?.totalReviews || 0) && (
+                                {reviews.length > 0 && reviews.length === limit &&(
                                     <button 
                                         onClick={handleLoadMore}
                                         className="flex-1 py-3 border-2 border-emerald-300 text-emerald-600 hover:bg-emerald-50 font-semibold rounded-lg transition-colors cursor-pointer"
@@ -344,5 +370,7 @@ export default function ProductPage() {
                 }
             </div>
         </div>
+    </>
     )
+
 }

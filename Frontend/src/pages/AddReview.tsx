@@ -2,10 +2,12 @@ import { useState } from "react"
 import { useNavigate, useLocation } from "react-router-dom"
 import useFetch from "../hooks/useFetch";
 import NotFound from "./NotFound";
+import Error from "../components/Error";
 export default function AddReview() {
     const [rating, setRating] = useState(0);
     const [hoverRating, setHoverRating] = useState(0);
     //const [wouldPurchaseAgain, setWouldPurchaseAgain] = useState<boolean | null>(null);
+    const [variant, setVariant] = useState<string>("");
     const [review, setReview] = useState("");
     const [images, setImages] = useState<File[]>([]);
     const [proofOfPurchase, setProofOfPurchase] = useState<File | null>(null);
@@ -14,10 +16,13 @@ export default function AddReview() {
     const navigate = useNavigate();
     const location = useLocation();
 
-    const supplementId: number = location.state?.supplementId;
+    const supplementId: number = Number(location.state?.supplementId);
     const brandName: string = location.state?.brandName;
     const supplementName: string = location.state?.supplementName;
     const imageUrl: string = location.state?.imageUrl;
+    const variants: string[] = location.state?.variants || [];
+    const [error, setError] = useState(false);
+
 
     const {post} = useFetch("http://localhost:8080/api/");
 
@@ -27,15 +32,25 @@ export default function AddReview() {
 
 
     const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const allowedTypes = ["image/png", "image/jpeg", "image/jpg", "image/gif"];
         const files = Array.from(e.target.files || []);
+        const validFiles = files.filter(file => allowedTypes.includes(file.type));
+        if (validFiles.length < files.length) {
+            alert("Only PNG, JPG, and GIF images are allowed.");
+        }
         const remainingSlots = 5 - images.length;
-        const newImages = files.slice(0, remainingSlots);
+        const newImages = validFiles.slice(0, remainingSlots);
         setImages([...images, ...newImages]);
     }
 
     const handleProofUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0]
+        const allowedTypes = ["application/pdf", "image/png", "image/jpeg", "image/jpg"];
+        const file = e.target.files?.[0];
         if (file) {
+            if (!allowedTypes.includes(file.type)) {
+                alert("Only PDF, PNG, or JPG files are allowed for proof of purchase.");
+                return;
+            }
             setProofOfPurchase(file);
         }
     }
@@ -77,33 +92,35 @@ export default function AddReview() {
         }
     };
 
-const HandleSubmitReview = async () => {
-    const batchPayload = images.map((image) => ({
-        fileName: image.name,
-        contentType: image.type,
-        fileSize: image.size,
-        imageType: "ReviewImages"
-    }));
+    const HandleSubmitReview = async () => {
+        const batchPayload = images.map((image) => ({
+            fileName: image.name,
+            contentType: image.type,
+            fileSize: image.size,
+            imageType: "ReviewImages"
+        }));
 
-    let uploadedImageUrls: string[] = [];
-    if (images.length > 0) {
-        const data = await post("s3/presigned-url", batchPayload);
+        let uploadedImageUrls: string[] = [];
+        if (images.length > 0) {
+            const data = await post("s3/presigned-url", batchPayload);
 
-        if (!data || !Array.isArray(data)) {
-            console.error("Failed to get presigned URLs from server");
-            return; 
+            if (!data || !Array.isArray(data)) {
+                return; 
+            }
+            await Promise.all(
+                images.map((image, idx) =>
+                    fetch(data[idx].uploadUrl, {
+                        method: "PUT",
+                        headers: { "Content-Type": image.type },
+                        body: image
+                    }).catch(() => {
+                        setError(true);
+                        setTimeout(() => setError(false), 3000);
+                    })
+                )
+            );
+            uploadedImageUrls = data.map((item: { publicUrl: string }) => item.publicUrl);
         }
-        await Promise.all(
-            images.map((image, idx) =>
-                fetch(data[idx].uploadUrl, {
-                    method: "PUT",
-                    headers: { "Content-Type": image.type },
-                    body: image
-                })
-            )
-        );
-        uploadedImageUrls = data.map((item: { publicUrl: string }) => item.publicUrl);
-    }
 
     let proofS3Url: string = "";
     if (proofOfPurchase) {
@@ -117,6 +134,9 @@ const HandleSubmitReview = async () => {
             method: "PUT",
             headers: { "Content-Type": proofOfPurchase.type },
             body: proofOfPurchase
+        }).catch(() => {
+            setError(true);
+            setTimeout(() => setError(false), 3000);
         });
         proofS3Url = response[0].publicUrl;
     }
@@ -127,16 +147,22 @@ const HandleSubmitReview = async () => {
         rating: rating,
         comment: review,
         imageUrls: uploadedImageUrls,
-        purchaseImageUrl: proofS3Url
+        purchaseImageUrl: proofS3Url,
+        variant: variant
     }).then(() => {
-        const supplementId = location.state?.supplementId;
-        const brandName = location.state?.brandName;
-        navigate(`/product/${supplementId}`, { state: { supplementId, brandName, reviewSubmitted: true } });
-    })
-}
+        navigate(`/product/${encodeURIComponent(brandName)}/${encodeURIComponent(supplementName)}/${supplementId}`, { 
+            state: { reviewSubmitted: true } 
+        })
+    }).catch(() => {
+        setError(true);
+        setTimeout(() => setError(false), 3000);
+    });
+    }
 
 
     return (
+        <>
+        {error && <Error />}
         <div className="min-h-screen">
             <div className="max-w-3xl mx-auto px-4 py-12">
                 <div className="mb-8">
@@ -208,6 +234,21 @@ const HandleSubmitReview = async () => {
                             <p className="text-sm text-gray-600 mt-1">Remain anonymous</p>
                         </div>
                     </div>
+                    <div className="mb-8">
+                    <label className="block text-lg font-bold text-gray-800 mb-3">
+                    Variant <span className="text-red-500">*</span>
+                        </label>
+                        <select
+                            className="w-full px-4 py-3 rounded-lg border-2 border-gray-200"
+                            value={variant}
+                            onChange={e => setVariant(e.target.value)}
+                        >
+                            <option value="">Select One</option>
+                            {variants.map((variant, idx) => (
+                                <option key={idx} value={variant}>{variant}</option>
+                            ))}
+                        </select>
+                    </div>
                     {/*}
                     <div className="mb-8">
                         <label className="block text-lg font-bold text-gray-800 mb-3">
@@ -250,10 +291,14 @@ const HandleSubmitReview = async () => {
                             maxLength={200}
                         />
                         <div className="flex justify-between items-center mt-2">
-                            
                             <p className="text-sm text-gray-500">
                                 {review.length}/200 characters
                             </p>
+                            {review.length > 0 && review.length < 50 && (
+                                <span className="text-xs text-red-500 ml-2">
+                                    Minimum 50 characters required.
+                                </span>
+                            )}
                         </div>
                     </div>
 
@@ -383,7 +428,7 @@ const HandleSubmitReview = async () => {
                             Cancel
                         </button>
                         <button 
-                            disabled={!rating || !review.trim() || !proofOfPurchase}
+                            disabled={!rating || !review.trim() || review.length < 50 || !proofOfPurchase}
                             className="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-4 rounded-xl transition-colors shadow-lg disabled:bg-gray-300 disabled:cursor-not-allowed"
                             onClick={HandleSubmitReview}
                         >
@@ -393,5 +438,6 @@ const HandleSubmitReview = async () => {
                 </div>
             </div>
         </div>
+        </>
     )
 }

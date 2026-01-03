@@ -1,3 +1,4 @@
+import type { Tag } from "./Tag";
 
 interface Supplement {
     id: number;
@@ -10,8 +11,7 @@ interface Supplement {
     variants: string[];
     servingSizes: string[];
     brandName: string;
-
-
+    tags: Tag[];
 }
 
 

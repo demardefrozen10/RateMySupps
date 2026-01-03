@@ -29,10 +29,12 @@ public class BrandController {
     @GetMapping("/getBrand")
     public ResponseEntity<ReadBrand> getBrandById(@RequestParam Long brandId) {  
     ReadBrand brand = queryRepo.getBrandById(brandId);
-    
-    if (brand == null) {
-        return ResponseEntity.notFound().build(); 
-    }
+
+     int totalReviews = queryRepo.countReviewsByBrandId(brand.getId());
+     double averageRating = queryRepo.averageRatingByBrandId(brand.getId());
+
+        brand.setTotalReviews(totalReviews);
+        brand.setAverageRating(averageRating);
     
     return ResponseEntity.ok(brand);  
     }
@@ -40,8 +42,17 @@ public class BrandController {
     @GetMapping("/getBrandByName")
     public List<ReadBrand> getBrandByName(@RequestParam String name){
 
-        return queryRepo.getBrandByName(name);
+    List<ReadBrand> brands = queryRepo.getBrandByName(name);
 
+    for (ReadBrand brand : brands) {
+        int totalReviews = queryRepo.countReviewsByBrandId(brand.getId());
+        double averageRating = queryRepo.averageRatingByBrandId(brand.getId());
+
+        brand.setTotalReviews(totalReviews);
+        brand.setAverageRating(averageRating);
+    }
+
+        return brands;
     }
 
     
