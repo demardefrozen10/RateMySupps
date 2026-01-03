@@ -27,5 +27,7 @@ public class ReadSupplement {
 
     public String brandName;
 
+    public List<ReadTag> tags;
+
 
 }
