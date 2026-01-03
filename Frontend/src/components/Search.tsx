@@ -14,7 +14,6 @@ export default function Search() {
         brands: [], 
         supplements: [] 
     });
-    const [error, setError] = useState<string | null>(null);
     const [showDropdown, setShowDropdown] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
     const navigate = useNavigate();
@@ -57,7 +56,6 @@ export default function Search() {
 
         const fetchResults = async () => {
             setLoading(true);
-            setError(null);
             try {
                 const [brandsData, supplementsData] = await Promise.all([
                     get(`brand/getBrandByName?name=${debouncedSearchQuery}`), 
@@ -67,9 +65,8 @@ export default function Search() {
                     brands: brandsData || [],
                     supplements: supplementsData || []
                 });
-            } catch (err) {
-                setError(err instanceof Error ? err.message : 'An error occurred');
-            } finally {
+            } 
+            finally {
                 setLoading(false);
             }
         };

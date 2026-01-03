@@ -1,4 +1,3 @@
-import BrandCard from "../components/BrandCard"
 
 export default function Catalog() {
     return (
