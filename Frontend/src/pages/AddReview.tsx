@@ -2,6 +2,7 @@ import { useState } from "react"
 import { useNavigate, useLocation } from "react-router-dom"
 import useFetch from "../hooks/useFetch";
 import NotFound from "./NotFound";
+import Error from "../components/Error";
 export default function AddReview() {
     const [rating, setRating] = useState(0);
     const [hoverRating, setHoverRating] = useState(0);
@@ -15,11 +16,13 @@ export default function AddReview() {
     const navigate = useNavigate();
     const location = useLocation();
 
-    const supplementId: number = location.state?.supplementId;
+    const supplementId: number = Number(location.state?.supplementId);
     const brandName: string = location.state?.brandName;
     const supplementName: string = location.state?.supplementName;
     const imageUrl: string = location.state?.imageUrl;
     const variants: string[] = location.state?.variants || [];
+    const [error, setError] = useState(false);
+
 
     const {post} = useFetch("http://localhost:8080/api/");
 
@@ -89,33 +92,35 @@ export default function AddReview() {
         }
     };
 
-const HandleSubmitReview = async () => {
-    const batchPayload = images.map((image) => ({
-        fileName: image.name,
-        contentType: image.type,
-        fileSize: image.size,
-        imageType: "ReviewImages"
-    }));
+    const HandleSubmitReview = async () => {
+        const batchPayload = images.map((image) => ({
+            fileName: image.name,
+            contentType: image.type,
+            fileSize: image.size,
+            imageType: "ReviewImages"
+        }));
 
-    let uploadedImageUrls: string[] = [];
-    if (images.length > 0) {
-        const data = await post("s3/presigned-url", batchPayload);
+        let uploadedImageUrls: string[] = [];
+        if (images.length > 0) {
+            const data = await post("s3/presigned-url", batchPayload);
 
-        if (!data || !Array.isArray(data)) {
-            console.error("Failed to get presigned URLs from server");
-            return; 
+            if (!data || !Array.isArray(data)) {
+                return; 
+            }
+            await Promise.all(
+                images.map((image, idx) =>
+                    fetch(data[idx].uploadUrl, {
+                        method: "PUT",
+                        headers: { "Content-Type": image.type },
+                        body: image
+                    }).catch(() => {
+                        setError(true);
+                        setTimeout(() => setError(false), 3000);
+                    })
+                )
+            );
+            uploadedImageUrls = data.map((item: { publicUrl: string }) => item.publicUrl);
         }
-        await Promise.all(
-            images.map((image, idx) =>
-                fetch(data[idx].uploadUrl, {
-                    method: "PUT",
-                    headers: { "Content-Type": image.type },
-                    body: image
-                })
-            )
-        );
-        uploadedImageUrls = data.map((item: { publicUrl: string }) => item.publicUrl);
-    }
 
     let proofS3Url: string = "";
     if (proofOfPurchase) {
@@ -129,27 +134,35 @@ const HandleSubmitReview = async () => {
             method: "PUT",
             headers: { "Content-Type": proofOfPurchase.type },
             body: proofOfPurchase
+        }).catch(() => {
+            setError(true);
+            setTimeout(() => setError(false), 3000);
         });
         proofS3Url = response[0].publicUrl;
     }
 
-await post("review/createReview", {
-    username: name,
-    supplementId: supplementId,
-    rating: rating,
-    comment: review,
-    imageUrls: uploadedImageUrls,
-    purchaseImageUrl: proofS3Url,
-    variant: variant
-}).then(() => {
-    navigate(`/product/${encodeURIComponent(brandName)}/${encodeURIComponent(supplementName)}/${supplementId}`, { 
-        state: { reviewSubmitted: true } 
+    await post("review/createReview", {
+        username: name,
+        supplementId: supplementId,
+        rating: rating,
+        comment: review,
+        imageUrls: uploadedImageUrls,
+        purchaseImageUrl: proofS3Url,
+        variant: variant
+    }).then(() => {
+        navigate(`/product/${encodeURIComponent(brandName)}/${encodeURIComponent(supplementName)}/${supplementId}`, { 
+            state: { reviewSubmitted: true } 
+        })
+    }).catch(() => {
+        setError(true);
+        setTimeout(() => setError(false), 3000);
     });
-});
-}
+    }
 
 
     return (
+        <>
+        {error && <Error />}
         <div className="min-h-screen">
             <div className="max-w-3xl mx-auto px-4 py-12">
                 <div className="mb-8">
@@ -425,5 +438,6 @@ await post("review/createReview", {
                 </div>
             </div>
         </div>
+        </>
     )
 }

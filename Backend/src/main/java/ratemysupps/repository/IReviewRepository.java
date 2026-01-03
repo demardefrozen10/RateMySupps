@@ -12,7 +12,7 @@ public interface IReviewRepository extends JpaRepository<Review, Long> {
 
     List<Review> findBySupplementIdOrderByRatingAsc(Long supplementId);
     List<Review> findBySupplementIdOrderByCreatedAtDesc(Long supplementId);
-    List<Review> findBySupplementIdAndVariant(Long supplementId, boolean isVariant);
+    List<Review> findByIsVerifiedFalse();
 
 
 

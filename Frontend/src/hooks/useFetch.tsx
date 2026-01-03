@@ -16,13 +16,21 @@ export default function useFetch(baseUrl: string) {
         .then (response => response.json())
     }
 
-    function del(url: string) {
-    return fetch(baseUrl + url, {
-        method: "DELETE",
-    }).then((response) => {
-        return response.json();
-    });
-}
+    function patch(url: string) {
+        return fetch(baseUrl + url, {
+            method: "PATCH",
+        }).then((response) => {
+            return response.json();
+        });
+    }
 
-    return { get, post, del };
+    function del(url: string) {
+        return fetch(baseUrl + url, {
+            method: "DELETE",
+        }).then((response) => {
+            return response.json();
+        });
+    }
+
+    return { get, post, patch, del };
 };

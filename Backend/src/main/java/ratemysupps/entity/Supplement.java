@@ -13,7 +13,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @Entity(name="supplement")
 @Getter
 @Setter
-public class Supplement {
+public class Supplement implements IReviewable {
 
 
     @Id

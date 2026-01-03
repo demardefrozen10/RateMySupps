@@ -131,7 +131,7 @@ export default function Search() {
        <h3 className="text-xl font-semibold text-gray-800 mb-2">
     No results found for "{searchQuery}"
 </h3>
-<p className="text-gray-600 mb-6">
+<p className="text-gray-600 mb-2">
     Can't find what you're looking for?
 </p>
 <div className="flex flex-col gap-3 items-center">

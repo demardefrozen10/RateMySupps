@@ -219,7 +219,7 @@ export default function ProductCatalog() {
     </div>
     <button 
         onClick={HandleAddSupplementClick}
-        className="px-6 py-3 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 font-semibold transition-colors whitespace-nowrap ml-4"
+        className="px-6 py-3 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 font-semibold transition-colors whitespace-nowrap ml-4 cursor-pointer"
     >
         Add Supplement
     </button>
