@@ -1,11 +1,18 @@
 import { useState, useEffect } from "react";
+import { Lock } from "lucide-react";
 import useFetch from "../hooks/useFetch";
 import type { Supplement } from "../types/Supplement";
 import type { Review } from "../types/Review";
 import Load from "../components/Load";
 import Error from "../components/Error";
 
+const ADMIN_PASSWORD = "admin123"; 
+
 export default function ApprovePage() {
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [password, setPassword] = useState("");
+    const [authError, setAuthError] = useState(false);
+    
     const [supplements, setSupplements] = useState<Supplement[]>([]);
     const [reviews, setReviews] = useState<Review[]>([]);
     const [loading, setLoading] = useState(true);
@@ -14,6 +21,8 @@ export default function ApprovePage() {
     const { get, patch } = useFetch("http://localhost:8080/api/");
 
     useEffect(() => {
+        if (!isAuthenticated) return;
+        
         Promise.all([
             get("review/getNotApprovedReviews").catch(() => {
                 setError(true);
@@ -30,7 +39,18 @@ export default function ApprovePage() {
             setSupplements(supplementsData || []);
             setLoading(false);
         });
-    }, []);
+    }, [isAuthenticated]);
+
+    const handleLogin = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (password === ADMIN_PASSWORD) {
+            setIsAuthenticated(true);
+            setAuthError(false);
+        } else {
+            setAuthError(true);
+            setTimeout(() => setAuthError(false), 3000);
+        }
+    };
 
     const handleApproveSupplement = (supplementId: number) => {
         patch(`supplement/approveSupplement?supplementId=${supplementId}`)
@@ -53,6 +73,39 @@ export default function ApprovePage() {
                 setTimeout(() => setError(false), 3000);
             });
     };
+
+    if (!isAuthenticated) {
+        return (
+            <div className="flex items-center justify-center px-4 pt-24">
+                {authError && <Error />}
+                <div className="bg-white rounded-xl shadow-lg p-8 w-full max-w-md">
+                    <div className="flex flex-col items-center mb-6">
+                        <div className="bg-emerald-100 p-4 rounded-full mb-4">
+                            <Lock className="w-8 h-8 text-emerald-600" />
+                        </div>
+                        <h1 className="text-2xl font-bold text-gray-800">Admin Access</h1>
+                        <p className="text-gray-600 text-sm mt-1">Enter password to continue</p>
+                    </div>
+                    <form onSubmit={handleLogin}>
+                        <input
+                            type="password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            placeholder="Enter password"
+                            className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-emerald-500 transition-colors mb-4"
+                        />
+                        <button
+                            type="submit"
+                            disabled={!password.trim()}
+                            className="w-full bg-emerald-500 hover:bg-emerald-600 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-semibold py-3 rounded-lg transition-colors cursor-pointer"
+                        >
+                            Unlock Dashboard
+                        </button>
+                    </form>
+                </div>
+            </div>
+        );
+    }
 
     if (loading) return <Load />;
 
