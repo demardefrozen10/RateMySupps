@@ -12,7 +12,8 @@ import NotFound from "./NotFound";
 export default function ProductCatalog() {
     const [currentImage, setCurrentImage] = useState(0);
     const [supplements, setSupplements] = useState<Supplement[]>([]);
-    const [showNotification] = useState(false);
+    const [showNotification, setShowNotification] = useState(false);
+    const [notificationType, setNotificationType] = useState<'brand' | 'supplement' | null>(null);
     const [brand, setBrand] = useState<Brand | null>(null);
 
     const [searchQuery, setSearchQuery] = useState("");
@@ -35,26 +36,45 @@ export default function ProductCatalog() {
   
 
     
-      useEffect(() => {
+    useEffect(() => {
         if (locationBrand) {
             setBrand(locationBrand);
+            setLoading(false);
         } else {
             const formattedBrandName = brandName ? brandName.replace(/-/g, " ") : "";
-            get(`brand/getBrandByName?name=${encodeURIComponent(formattedBrandName)}`).then((data: Brand[]) => {
-                if (data.length > 0) {
-                    setBrand(data[0]);
-
-                }
-                else {
+            get(`brand/getBrandByName?name=${encodeURIComponent(formattedBrandName)}`)
+                .then((data: Brand[]) => {
+                    if (data.length > 0) {
+                        setBrand(data[0]);
+                    } else {
+                        setBrand(null);
+                    }
+                })
+                .catch((error) => {
+                    console.error("Error fetching brand:", error);
                     setBrand(null);
-                }
-            }).catch((error) => {
-                console.error("Error fetching brand:", error);
-            });
+                })
+                .finally(() => {
+                    setLoading(false);
+                });
         }
-        setLoading(false);
+    }, [brandName, locationBrand]);
 
-    }, []);
+    useEffect(() => {
+        if (location.state?.brandSubmitted) {
+            setNotificationType('brand');
+            setShowNotification(true);
+            navigate(location.pathname, { replace: true, state: { ...location.state, brandSubmitted: undefined } });
+            const timer = setTimeout(() => setShowNotification(false), 3000);
+            return () => clearTimeout(timer);
+        } else if (location.state?.supplementSubmitted) {
+            setNotificationType('supplement');
+            setShowNotification(true);
+            navigate(location.pathname, { replace: true, state: { ...location.state, supplementSubmitted: undefined } });
+            const timer = setTimeout(() => setShowNotification(false), 3000);
+            return () => clearTimeout(timer);
+        }
+    }, [location.state, navigate, location.pathname]);
 
 
     useEffect(() => {
@@ -137,7 +157,9 @@ export default function ProductCatalog() {
                         <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                         </svg>
-                        <span className="font-semibold">Supplement Submitted</span>
+                        <span className="font-semibold">
+                            {notificationType === 'brand' ? 'Brand Submitted' : 'Supplement Submitted'}
+                        </span>
                     </div>
                 </div>
             )}
