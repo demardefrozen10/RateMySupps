@@ -96,7 +96,7 @@ export default function AddSupplement() {
                 setTimeout(() => setError(false), 3000);
           });
 
-    navigate(`/products/${brand.id}`, {
+    navigate(`/products/${brand.brandName}`, {
       state: { brand, supplementSubmitted: true },
     });
   };

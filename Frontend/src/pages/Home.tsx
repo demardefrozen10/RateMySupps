@@ -6,11 +6,13 @@ import { useEffect, useState } from 'react';
 import useFetch from '../hooks/useFetch';
 import type { Supplement } from '../types/Supplement';
 import { useLocation, useNavigate } from 'react-router-dom';
+import Load from '../components/Load';
 
 function Home() {
   const { get } = useFetch("http://localhost:8080/api/supplement/");
   const [supplements, setSupplements] = useState<Supplement[]>([]);
   const [showNotification, setShowNotification] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -23,7 +25,8 @@ function Home() {
       .catch((err) => {
         console.error("Failed to fetch supplements:", err);
         setSupplements([]);
-      });
+      })
+      .finally(() => setLoading(false));
   }, []);
 
   useEffect(() => {
@@ -35,6 +38,9 @@ function Home() {
     }
   }, [location.state, navigate, location.pathname]);
 
+  if (loading) {
+    return <Load />;
+  }
 
   return (
     <>

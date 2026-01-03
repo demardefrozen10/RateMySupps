@@ -21,7 +21,7 @@ export default function ProductCatalog() {
     const [filterOption, setFilterOption] = useState("");
     const [categories, setCategories] = useState<string[]>([]);
     const [loading, setLoading] = useState(true);
-
+    const [supplementsLoading, setSupplementsLoading] = useState(false);
 
     const { get } = useFetch("http://localhost:8080/api/");
     
@@ -86,9 +86,11 @@ export default function ProductCatalog() {
         if (filterOption) url += `&filter=${filterOption}`;
         if (sortOption) url += `&sortOption=${sortOption}`;
 
+        setSupplementsLoading(true);
         get(url)
             .then((data: Supplement[]) => setSupplements(data))
-            .catch((error) => console.error("Error fetching supplements:", error));
+            .catch((error) => console.error("Error fetching supplements:", error))
+            .finally(() => setSupplementsLoading(false));
     }, [debouncedSearchQuery, filterOption, sortOption, brand]);
 
         useEffect(() => {
@@ -248,7 +250,9 @@ export default function ProductCatalog() {
 </div>
 
                 <div className="flex flex-col gap-4">
-                    {supplements.length === 0 ? (
+                    {supplementsLoading ? (
+                        <Load />
+                    ) : supplements.length === 0 ? (
                         <div className="flex flex-col items-center justify-center py-20 bg-gray-50 rounded-xl border-2 border-dashed border-gray-200">
                             <svg className="w-16 h-16 text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -276,6 +280,7 @@ export default function ProductCatalog() {
                                 variants={supplement.variants}
                                 servingSizes={supplement.servingSizes}
                                 brandName={brand!.brandName}
+                                tags={supplement.tags}
                             />
                         ))
                     )}
