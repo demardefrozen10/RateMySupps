@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import ratemysupps.icommandservice.ISupplementCommandService;
 import ratemysupps.iqueryservice.ISupplementQueryService;
 import ratemysupps.readmodel.ReadSupplement;
+import ratemysupps.writemodel.UpdateSupplement;
 import ratemysupps.writemodel.WriteSupplement;
 import org.springframework.data.domain.Sort;
 
@@ -109,6 +110,14 @@ public class SupplementController {
     public ResponseEntity<ReadSupplement> approveSupplement(@RequestParam Long supplementId) {
         ReadSupplement updated = commandRepo.approveSupplement(supplementId);
 
+        return ResponseEntity.ok(updated);
+    }
+
+    @PatchMapping("/updateSupplement")
+    public ResponseEntity<ReadSupplement> updateSupplement(
+            @RequestParam Long supplementId,
+            @RequestBody UpdateSupplement update) {
+        ReadSupplement updated = commandRepo.updateSupplement(supplementId, update);
         return ResponseEntity.ok(updated);
     }
 

@@ -22,6 +22,6 @@ public class WriteSupplement {
 
     private String websiteUrl;
 
-    private Category category;
+    private String category;
 
 }
