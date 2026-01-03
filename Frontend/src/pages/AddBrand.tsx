@@ -1,6 +1,7 @@
 import { useState } from "react";
 import {useNavigate} from "react-router-dom";
 import useFetch from "../hooks/useFetch";
+import { API_BASE_URL } from '../config/api';
 import Error from "../components/Error";
 
 export default function AddBrand() {
@@ -10,7 +11,7 @@ export default function AddBrand() {
     const [error, setError] = useState(false);
 
 
-    const {post} = useFetch("http://localhost:8080/api/");
+    const {post} = useFetch(`${API_BASE_URL}/api/`);
     const navigate = useNavigate();
 
     const HandleBrandSubmit = () => {

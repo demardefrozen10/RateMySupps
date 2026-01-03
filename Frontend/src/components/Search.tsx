@@ -6,6 +6,7 @@ import useFetch from '../hooks/useFetch';
 import type { Brand } from '../types/Brand';
 import type { Supplement } from '../types/Supplement';
 import Powder from '../assets/powder1.jpg';
+import { API_BASE_URL } from '../config/api';
 
 export default function Search() {
     const [searchQuery, setSearchQuery] = useState('');
@@ -18,7 +19,7 @@ export default function Search() {
     const dropdownRef = useRef<HTMLDivElement>(null);
     const navigate = useNavigate();
 
-    const { get } = useFetch("http://localhost:8080/api/");
+    const { get } = useFetch(`${API_BASE_URL}/api/`);
     const debouncedSearchQuery = useDebounce(searchQuery, 500);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {

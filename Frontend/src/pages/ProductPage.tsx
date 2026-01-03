@@ -9,6 +9,8 @@ import Carousel from "../components/Carousel";
 import Load from "../components/Load";
 import NotFound from "../pages/NotFound";
 import Error from "../components/Error";
+import { API_BASE_URL } from '../config/api';
+
 
 export default function ProductPage() {
     const [supplement, setSupplement] = useState<Supplement | null>(null);
@@ -29,7 +31,7 @@ export default function ProductPage() {
     const location = useLocation();
     const locationSupplement: Supplement = location.state?.supplement;
 
-    const {get} = useFetch("http://localhost:8080/api/");
+    const {get} = useFetch(`${API_BASE_URL}/api/`);
 
 
 

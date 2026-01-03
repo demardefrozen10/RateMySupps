@@ -7,6 +7,8 @@ import useFetch from "../hooks/useFetch";
 import type {Supplement} from "../types/Supplement";
 import Load from "../components/Load";
 import NotFound from "./NotFound";
+import { API_BASE_URL } from '../config/api';
+
 
 
 export default function ProductCatalog() {
@@ -23,7 +25,7 @@ export default function ProductCatalog() {
     const [loading, setLoading] = useState(true);
     const [supplementsLoading, setSupplementsLoading] = useState(false);
 
-    const { get } = useFetch("http://localhost:8080/api/");
+    const { get } = useFetch(`${API_BASE_URL}/api/`);
     
     const debouncedSearchQuery = useDebounce(searchQuery, 500);
     const navigate = useNavigate();

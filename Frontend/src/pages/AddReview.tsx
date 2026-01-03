@@ -3,6 +3,9 @@ import { useNavigate, useLocation } from "react-router-dom"
 import useFetch from "../hooks/useFetch";
 import NotFound from "./NotFound";
 import Error from "../components/Error";
+import { API_BASE_URL } from '../config/api';
+
+
 export default function AddReview() {
     const [rating, setRating] = useState(0);
     const [hoverRating, setHoverRating] = useState(0);
@@ -24,7 +27,7 @@ export default function AddReview() {
     const [error, setError] = useState(false);
 
 
-    const {post} = useFetch("http://localhost:8080/api/");
+    const {post} = useFetch(`${API_BASE_URL}/api/`);
 
     if (!supplementId || !brandName || !supplementName || !imageUrl) {
         return <NotFound />;

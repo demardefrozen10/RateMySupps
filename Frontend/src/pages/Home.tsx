@@ -7,9 +7,10 @@ import useFetch from '../hooks/useFetch';
 import type { Supplement } from '../types/Supplement';
 import { useLocation, useNavigate } from 'react-router-dom';
 import Load from '../components/Load';
+import { API_BASE_URL } from '../config/api';
 
 function Home() {
-  const { get } = useFetch("http://localhost:8080/api/supplement/");
+  const { get } = useFetch(`${API_BASE_URL}/api/supplement/`);
   const [supplements, setSupplements] = useState<Supplement[]>([]);
   const [showNotification, setShowNotification] = useState(false);
   const [loading, setLoading] = useState(true);

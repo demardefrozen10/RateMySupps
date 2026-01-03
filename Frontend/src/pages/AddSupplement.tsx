@@ -5,6 +5,8 @@ import useFetch from "../hooks/useFetch";
 import Load from "../components/Load";
 import NotFound from "./NotFound";
 import Error from "../components/Error";
+import { API_BASE_URL } from '../config/api';
+
 
 export default function AddSupplement() {
     const [supplementName, setSupplementName] = useState("");
@@ -17,7 +19,7 @@ export default function AddSupplement() {
     const[error, setError] = useState(false);
 
 
-    const {post, get} = useFetch("http://localhost:8080/api/");
+    const {post, get} = useFetch(`${API_BASE_URL}/api/`);
     const location = useLocation();
     const navigate = useNavigate();
 

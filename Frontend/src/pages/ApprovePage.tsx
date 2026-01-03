@@ -6,6 +6,9 @@ import type { Review } from "../types/Review";
 import type { Tag } from "../types/Tag";
 import Load from "../components/Load";
 import Error from "../components/Error";
+import { API_BASE_URL } from '../config/api';
+
+
 
 const ADMIN_PASSWORD = "admin123"; 
 
@@ -36,7 +39,7 @@ export default function ApprovePage() {
     const [newServingSize, setNewServingSize] = useState("");
     const [saving, setSaving] = useState(false);
 
-    const { get, patch } = useFetch("http://localhost:8080/api/");
+    const { get, patch } = useFetch(`${API_BASE_URL}/api/`);
 
     useEffect(() => {
         if (!isAuthenticated) return;
