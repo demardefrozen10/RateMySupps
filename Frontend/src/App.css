@@ -127,3 +127,14 @@ img {
   object-fit: contain;
   object-position: center;
 }
+
+
+* {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+body {
+  hyphens: auto;
+}
