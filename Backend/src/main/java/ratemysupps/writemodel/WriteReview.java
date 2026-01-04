@@ -21,4 +21,6 @@ public class WriteReview {
 
     private String variant;
 
+    public Long brandId;
+
 }

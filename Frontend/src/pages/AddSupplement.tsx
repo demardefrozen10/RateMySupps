@@ -4,6 +4,9 @@ import type { Brand } from "../types/Brand";
 import useFetch from "../hooks/useFetch";
 import Load from "../components/Load";
 import NotFound from "./NotFound";
+import Error from "../components/Error";
+import { API_BASE_URL } from '../config/api';
+
 
 export default function AddSupplement() {
     const [supplementName, setSupplementName] = useState("");
@@ -13,9 +16,10 @@ export default function AddSupplement() {
     const [categories, setCategories] = useState<string[]>([]);
     const [brand, setBrand] = useState<Brand | null>(null);
     const [loading, setLoading] = useState(true);
+    const[error, setError] = useState(false);
 
 
-    const {post, get} = useFetch("http://localhost:8080/api/");
+    const {post, get} = useFetch(`${API_BASE_URL}/api/`);
     const location = useLocation();
     const navigate = useNavigate();
 
@@ -29,7 +33,10 @@ export default function AddSupplement() {
     if (!brand) return;
     get("supplement/getCategories")
         .then((data: string[]) => setCategories(data))
-        .catch((err) => console.error("Failed to load categories:", err));
+        .catch(() =>{
+            setError(true);
+            setTimeout(() => setError(false), 3000);
+        })
     }, [brand]);
 
 
@@ -71,6 +78,9 @@ export default function AddSupplement() {
                         method: "PUT",
                         headers: { "Content-Type": image.type },
                         body: image
+                    }).catch(() =>{
+                        setError(true);
+                        setTimeout(() => setError(false), 3000);
                     })
                 )
             );
@@ -83,9 +93,12 @@ export default function AddSupplement() {
             category: category,
             websiteUrl: websiteUrl,
             imageUrl: uploadedImageUrls
+          }).catch(() => {
+                setError(true);
+                setTimeout(() => setError(false), 3000);
           });
 
-    navigate(`/products/${brand.id}`, {
+    navigate(`/products/${brand.brandName}`, {
       state: { brand, supplementSubmitted: true },
     });
   };
@@ -93,6 +106,8 @@ export default function AddSupplement() {
 
 
     return (
+        <>
+        {error && <Error />}
         <div className="min-h-screen">
             <div className="max-w-3xl mx-auto px-4 py-12">
                 <div className="mb-8">
@@ -220,5 +235,6 @@ export default function AddSupplement() {
                 </div>
             </div>
         </div>
+        </>
     )
 }

@@ -1,100 +1,38 @@
 import { useState } from "react";
-import {useLocation, useNavigate} from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 import useFetch from "../hooks/useFetch";
-import Load from "../components/Load";
+import { API_BASE_URL } from '../config/api';
+import Error from "../components/Error";
 
 export default function AddBrand() {
     const [brandName, setBrandName] = useState("");
     const [country, setCountry] = useState("");
     const [websiteUrl, setWebsiteUrl] = useState("");
-    const [description, setDescription] = useState("");
-    const [images, setImage] = useState<File[]>([]);
-    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(false);
 
 
-    const {post, get} = useFetch("http://localhost:8080/api/");
-    const location = useLocation();
+    const {post} = useFetch(`${API_BASE_URL}/api/`);
     const navigate = useNavigate();
 
-
-    if (loading) {
-        return <Load />;
-    }
-
-
-    const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files) {
-            const allowedTypes = ["image/png", "image/jpeg", "image/jpg", "image/gif"];
-            const selectedFiles = Array.from(e.target.files);
-            const validFiles = selectedFiles.filter(file => allowedTypes.includes(file.type));
-            if (validFiles.length < selectedFiles.length) {
-                alert("Only PNG, JPG, and GIF images are allowed.");
-            }
-            setImage((prevImages) => [...prevImages, ...validFiles].slice(0, 1));
-        }
-    };
-
-    
-    const removeImage = (index: number) => {
-        setImage(images.filter((_, i) => i !== index));
-    }
-
-    const HandleBrandSubmit = async () => {
-         setLoading(true); 
-        try {
-            const batchPayload = images.map((image) => ({
-            fileName: image.name,
-            contentType: image.type,
-            fileSize: image.size,
-            imageType: "BrandImage"
-        }));
-
-            
-
-        let uploadedImageUrl: string[] = [];
-        if (images.length > 0) {
-            const data = await post("s3/presigned-url", batchPayload); 
-            await Promise.all(
-                images.map((image, idx) =>
-                    fetch(data[idx].uploadUrl, {
-                        method: "PUT",
-                        headers: { "Content-Type": image.type },
-                        body: image
-                    })
-                )
-            );
-            uploadedImageUrl = data.map((item: { publicUrl: string }) => item.publicUrl);
-        }
-
-        const newBrand = await post("brand/createBrand", {
+    const HandleBrandSubmit = () => {
+        post("brand/createBrand", {
             brandName: brandName,
             country: country,
-            websiteUrl: websiteUrl,
-            imageUrl: uploadedImageUrl[0] || null,
-            description: description
-            
+            websiteUrl: websiteUrl
+        }).then(() => {
+            navigate('/', {state: {brandSubmitted: true}});
+        })
+        .catch(() => {
+            setError(true);
+            setTimeout(() => setError(false), 3000);
         });
-          
-        console.log("Created brand:", newBrand);
+    };
+     
 
-    if (newBrand && !newBrand.error && newBrand.status !== 500) {
-        navigate(`/products/${encodeURIComponent(brandName)}`, { 
-            state: { brandSubmitted: true } 
-    });
-} else {
-
-    alert("Server Error: Could not save brand. Please check the logs.");
-}  
-        } catch (error) {
-            console.error("Error creating brand:", error);
-            alert("An error occurred while creating the brand. Please try again.");
-        } finally {
-            setLoading(false);
-        }
-
-  };
 
     return (
+        <>
+        {error && <Error />}
         <div className="min-h-screen">
             <div className="max-w-3xl mx-auto px-4 py-12">
                 <div className="mb-8">
@@ -135,17 +73,6 @@ export default function AddBrand() {
 
                     <div className="mb-8">
                         <label className="block text-lg font-bold text-gray-800 mb-3">
-                            Description <span className="text-red-500">*</span>
-                        </label>
-                        <p className="text-sm text-gray-600 mb-3">Enter a description of the brand.</p>
-                        <input
-                            className="w-full px-4 py-3 rounded-lg border-2 border-gray-200"
-                            value={description}
-                            onChange={e => setDescription(e.target.value)}
-                        />
-                    </div>
-                    <div className="mb-8">
-                        <label className="block text-lg font-bold text-gray-800 mb-3">
                             Brand Link <span className="text-red-500">*</span>
                         </label>
                         <p className="text-sm text-gray-600 mb-3">Enter the link to the brand's official site.</p>
@@ -157,52 +84,7 @@ export default function AddBrand() {
                     </div>
                 
                     
-                    <div className="mb-8">
-                        <label className="block text-lg font-bold text-gray-800 mb-3">
-                            Add A Photo (Optional)
-                        </label>
-                        
-                        {images.length < 2 && (
-                            <label className="cursor-pointer">
-                                <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-emerald-500 hover:bg-emerald-50 transition-all">
-                                    <svg className="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
-                                        <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                    </svg>
-                                    <p className="mt-2 text-sm text-gray-600">
-                                        <span className="font-semibold text-emerald-600">Click to upload</span>
-                                    </p>
-                                    <p className="text-xs text-gray-500 mt-1">PNG, JPG, GIF up to 10MB</p>
-                                </div>
-                                <input
-                                    type="file"
-                                    accept="image/*"
-                                    multiple
-                                    onChange={handleImageUpload}
-                                    className="hidden"
-                                />
-                            </label>
-                        )}
-
-                        {images.length > 0 && (
-                            <div className="grid grid-cols-5 gap-3 mt-4">
-                                {images.map((image, index) => (
-                                    <div key={index} className="relative group">
-                                        <img
-                                            src={URL.createObjectURL(image)}
-                                            alt={`Upload ${index + 1}`}
-                                            className="w-full h-24 object-cover rounded-lg border-2 border-gray-200"
-                                        />
-                                        <button
-                                            onClick={() => removeImage(index)}
-                                            className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg hover:bg-red-600"
-                                        >
-                                            ×
-                                        </button>
-                                    </div>
-                                ))}
-                            </div>
-                        )}
-                    </div>
+   
 
 
                     <div className="flex gap-4">
@@ -220,5 +102,6 @@ export default function AddBrand() {
                 </div>
             </div>
         </div>
+        </>
     )
 }

@@ -16,7 +16,7 @@ function NavBar() {
           onClick={handleLogoClick}
         >
           <h1 className="text-3xl md:text-4xl font-black tracking-tighter text-slate-900">
-            RateMy<span className="text-emerald-500">Supplements</span>
+            RateMy<span className="text-emerald-500">Supplement</span>
           </h1>
         </div>
 

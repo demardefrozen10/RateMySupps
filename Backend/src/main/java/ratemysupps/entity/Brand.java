@@ -10,7 +10,7 @@ import java.util.List;
 @Entity(name="brand")
 @Getter
 @Setter
-public class Brand {
+public class Brand implements IReviewable {
 
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO)
@@ -35,7 +35,7 @@ public class Brand {
 
     private Double averageRating;
 
-    private int totalReviews;
+    private Integer totalReviews;
 
     @Column(nullable = false)
     private boolean isVerified;

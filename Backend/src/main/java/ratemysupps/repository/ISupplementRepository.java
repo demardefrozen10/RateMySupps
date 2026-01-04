@@ -5,15 +5,15 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import ratemysupps.entity.Category;
 import ratemysupps.entity.Supplement;
 import ratemysupps.entity.Tag;
+import ratemysupps.readmodel.ReadSupplement;
 
 import java.util.List;
 
 public interface ISupplementRepository extends JpaRepository<Supplement, Long> {
 
-    List<Supplement> findByBrandId(Long brandId);
+    List<Supplement> findByIsVerifiedFalse();
 
     @Query("SELECT s FROM supplement s LEFT JOIN FETCH s.reviews WHERE s.brand.id = :brandId")
     List<Supplement> findAllWithReviewsByBrandId(@Param("brandId") Long brandId);

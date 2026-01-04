@@ -1,6 +1,7 @@
 package ratemysupps.writemodel;
 
 import lombok.Getter;
+import ratemysupps.entity.Category;
 
 import java.util.List;
 

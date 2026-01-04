@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import ratemysupps.icommandservice.ISupplementCommandService;
 import ratemysupps.iqueryservice.ISupplementQueryService;
 import ratemysupps.readmodel.ReadSupplement;
+import ratemysupps.writemodel.UpdateSupplement;
 import ratemysupps.writemodel.WriteSupplement;
 import org.springframework.data.domain.Sort;
 
@@ -39,6 +40,11 @@ public class SupplementController {
         return queryRepo.getSupplementsByBrand(brandId, search, filter, sortOption);
     }
 
+    @GetMapping("/getNotApprovedSupplements")
+    public List<ReadSupplement> getNotApprovedSupplements() {
+        return queryRepo.getNotApprovedSupplements();
+    }
+
     @GetMapping("/getSupplement")
     public ResponseEntity<ReadSupplement> getSupplementById(@RequestParam Long supplementId) {
         ReadSupplement supplement = queryRepo.getSupplementById(supplementId);
@@ -55,12 +61,6 @@ public class SupplementController {
         return queryRepo.getVariantsBySupplementId(supplementId);
     }
 
-    @PostMapping("/createSupplement")
-    public ResponseEntity<ReadSupplement> createSupplement(@RequestBody @Valid WriteSupplement supplement) {
-        ReadSupplement created = commandRepo.submitSupplement(supplement);
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(created);
-    }
 
      @GetMapping("/filterByRating")
     public List<ReadSupplement> filterByRating(
@@ -96,8 +96,30 @@ public class SupplementController {
 
     @GetMapping("/recommendations")
     public List<ReadSupplement> getRecommendations(@RequestParam Long supplementId) {
-    return queryRepo.getRecommendations(supplementId);
-}
+        return queryRepo.getRecommendations(supplementId);
+    }
+
+    @PostMapping("/createSupplement")
+    public ResponseEntity<ReadSupplement> createSupplement(@RequestBody @Valid WriteSupplement supplement) {
+        ReadSupplement created = commandRepo.submitSupplement(supplement);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(created);
+    }
+
+    @PatchMapping("/approveSupplement")
+    public ResponseEntity<ReadSupplement> approveSupplement(@RequestParam Long supplementId) {
+        ReadSupplement updated = commandRepo.approveSupplement(supplementId);
+
+        return ResponseEntity.ok(updated);
+    }
+
+    @PatchMapping("/updateSupplement")
+    public ResponseEntity<ReadSupplement> updateSupplement(
+            @RequestParam Long supplementId,
+            @RequestBody UpdateSupplement update) {
+        ReadSupplement updated = commandRepo.updateSupplement(supplementId, update);
+        return ResponseEntity.ok(updated);
+    }
 
 
 }

@@ -11,7 +11,8 @@ public class CorsConfig implements WebMvcConfigurer {
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/api/**")  // Only apply to /api routes
                 .allowedOrigins(
-                        "http://localhost:5173"      // Vite dev
+                        "http://localhost:5173", // vite dev
+                        "https://www.ratemysupp.com"
                 )
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS")
                 .allowedHeaders("*")

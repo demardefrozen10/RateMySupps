@@ -6,6 +6,7 @@ import useFetch from '../hooks/useFetch';
 import type { Brand } from '../types/Brand';
 import type { Supplement } from '../types/Supplement';
 import Powder from '../assets/powder1.jpg';
+import { API_BASE_URL } from '../config/api';
 
 export default function Search() {
     const [searchQuery, setSearchQuery] = useState('');
@@ -14,12 +15,11 @@ export default function Search() {
         brands: [], 
         supplements: [] 
     });
-    const [error, setError] = useState<string | null>(null);
     const [showDropdown, setShowDropdown] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
     const navigate = useNavigate();
 
-    const { get } = useFetch("http://localhost:8080/api/");
+    const { get } = useFetch(`${API_BASE_URL}/api/`);
     const debouncedSearchQuery = useDebounce(searchQuery, 500);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -57,7 +57,6 @@ export default function Search() {
 
         const fetchResults = async () => {
             setLoading(true);
-            setError(null);
             try {
                 const [brandsData, supplementsData] = await Promise.all([
                     get(`brand/getBrandByName?name=${debouncedSearchQuery}`), 
@@ -67,9 +66,8 @@ export default function Search() {
                     brands: brandsData || [],
                     supplements: supplementsData || []
                 });
-            } catch (err) {
-                setError(err instanceof Error ? err.message : 'An error occurred');
-            } finally {
+            } 
+            finally {
                 setLoading(false);
             }
         };
@@ -131,7 +129,7 @@ export default function Search() {
        <h3 className="text-xl font-semibold text-gray-800 mb-2">
     No results found for "{searchQuery}"
 </h3>
-<p className="text-gray-600 mb-6">
+<p className="text-gray-600 mb-2">
     Can't find what you're looking for?
 </p>
 <div className="flex flex-col gap-3 items-center">
