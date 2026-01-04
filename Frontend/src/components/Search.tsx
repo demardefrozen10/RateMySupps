@@ -52,6 +52,7 @@ export default function Search() {
     useEffect(() => {
         if (!debouncedSearchQuery.trim() || debouncedSearchQuery.trim().length < 2) {
             setResults({ brands: [], supplements: [] });
+            setShowDropdown(false); 
             return;
         }
 
@@ -104,7 +105,7 @@ export default function Search() {
                             type="text" 
                             value={searchQuery}
                             placeholder="Search brands or products..." 
-                            className="w-full pl-14 pr-32 py-5 text-lg rounded-2xl shadow-2xl focus:outline-none text-gray-900 bg-white border-none transition-all placeholder:text-gray-400 font-medium"
+                            className="w-full pl-14 pr-32 py-5 text-lg rounded-2xl focus:ring focus:outline-none text-gray-900 bg-white border-none transition-all placeholder:text-gray-400 font-medium"
                             onChange={handleChange}
                             onFocus={() => hasResults && setShowDropdown(true)}
                         />
@@ -114,7 +115,7 @@ export default function Search() {
                     </div>
 
                     {showDropdown && (
-                        <div className="absolute top-full mt-3 w-full bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-100">
+                        <div className="absolute top-full mt-3 w-full bg-white rounded-2xl focus:ring border border-gray-100 overflow-hidden z-100">
                             <div className="max-h-[420px] overflow-y-auto">
                                 
                                 {loading && (
