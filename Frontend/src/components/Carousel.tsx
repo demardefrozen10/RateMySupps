@@ -50,13 +50,14 @@ export default function Carousel({ title, supplements }: { title: string, supple
               className="min-w-[200px] md:min-w-[240px] flex-shrink-0 bg-white rounded-lg border border-slate-200 overflow-hidden cursor-pointer hover:shadow-md transition-shadow snap-start"
               onClick={handleCardClick}
             >
-              <div className="h-40 bg-slate-100">
-                <img 
-                  src={supplement.imageUrl} 
-                  alt={supplement.supplementName} 
-                  className="w-full h-full object-cover"
-                />
-              </div>
+        <div className="h-40 bg-slate-100 flex items-center justify-center overflow-hidden">
+  <img 
+    src={supplement.imageUrl} 
+    alt={supplement.supplementName} 
+    className="carousel-image"
+  />
+</div>
+
               <div className="p-3">
                 <h3 className="font-bold text-sm text-slate-800 truncate">{supplement.supplementName}</h3>
                 <p className="text-xs text-emerald-400">{supplement.brandName}</p>
