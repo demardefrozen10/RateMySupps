@@ -11,9 +11,9 @@ export default function BrandCard(props: Supplement) {
     }
 
     return (
-        <div onClick={handleCardClick} className="flex items-center justify-between bg-white border-2 border-emerald-100 rounded-xl p-6 shadow-sm hover:shadow-lg hover:border-emerald-300 transition-all cursor-pointer">
-            <div className="flex items-center gap-6">
-                <div className="w-30 h-30 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden">
+        <div onClick={handleCardClick} className="flex items-center justify-between bg-white border-2 border-emerald-100 rounded-xl p-4 md:p-6 shadow-sm hover:shadow-lg hover:border-emerald-300 transition-all cursor-pointer gap-3 md:gap-6">
+            <div className="flex items-center gap-3 md:gap-6 min-w-0 flex-1">
+                <div className="w-16 h-16 md:w-30 md:h-30 bg-gray-100 rounded-lg flex-shrink-0 flex items-center justify-center overflow-hidden">
                     <img 
                         src={props.imageUrl} 
                         alt="Brand Logo" 
@@ -21,19 +21,19 @@ export default function BrandCard(props: Supplement) {
                     />
                 </div>
 
-                <div className="flex flex-col gap-1">
-                    <h2 className="text-2xl font-bold text-gray-800 hover:text-emerald-600 transition-colors">
+                <div className="flex flex-col gap-1 min-w-0">
+                    <h2 className="text-base md:text-2xl font-bold text-gray-800 hover:text-emerald-600 transition-colors truncate">
                         {props.supplementName}
                     </h2>
                 </div>
             </div>
 
-            <div className="flex items-center gap-6">
+            <div className="flex items-center gap-2 md:gap-6 flex-shrink-0">
                 <div className="flex flex-col items-center">
-                    <span className="text-xs font-semibold text-emerald-600 uppercase tracking-wide mb-1">
+                    <span className="text-[10px] md:text-xs font-semibold text-emerald-600 uppercase tracking-wide mb-1">
                         Quality
                     </span>
-                    <div className={`rounded-lg px-4 py-2 shadow-md ${
+                    <div className={`rounded-lg px-2 py-1 md:px-4 md:py-2 shadow-md ${
                     props.totalReviews === 0 
                         ? 'bg-gray-400' 
                         : props.averageRating <= 2 
@@ -42,12 +42,12 @@ export default function BrandCard(props: Supplement) {
                                 ? 'bg-gradient-to-br from-yellow-400 to-yellow-500'
                                 : 'bg-gradient-to-br from-emerald-400 to-emerald-500'
                     }`}>
-                    <span className="text-3xl font-bold text-white">{(props.averageRating ?? 0).toFixed(1)}</span>
+                    <span className="text-xl md:text-3xl font-bold text-white">{(props.averageRating ?? 0).toFixed(1)}</span>
                 </div>
-                    <span className="text-xs text-gray-500 mt-2">{props.totalReviews} ratings</span>
+                    <span className="text-[10px] md:text-xs text-gray-500 mt-1 md:mt-2">{props.totalReviews} ratings</span>
                 </div>
 
-                <div className="text-emerald-500">
+                <div className="text-emerald-500 hidden md:block">
                     <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>

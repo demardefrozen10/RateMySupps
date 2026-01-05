@@ -27,3 +27,4 @@ Backend/.env
 # Java build output
 target/
 
+Frontend/.env

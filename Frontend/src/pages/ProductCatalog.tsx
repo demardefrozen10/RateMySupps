@@ -1,13 +1,15 @@
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 import BrandCard from "../components/BrandCard";
+import BrandCardSkeleton from '../components/BrandCardSkeleton';
 import useDebounce from '../hooks/useDebounce';
 import type { Brand } from "../types/Brand";
 import useFetch from "../hooks/useFetch";
 import type {Supplement} from "../types/Supplement";
-import Load from "../components/Load";
 import NotFound from "./NotFound";
+import Error from "../components/Error";
 import { API_BASE_URL } from '../config/api';
+import Load from "../components/Load";
 
 
 
@@ -24,6 +26,7 @@ export default function ProductCatalog() {
     const [categories, setCategories] = useState<string[]>([]);
     const [loading, setLoading] = useState(true);
     const [supplementsLoading, setSupplementsLoading] = useState(false);
+    const [error, setError] = useState(false);
 
     const { get } = useFetch(`${API_BASE_URL}/api/`);
     
@@ -52,8 +55,9 @@ export default function ProductCatalog() {
                         setBrand(null);
                     }
                 })
-                .catch((error) => {
-                    console.error("Error fetching brand:", error);
+                .catch(() => {
+                    setError(true);
+                    setTimeout(() => setError(false), 3000);
                     setBrand(null);
                 })
                 .finally(() => {
@@ -91,7 +95,10 @@ export default function ProductCatalog() {
         setSupplementsLoading(true);
         get(url)
             .then((data: Supplement[]) => setSupplements(data))
-            .catch((error) => console.error("Error fetching supplements:", error))
+            .catch(() => {
+                setError(true);
+                setTimeout(() => setError(false), 3000);
+            })
             .finally(() => setSupplementsLoading(false));
     }, [debouncedSearchQuery, filterOption, sortOption, brand]);
 
@@ -101,8 +108,9 @@ export default function ProductCatalog() {
             .then((data: string[]) => {
                 setCategories(Array.isArray(data) ? data : []);
             })
-            .catch(err => {
-                console.error("Error fetching categories:", err);
+            .catch(() => {
+                setError(true);
+                setTimeout(() => setError(false), 3000);
                 setCategories([]);
             });
     }, [brand?.id]);
@@ -119,7 +127,7 @@ export default function ProductCatalog() {
     };
 
     if (loading) {
-        return <Load/>;
+        return <Load/>
     }
 
     if (!brand) {
@@ -153,7 +161,8 @@ export default function ProductCatalog() {
     const images = [brand!.imageUrl];
     
     return (   
-
+        <>
+        {error && <Error />}
         <div className="min-h-screen to-white">
             {showNotification && (
                 <div className="fixed top-6 left-1/2 transform -translate-x-1/2 z-50">
@@ -253,7 +262,11 @@ export default function ProductCatalog() {
 
                 <div className="flex flex-col gap-4">
                     {supplementsLoading ? (
-                        <Load />
+                        <>
+                            {[...Array(5)].map((_, index) => (
+                                <BrandCardSkeleton key={index} />
+                            ))}
+                        </>
                     ) : supplements.length === 0 ? (
                         <div className="flex flex-col items-center justify-center py-20 bg-gray-50 rounded-xl border-2 border-dashed border-gray-200">
                             <svg className="w-16 h-16 text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -289,5 +302,6 @@ export default function ProductCatalog() {
                 </div>
             </div>
         </div>
+        </>
     )
 }

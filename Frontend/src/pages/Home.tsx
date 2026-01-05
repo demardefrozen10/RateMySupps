@@ -6,7 +6,6 @@ import { useEffect, useState } from 'react';
 import useFetch from '../hooks/useFetch';
 import type { Supplement } from '../types/Supplement';
 import { useLocation, useNavigate } from 'react-router-dom';
-import Load from '../components/Load';
 import { API_BASE_URL } from '../config/api';
 
 function Home() {
@@ -39,10 +38,6 @@ function Home() {
     }
   }, [location.state, navigate, location.pathname]);
 
-  if (loading) {
-    return <Load />;
-  }
-
   return (
     <>
     {showNotification && (
@@ -59,6 +54,7 @@ function Home() {
     <Carousel 
       title="Top Rated Supplements" 
       supplements={supplements}
+      loading={loading}
     />
     <TextPane/>
 
