@@ -41,16 +41,21 @@ export default function Carousel({ title, supplements, loading = false }: { titl
         className="flex gap-4 overflow-x-auto scrollbar-hide snap-x snap-mandatory"
         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
       >
-        {supplements.map((supplement) => {
-          const handleCardClick = () => {
-            navigate(`/product/${supplement.brandName}/${supplement.supplementName}/${supplement.id}`, { state: { supplement: supplement } });
-          };
-          return (
-            <div 
-              key={supplement.id}
-              className="min-w-[200px] md:min-w-[240px] flex-shrink-0 bg-white rounded-lg border border-slate-200 overflow-hidden cursor-pointer hover:shadow-md transition-shadow snap-start"
-              onClick={handleCardClick}
-            >
+        {loading ? (
+          [...Array(5)].map((_, index) => (
+            <CarouselSkeleton key={index} />
+          ))
+        ) : (
+          supplements.map((supplement) => {
+            const handleCardClick = () => {
+              navigate(`/product/${supplement.brandName}/${supplement.supplementName}/${supplement.id}`, { state: { supplement: supplement } });
+            };
+            return (
+              <div 
+                key={supplement.id}
+                className="min-w-[200px] md:min-w-[240px] flex-shrink-0 bg-white rounded-lg border border-slate-200 overflow-hidden cursor-pointer hover:shadow-md transition-shadow snap-start"
+                onClick={handleCardClick}
+              >
         <div className="h-40 bg-slate-100 flex items-center justify-center overflow-hidden">
   <img 
     src={supplement.imageUrl} 
@@ -65,38 +70,6 @@ export default function Carousel({ title, supplements, loading = false }: { titl
                 <p className="text-xs text-slate-500 mt-1">{supplement.totalReviews} Reviews</p>
               </div>
             </div>
-          );
-        })}
-        {loading ? (
-          <>
-            {[...Array(5)].map((_, index) => (
-              <CarouselSkeleton key={index} />
-            ))}
-          </>
-        ) : (
-          supplements.map((supplement) => {
-            const handleCardClick = () => {
-              navigate(`/product/${supplement.brandName}/${supplement.supplementName}/${supplement.id}`, { state: { supplement: supplement } });
-            };
-            return (
-              <div 
-                key={supplement.id}
-                className="min-w-[200px] md:min-w-[240px] flex-shrink-0 bg-white rounded-lg border border-slate-200 overflow-hidden cursor-pointer hover:shadow-md transition-shadow snap-start"
-                onClick={handleCardClick}
-              >
-                <div className="h-40 bg-slate-100">
-                  <img 
-                    src={supplement.imageUrl} 
-                    alt={supplement.supplementName} 
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <div className="p-3">
-                  <h3 className="font-bold text-sm text-slate-800 truncate">{supplement.supplementName}</h3>
-                  <p className="text-xs text-emerald-400">{supplement.brandName}</p>
-                  <p className="text-xs text-slate-500 mt-1">{supplement.totalReviews} Reviews</p>
-                </div>
-              </div>
             );
           })
         )}
