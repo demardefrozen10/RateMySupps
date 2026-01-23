@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom"
 import useFetch from "../hooks/useFetch";
 import NotFound from "./NotFound";
 import Error from "../components/Error";
+import Loading from "../components/Load";
 import { API_BASE_URL } from '../config/api';
 
 
@@ -25,6 +26,7 @@ export default function AddReview() {
     const imageUrl: string = location.state?.imageUrl;
     const variants: string[] = location.state?.variants || [];
     const [error, setError] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
 
     const {post} = useFetch(`${API_BASE_URL}/api/`);
@@ -96,72 +98,83 @@ export default function AddReview() {
     };
 
     const HandleSubmitReview = async () => {
-        const batchPayload = images.map((image) => ({
-            fileName: image.name,
-            contentType: image.type,
-            fileSize: image.size,
-            imageType: "ReviewImages"
-        }));
+        setIsSubmitting(true);
+        try {
+            const batchPayload = images.map((image) => ({
+                fileName: image.name,
+                contentType: image.type,
+                fileSize: image.size,
+                imageType: "ReviewImages"
+            }));
 
-        let uploadedImageUrls: string[] = [];
-        if (images.length > 0) {
-            const data = await post("s3/presigned-url", batchPayload);
+            let uploadedImageUrls: string[] = [];
+            if (images.length > 0) {
+                const data = await post("s3/presigned-url", batchPayload);
 
-            if (!data || !Array.isArray(data)) {
-                return; 
+                if (!data || !Array.isArray(data)) {
+                    return; 
+                }
+                await Promise.all(
+                    images.map((image, idx) =>
+                        fetch(data[idx].uploadUrl, {
+                            method: "PUT",
+                            headers: { "Content-Type": image.type },
+                            body: image
+                        }).catch(() => {
+                            setError(true);
+                            setTimeout(() => setError(false), 3000);
+                        })
+                    )
+                );
+                uploadedImageUrls = data.map((item: { publicUrl: string }) => item.publicUrl);
             }
-            await Promise.all(
-                images.map((image, idx) =>
-                    fetch(data[idx].uploadUrl, {
-                        method: "PUT",
-                        headers: { "Content-Type": image.type },
-                        body: image
-                    }).catch(() => {
-                        setError(true);
-                        setTimeout(() => setError(false), 3000);
-                    })
-                )
-            );
-            uploadedImageUrls = data.map((item: { publicUrl: string }) => item.publicUrl);
+
+        let proofS3Url: string = "";
+        if (proofOfPurchase) {
+            const response = await post("s3/presigned-url", [{
+                fileName: proofOfPurchase.name,
+                contentType: proofOfPurchase.type,
+                fileSize: proofOfPurchase.size,
+                imageType: "PurchaseImages"
+            }]);
+            await fetch(response[0].uploadUrl, {
+                method: "PUT",
+                headers: { "Content-Type": proofOfPurchase.type },
+                body: proofOfPurchase
+            }).catch(() => {
+                setError(true);
+                setTimeout(() => setError(false), 3000);
+            });
+            proofS3Url = response[0].publicUrl;
         }
 
-    let proofS3Url: string = "";
-    if (proofOfPurchase) {
-        const response = await post("s3/presigned-url", [{
-            fileName: proofOfPurchase.name,
-            contentType: proofOfPurchase.type,
-            fileSize: proofOfPurchase.size,
-            imageType: "PurchaseImages"
-        }]);
-        await fetch(response[0].uploadUrl, {
-            method: "PUT",
-            headers: { "Content-Type": proofOfPurchase.type },
-            body: proofOfPurchase
+        await post("review/createReview", {
+            username: name,
+            supplementId: supplementId,
+            rating: rating,
+            comment: review,
+            imageUrls: uploadedImageUrls,
+            purchaseImageUrl: proofS3Url,
+            variant: variant
+        }).then(() => {
+            navigate(`/product/${encodeURIComponent(brandName)}/${encodeURIComponent(supplementName)}/${supplementId}`, { 
+                state: { reviewSubmitted: true } 
+            })
         }).catch(() => {
             setError(true);
             setTimeout(() => setError(false), 3000);
         });
-        proofS3Url = response[0].publicUrl;
+        } catch (error) {
+            setError(true);
+            setTimeout(() => setError(false), 3000);
+        } finally {
+            setIsSubmitting(false);
+        }
     }
 
-    await post("review/createReview", {
-        username: name,
-        supplementId: supplementId,
-        rating: rating,
-        comment: review,
-        imageUrls: uploadedImageUrls,
-        purchaseImageUrl: proofS3Url,
-        variant: variant
-    }).then(() => {
-        navigate(`/product/${encodeURIComponent(brandName)}/${encodeURIComponent(supplementName)}/${supplementId}`, { 
-            state: { reviewSubmitted: true } 
-        })
-    }).catch(() => {
-        setError(true);
-        setTimeout(() => setError(false), 3000);
-    });
+    if (isSubmitting) {
+        return <Loading />;
     }
-
 
     return (
         <>
@@ -431,7 +444,7 @@ export default function AddReview() {
                             Cancel
                         </button>
                         <button 
-                            disabled={!rating || !review.trim() || review.length < 50 || !proofOfPurchase}
+                            disabled={!rating || !review.trim() || review.length < 50 || !proofOfPurchase || isSubmitting}
                             className="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-4 rounded-xl transition-colors shadow-lg disabled:bg-gray-300 disabled:cursor-not-allowed"
                             onClick={HandleSubmitReview}
                         >
