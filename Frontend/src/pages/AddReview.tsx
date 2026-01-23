@@ -445,7 +445,7 @@ export default function AddReview() {
                         </button>
                         <button 
                             disabled={!rating || !review.trim() || review.length < 50 || !proofOfPurchase || isSubmitting}
-                            className="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-4 rounded-xl transition-colors shadow-lg disabled:bg-gray-300 disabled:cursor-not-allowed"
+                            className="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-4 rounded-xl transition-colors shadow-lg disabled:bg-gray-300 disabled:cursor-not-allowed cursor-pointer"
                             onClick={HandleSubmitReview}
                         >
                             Submit Review
